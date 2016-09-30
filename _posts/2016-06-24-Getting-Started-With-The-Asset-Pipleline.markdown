@@ -252,7 +252,8 @@ Both versions have the same programming tricks up their sleeves. They are excell
 
 ### Slim & Haml
 
-Similar arguments can be made about the benefits of something like Slim and Haml for writing more compact HTML code. Both let you write markup much more reduced—no closing tags and cool abbreviations for tagnames and such. This results in shorter bursts of markup that is meant to be easier to skim and read. Me personally, I’m not a huge fan of Haml, never was, but Slim is not only fancy and convenient, it is also very smart. For peeps who like the indented Sass syntax it’s something I would definitely recommend to try out. Let’s have a quick look:
+Similar arguments can be made about the benefits of using something like Slim and Haml. They are pretty handy for creating more compact markup. It will get compiled into valid HTML but the files you deal with are much more reduced. 
+You can spare yourself the trouble of writing closing tags and use cool abbreviations for tagnames and such. These shorter bursts of markup are easier to skim and read. Me personally, I’m not a huge fan of Haml, never was, but Slim is not only fancy and convenient, it’s also very smart. For peeps who like the indented Sass syntax, I would definitely recommend to play with it. Let’s have a quick look:
 
 ###### Slim
 
@@ -280,7 +281,7 @@ Similar arguments can be made about the benefits of something like Slim and Haml
 
 ```
 
-And both result in the following ERB-enhanced HTML in Rails:
+Both result in the following ERB-enhanced HTML in Rails:
 
 ``` html
 
@@ -299,11 +300,11 @@ And both result in the following ERB-enhanced HTML in Rails:
 
 ```
 
-The difference on the surface are not that big but I never quite got why Haml wants me to write all these extra `%` to prepend tags. Slim found a solution that got rid of these and therefore I salute you! The other differences are under the hood and are not within the scope of this piece today. Just wanted to whet your appetite.
+On the surface, the differences are not that big but I never quite got why Haml wants me to write all these extra `%` to prepend tags. Slim found a solution that got rid of these and therefore I salute the team! Not a big pain in the butt but a annoying one nevertheless. The other differences are under the hood and are not within the scope of this piece today. Just wanted to whet your appetite.
 
-As you can see, both preprocessors reduce the amount you need to write significantly. Yes, you need to learn another language and it reads a bit weird at first but at the same timeI feel the removal of so much clutter is totally worth it. Also, once you know how to write ERB-flavored HTML, you will be able to pick up any of these preprocessors rather quickly. No rocket science—same goes for Sass btw.
+As you can see, both preprocessors significantly reduce the amount you need to write. Yes, you need to learn another language and it reads a bit weird at first. At the same time I feel the removal of that much clutter is totally worth it. Also, once you know how to write ERB-flavored HTML, you will be able to pick up any of these preprocessors rather quickly. No rocket science—same goes for Sass btw.
 
-There are two handy gems for using either of them in Rails. Do yourself a favor and check them out when you are tired of writing all these tiresome opening / closing tags.
+In case you got interested, there are two handy gems for using either of them in Rails. Do yourself a favor and check them out when you get tired of writing all these tiresome opening / closing tags.
 
 ``` ruby
 
@@ -314,7 +315,7 @@ gem "haml-rails"
 ```
 ### CoffeeScript
 
-CoffeeScript is a programming language like any other but it sort of has that Ruby flavor of writing your JavaScript. Through preprocessing, it compiles into plain old JavaScript that browsers can deal with. The short argument for working with CoffeeScript was that it helped to overcome some shortcomings that JS was carrying around. The documentation says that it aims at exposing the “good parts of JavaScript in a simple way”. Fair enough but lets have a quick look at a short example to see what we’re dealing with:
+CoffeeScript is a programming language like any other but it sort of has that Ruby flavor for writing your JavaScript. Through preprocessing, it compiles into plain old JavaScript that browsers can deal with. The short argument for working with CoffeeScript was that it helped to overcome some shortcomings that JS was carrying around. The documentation says that it aims at exposing the “good parts of JavaScript in a simple way”. Fair enough! Lets have a quick look at a short example and see what we’re dealing with:
 
 ###### JavaScript
 
@@ -347,7 +348,7 @@ $(document).ready ->
 
 ```
 
-Reads just a tad nicer without all the curlies and semicolons, no? CoffeeScript tries to take care of some of the annoying bits in JavaScript, lets you type less, makes the code a bit more readable, offers a friendlier syntax than JS and deals more pleasantly with writing classes. Defining classes was especially for people coming from Ruby not the biggest plus when they had to deal with it in JavaScript. CoffeeScript took a similar approach than Ruby and gives you a nice piece of syntactic sugar for it.
+Reads just a tad nicer without all the curlies and semicolons, no? CoffeeScript tries to take care of some of the annoying bits in JavaScript, lets you type less, makes the code a bit more readable, offers a friendlier syntax and deals more pleasantly with writing classes. Defining classes was a big plus for a while, especially for people coming from Ruby who were not super fond of dealing with pure JavaScript. CoffeeScript took a similar approach than Ruby and gives you a nice piece of syntactic sugar. Classes look like this for example:
 
 ###### Class
 
@@ -364,46 +365,10 @@ class Agent
 
 ```
 
-This language was quite popular in Ruby land for a while. Not sure how adoption rates are these days, it seems to have slowed down a bit but it is still supported by default by Rails. With ES6, JavaScript now also supports classes—one big reason to maybe not use CoffeeScript and play with plain JS instead. I think CoffeeScript still reads nicer but a lot of the less cosmetic reasons to use it have been addressed with ES6 these days. I think it’s still a good reason to give it a shot but that is not what you came for here. Just wanted to give you another appetizer and provide a little bit of context why the Asset Pipeline offers you to work in CoffeeScript out of the box.
-
-### MD5 Fingerprinting?
-
-digest” or a “fingerprint” 
-generate digest assets
-digest filenames
-
-Rails creates a fingerprint for each filename.
-
-``` bash
-
-navbar-908e25f4bf641868d8683022a5b62f54.css
-
-```
-
-That way it can easily determine if a file has changed its contents and can update the file. If nothing has changed it is cached by the web browser for future requests.
-
-When you change the contents, a new fingerprint will created and added to the filename of your asset.
-
-So the filename changes with changes to the contents of the file. That way Rails can easily compare versions of the same file and decide if it needs let the browser request a new version for it.
-
-The added hash is a mathematical function that converts the contents of a file into a unique sequence of 32 hexadecimal digits
-
-That means that you get the same hashed result when you apply the function to the same content twice—or how often you like.
-
-``` bash
-
-MD5("The quick brown fox jumps over the lazy dog")
-
-```
-
-``` bash
-
-9e107d9d372bb6826bd81d3542a419d6
-
-```
-
-The process of fingerprinting is very effective at ensuring that files are updated only when necessary.
-
-You can disable it in config.assets.digest
+This language was quite popular in Ruby land for a while. Not sure how adoption rates are these days, but CoffeeScript is the default JS flavour in Rails. With ES6, JavaScript now also supports classes—one big reason to maybe not use CoffeeScript and play with plain JS instead. I think CoffeeScript still reads nicer but a lot of the less cosmetic reasons to use it have been addressed with ES6 these days. I think it’s still a good reason to give it a shot but that is not what you came for here. Just wanted to give you another appetizer and provide a little bit of context why the Asset Pipeline offers you to work in CoffeeScript out of the box.
 
 ## Final Thoughts
+
+The Asset Pipeline has proven itself far beyond my expectation when it was introduced. At the time it really made quite the splash and was addressing a serious pain for developers. It still does of course and has established itself as a frictionless, effortless tools that improves the quality of your applications.
+
+What I like most about is the fact how little hassle it involves getting it to work. Don’t get me wrong, tools like Gulp and Grunt are impressive as well. The options for customization are plenty. I just can’t shake the comfy feeling that Rails gives me when I don’t have to deal with any setup before getting started. Conventions can be powerful, especially whey they result in something seemless and hassle-free.
