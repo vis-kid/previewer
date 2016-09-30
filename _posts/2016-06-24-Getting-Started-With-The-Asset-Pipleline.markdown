@@ -15,7 +15,6 @@ categories: [Rails, RSpec, Ruby, Ruby on Rails, Asset Pipeline, Sass, CSS, JS, J
 + Organization
 + Concatenation & Compression?
 + Higher-Level Languages
-+ MD5 Fingerprinting?
 
 ## Asset Pipeline?
 
