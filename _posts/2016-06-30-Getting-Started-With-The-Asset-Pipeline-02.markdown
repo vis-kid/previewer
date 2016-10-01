@@ -20,7 +20,7 @@ categories: [Rails, RSpec, Ruby, Ruby on Rails, Asset Pipeline, Sass, CSS, JS, J
 
 ## Sprockets?
 
-The Asset Pipeline in Rails is handled by the `sprockets-rails` gem. By default, it is enabled when you create a new Rails application. Sprockets is a Ruby library and helps you manage your JavaScript and CSS assets. On top of that, it takes care compiling as well as pre-processing higher-level languages like Sass, SCSS and CoffeeScript. Preprocessing simply means that your styles, HTML or JavaScript get generated after you wrote code in another language. For example your Sass stylesheets get precompiled into valid CSS. Since browsers can’t comprehend stuff like CoffeeScript we have to preprocess it first.
+The Asset Pipeline in Rails is handled by the `sprockets-rails` gem. By default, it is enabled when you create a new Rails application. Sprockets is a Ruby library and helps you manage your JavaScript and CSS assets. On top of that, it takes care compiling as well as preprocessing higher-level languages like Sass, SCSS and CoffeeScript. Preprocessing simply means that your styles, HTML or JavaScript get generated after you wrote code in another language. For example your Sass stylesheets get precompiled into valid CSS. Since browsers can’t comprehend stuff like CoffeeScript we have to preprocess it first.
 
 There are three gems that play a vital role in all of this:
 
@@ -30,7 +30,7 @@ There are three gems that play a vital role in all of this:
 
 `sass-rails` let’s you write your Sass-flavor of choice for creating your CSS, `coffee-rails` gives you a nicer syntax for writing you JavaScript and `uglifier` in turn compresses these assets. Btw, `sass-rails` is in charge for compressing CSS files itself. All three gems will be added to your Gemfile automatically when you create a new Rails app. If you have a reason to not use Sprockets with Rails you can skip it from the command line when you initiate your app:
 
-###### Terminal
+#### Terminal
 
 ``` ruby
 
@@ -40,25 +40,29 @@ rails new appname --skip-sprockets
 
 This command prevents adding the above mentioned gems to your Gemfile and give you a different version of the `config/application.rb` file. Now you need to set up your own solution for handling your assets.
 
+### Processing
+
+When you preprocess something like CoffeeScript into valid JS, or Sass into CSS, you also have the option to process these files some more. Minfication and compression are the two big ones. Minification gets rid of stuff the browser does not care about—white space and comments are good candidates for example. Sass can also deal directly with minification as well. Or you simply use the Rails default of the YUI compressor when dealing with stylesheets. Just as an aside, Rails lets you even write and configure your own custom compressor—just sayin’.
+
+I should mention that Sass has a compressed version of outputting styles. This is different actually confusing since it is minifying your stylesheets. Compression is a different process and reduces your files size significantly more. Compression, or gzipping, targets repetive bits of the code and replaces them with pointers that take up less space. So the more repetetive your assets files, the more it be compressed and reduced in size. Minification is quite nice but you will see the biggest filesize reductions when you use gzipping. It’s not rare to see files shrink to 14% or their original size if you both minify and compress them. When you think about downloading tons of assets over slower networks, this can be of tremendous benefit.
+
 ## Precompiling Assets
 
-For production, your assets need to be compiled first. Files that you place in `app/assets` usually need to be pre-processed before they can be served. What are we talking about here? Let’s say you have worked one some new app that works on your local server. Your Sass files and your CoffeeScript flavored JavaScript works magically out of the box. Cool, but what happens if you wanna push this to a production server?
+For production, your assets need to be compiled first. Files that you place in `app/assets` usually need to be preprocessed before they can be served. What are we talking about here? Let’s say you have worked one some new app that works on your local server. Your Sass files and your CoffeeScript flavored JavaScript works magically out of the box. Cool, but what happens if you wanna push this to a production server?
 
 Such a server, responsible for delivering this content to a possibly much larger audience, has a few different demands than your local server.
-As a default, Rails will look for files that are named `application` and try to precompile them for you.
-In this step, assets are compiled from high-level languages like Sass into CSS, they are concatenated together—from multiple files into fewer bundles of files. They are also cached so that you only load new assets when they have been changed on your end.
+As a default, Rails will look for files that are named `application` and try to precompile them for you. In this step, assets are compiled from high-level languages like Sass into CSS, they are concatenated together—from multiple files into fewer bundles of files.
+Having as few files as possible is beneficial for performance and speed. Compressing their size to their bare minimum is also of tremendous importance—especially for bigger applications. On top of all that, files are also cached. That means you only load new assets when they have been changed on your end.
 
-### Local & Live Compilation
+### Compilation
 
-You have two options where you  want to compile your assets. Local compilation means that you exectute this process on your own machine first and then push it to production. This has the advantages that you don’t need write access to the file system on a production server and if you deploy to multiple servers you can do this process only once. Not needing to precompile your assets on the server if deployed changes do not include asset changes is another benefit of precompiling locally.
+You have two options where you  want to compile your assets. YOu compile on your production server or locally. Local compilation means that you exectute this process on your own machine first and then push it to production. This has the advantages that you don’t need write access to the file system on a production server and if you deploy to multiple servers you can do this process only once. Not needing to precompile your assets on the server if deployed changes do not include asset changes is another benefit of precompiling locally.
 
-For that to work, you are responsible of having the compression and minifying gems ready on your machine. You can put these compiled assets in your Git repo—or whatever version control tool you prefer—and deploy only these final assets to production.
-
-For better performance and speed, it would be nice to have as few files as possible. Compressing their size to their bare minimum is also of tremendous importance at a ceratain size. Since servers are highly specialized fellas, we should not expect that they do all the work for us automatically. Precompiling assets is one of these things we need to do before we send them our “pure”, compiled CSS, HTML and JS. Servers should probably not need to know about how to deal with high-level languages like Sass, Slim and whatnot. They have enough responsibilities already.
+Precompiling assets is one of these things we need to do before we send them our “pure”, compiled CSS, HTML and JS. Servers should probably not need to know about how to deal with high-level languages like Sass, Slim and whatnot. They have enough responsibilities already. For that to work, you are responsible of having the compression and minifying gems ready on your machine. You can put these compiled assets in your Git repo—or whatever version control tool you prefer—and deploy only these final assets to production.
 
 Rails offers you a Rake task that takes care of precompiling assets though. Such a task is simply a series of predefined steps that are executed in order to achieve a specific goal. Using the Rake build tool for such things is very common in Ruby land. You can easily write your own tasks in Rake yourself. Rails makes this very easy. Out of the box, Rails comes with the `lib/tasks` directory where you can conveniently park your Rake tasks. No further setup necessary. So when you run:
 
-###### Terminal
+#### Terminal
 
 ``` bash
 
@@ -70,9 +74,9 @@ bundle exec rake assets:precompile
 
 ```
 
-Sprockets will take the assets it can find in its search path and pre-processes / compiles them into `public/assets`. They output will look something like this:
+Sprockets will take the assets it can find in its search path and preprocesses / compiles them into `public/assets`. They output will look something like this:
 
-###### Terminal
+#### Terminal
 
 ``` bash
 
@@ -86,15 +90,38 @@ your_rails_app/public/assets/application-e80e8f2318043e8af94dddc2adad5a4f09739a8
 
 ```
 
+When you want to compile locally, it is recommended to change the location where Rails outputs your assets. If you don’t do that, you would need to recompile assets for development because you wouldn’t see local changes without it. The changed URL will be used by Sprockets to serve your assets in development mode.
+
+#### config/environments/development.rb
+
+```
+
+config.assets.prefix = "/dev-assets"
+
+```
+
+For production, the compiled files will still be placed into an `/assets` directory by default.
+
 You will end up with single assets, aka manifest files like `application.js` and `application.css`. That way you don’t need to manually link to all your assets by hand in your markup and avoid having to load multiple asset files instead of one for each category. The long number you see that is attached is called the fingerprint. It is used to compare files and if their contents might have changed before they need to be cached again. What you can also see is that you get two versions of the same file. The one with the `.gz` file extension is the gzipped version of the assets. `gzip` is used for file compression and decompression and cut away a bit of the fat that we don’t want to have sent over the wire. Another improvement to increase speed basically.
 
+???
 If you ever feel the need to change the location for outputting these assets files, say from `public` to `some_other_place`, you need to update your configuration file with the new location.
+
+In case you feel the need to predcompile your assets on a production server, the following command below will create the assets directly on your server(s). However I only add this for completion sake. Not sure that you will have much need for this as a beginner right now.
+
+#### Terminal
+
+``` bash
+
+RAILS_ENV=production bin/rails assets:precompile
+
+```
 
 ### Manifest Files & Directives
 
 These manifest files like `application.css` include the logic to import all the files its search path. Rails importes these partials first and then compiles into a single authorative file that the browser will use. That’s just a default though and you can change that of course.
 
-Every manifest file has directives which are instructions that determine which files need to be required to build up these manifest files. The order in which they are imported is determined in there as well. The final result contains all the contents of all the files the directives have access to. Sprockets loads these files, does the necessary pre-processing and rounds the whole thing off by compressing the result. Pretty darn useful!
+Every manifest file has directives which are instructions that determine which files need to be required to build up these manifest files. The order in which they are imported is determined in there as well. The final result contains all the contents of all the files the directives have access to. Sprockets loads these files, does the necessary preprocessing and rounds the whole thing off by compressing the result. Pretty darn useful!
 
 For your CSS manifest file, `app/assets/stylesheets/application.css` this looks like the following:
 
@@ -120,19 +147,12 @@ The JavaScript equivalent `app/assets/javascripts/application.js` looks similar:
 
 As you can see from this example, requiring jQuery first is a must if you rely on it within your JavaScript code.
 
-### Pre-Processing / Post-Processing
+## MD5 Fingerprinting?
 
-When you pre-process something like CoffeeScript into valid JS, or Sass into CSS, you also have the option to process these files some more. When you post-process them you can do stuff like compress your compiled assets and get rid of stuff the browser does not care about—white space is a good candidate for example. You have a few options at your disposal, letting Sass deal directly with compression for example or simply using the Rails default of the YUI compressor when dealing with stylesheet but I feel a high-level understanding is more important for now. Just as an aside, Rails even let’s you write and configure your own custom compressor—just sayin’.
 
-### MD5 Fingerprinting?
+By default, Rails creates a fingerprint for each filename during the precompilation process. More specificaly, sprockets creates an MD5 hash from your files’ contents. The resulting 32 character long hexadecimmal string, aka a digest. It is then attached to the filenames of your assets. That means that if the contents of your files change, your filenames, the MD5 hash part of it, will change as well. Why is it called fingerprinting? Such hashes have a very high probability of being unique and can therefore be used to identify uniqueness of file—just like fingerprints.
 
-During the precompilation process, sprockets creates an MD5 hash from your files. This number is attached to the filenames of your assets. That way it is possible to check for changes and only update files that would result in a different MD5 hash.
-
-digest” or a “fingerprint” 
-generate digest assets
-digest filenames
-
-Rails creates a fingerprint for each filename.
+#### Filename Example
 
 ``` bash
 
@@ -140,15 +160,9 @@ navbar-908e25f4bf641868d8683022a5b62f54.css
 
 ```
 
-That way it can easily determine if a file has changed its contents and can update the file. If nothing has changed it is cached by the web browser for future requests.
+We are not talking about a randomized hexademcial string. The contents of files are pushed though a mathematical function that converts it into a unique 32 character long sequence. That means that you get the same hashed result when you apply the function to the same content twice—or how often you like.
 
-When you change the contents, a new fingerprint will created and added to the filename of your asset.
-
-So the filename changes with changes to the contents of the file. That way Rails can easily compare versions of the same file and decide if it needs let the browser request a new version for it.
-
-The added hash is a mathematical function that converts the contents of a file into a unique sequence of 32 hexadecimal digits
-
-That means that you get the same hashed result when you apply the function to the same content twice—or how often you like.
+Through that clever mechanism it is possible to check for changes and only update files that would result in a different MD5 hash. For caching purposes, this is golden. If nothing has changed it is cached by the web browser for future requests. In that context, cache busting simply means that remote clients will request a new copy of a file because the fingerprint has changed. Of course, a new fingerprint will created and added to the filename of your asset.
 
 ``` bash
 
@@ -162,10 +176,23 @@ MD5("The quick brown fox jumps over the lazy dog")
 
 ```
 
-The process of fingerprinting is very effective at ensuring that files are updated only when necessary.
+You can disable fingerprinting both for production and development:
 
-You can disable it in config.assets.digest
+#### config/environments/production.rb 
 
+``` ruby
+
+config.assets.digest = false
+
+```
+
+#### config/environments/development.rb
+
+``` ruby
+
+config.assets.digest = false
+
+```
 
 ## Asset Links
 
@@ -177,7 +204,7 @@ Let’s not forget why the Asset Pipeline is a nice thing to have. It aims at ma
 
 Since its extraction, Sprockets did not change the way you can link to your assets and they still work the same way as before. These are convenience methods that take the name of your assets as arguments and figure out the extension names for correlated files themselves. These helper methods not only create the necessary tags for the proper HTML but also take care of linking to the asset files. They are not mandatory of course but still nice to have and very readable too.
 
-###### Some View
+#### Some View
 
 ``` erb
 
@@ -198,7 +225,7 @@ Let’s look at one of them and see how they work in general:
 
 Images placed in `public/assets/images` directory can be accessed via this convenience method—no need to fiddle around with path names yourself. A good example of “convention over configuration” at work.
 
-###### some.html.erb file
+#### some.html.erb file
 
 ``` ruby
 
@@ -275,7 +302,7 @@ You can enhance your stylesheets by using ERB in them. All you need to do is add
 
 When you use `sass-rails` you can make use of `url` and `path` helpers for your assets. They are a no-brainer to use. It’s as simple as this:
 
-###### some-stylesheet.css.erb
+#### some-stylesheet.css.erb
 
 ``` css
 
@@ -296,7 +323,7 @@ When you use `sass-rails` you can make use of `url` and `path` helpers for your 
 
 During the precompilation, Sprockets will interpolate the code used in the CSS or Sass files and output plain `.css` files again—with or without a fingerprint according to your settings of course. 
 
-###### some-stylesheet.css.erb
+#### some-stylesheet.css.erb
 
 ``` css
 
