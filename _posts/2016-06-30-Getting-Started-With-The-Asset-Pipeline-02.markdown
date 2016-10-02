@@ -196,13 +196,15 @@ config.assets.digest = false
 
 ## Asset Links
 
-Let’s not forget why the Asset Pipeline is a nice thing to have. It aims at making it easy for you to deal with assets. Writing the styles and behaviours for apps has become increasingly more nuanced and complex—while the tools have also become more joyful to work with. Preparing assets for production and serving them should be at least a bit more trivial and save you some time. Having a bit of automation and conventions to organize them is truly nice and makes your job easy as well. When it’s even rounded off with a few sugary assets links to deal with such assets, happiness levels increase even more. Let’s look at a few of the usual suspects: 
+Let’s not forget why it’s nice to have the Asset Pipeline. It aims at making it easy for you to deal with assets. Writing the styles and behaviours for apps has become increasingly more nuanced and complex. Some of the tools also have become more joyful to work with. Preparing assets for production and serving them should be at least a bit more trivial and save you some time.
+
+Having a bit of automation and conventions to organize assets is truly nice because it makes your actual job easy along the way. The Asset Pipeline even sweetens the deal and rounds things off with a few sugary assets links. This makes it a blast to deal with assets in your code. Let’s look at a few of the usual suspects that hopefully increase your happiness level even more.: 
 
 + `javascript_include_tag`
 + `stylesheet_link_tag` 
-+ `image_tag`
++ ```image_tag```
 
-Since its extraction, Sprockets did not change the way you can link to your assets and they still work the same way as before. These are convenience methods that take the name of your assets as arguments and figure out the extension names for correlated files themselves. These helper methods not only create the necessary tags for the proper HTML but also take care of linking to the asset files. They are not mandatory of course but still nice to have and very readable too.
+Since its extraction, Sprockets did not change the way you can link your assets, it still works the same as before. The examples above are convenience methods that take the name of your assets as arguments. They then figure out the extension names for correlated files themselves. These helper methods not only create the necessary tags for the proper HTML but also take care of linking to the asset files. They are not mandatory of course but still nice to have and very readable too. There is a bit less clutter in your markup if you make use of them.
 
 #### Some View
 
@@ -216,10 +218,33 @@ Since its extraction, Sprockets did not change the way you can link to your asse
 
 ```
 
-??? Converted version example
+In your global layout file, Rails gives you three of them out of the box.
 
+#### app/views/layouts/application.html.erb
 
-Let’s look at one of them and see how they work in general:
+``` erb
+
+<%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+<%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+<%= csrf_meta_tags %>
+
+```
+
+This results in the following output in the rendered HTML:
+
+``` html
+
+<link rel="stylesheet" media="all" href="/assets/application.self-e80e8f2318043e8af94dddc2adad5a4f09739a8ebb323b3ab31cd71d45fd9113.css?body=1" data-turbolinks-track="true" />
+
+<script src="/assets/application.self-3b8dabdc891efe46b9a144b400ad69e37d7e5876bdc39dee783419a69d7ca819.js?body=1" data-turbolinks-track="true"></script>
+
+<meta name="csrf-param" content="authenticity_token" />
+
+<meta name="csrf-token" content="hwaD9ubZUD8tKOrHAA9wgccbxmnOW5mSl4VzU7S2UmPvTXv9fVJND25/YZOz84ntdpP0rhun6ShSEkkZrmcsbQ==" />
+
+```
+
+Let’s look closer at how to handle image assets.
 
 ### image_tag
 
@@ -237,13 +262,13 @@ That would result in the following:
 
 ``` html
 
-<img src="http://example.com/assets/some-iamge.png" alt="Some image"  />
+<img src="http://example.com/assets/some-image.png" alt="Some image"  />
 
 ```
 
 If activated, Sprockets will serve such files if found. When a file like `some-image.png` is fingerprinted like `some-image-9e107d9d372bb6826bd81d3542a419d6.png` it will be treated the same way.
 
-If you need other directories within `public/assets/images` or within `app/assets/images` to organize your images, something extra for icons or svg files maybe, Rails will have no problem finding them—but you need to add the directory’s name first:
+If you need other directories within `public/assets/images` or within `app/assets/images` to organize your images, maybe something extra for icons or svg files, Rails will have no problem finding them. You simply need to add the directory’s name first:
 
 ``` ruby
 
@@ -254,7 +279,28 @@ If you need other directories within `public/assets/images` or within `app/asset
 
 ```
 
-Additionally you have the following options that might come in handy to link to various assets:
+See, no rocket science and the other asset helpers are handled the same way.
+
+## Pimped Styles
+
+
+### CSS & ERB
+
+The Asset Pipeline is set up to evaluate ERB code from the get go. All you need to do is add the `.erb` extension to a file and you are good to go—Sprockets will take care of the rest. Btw, when you generate controllers, it will also create views that already have the `.erb` extension. The same goes for scaffolds.
+
+But this works for stylesheets as well. You can enhance them by using ERB in them. You simply create something like `example.css.erb` files. I’m not sure if it is a widely used technique though. It can be very handy but I would probably be cautious to overuse this since you can take this very far. These dynamic CSS files should probably not contain too much logic. Feels like a code smell but the damage seems to be contained if you rely on ERB helpers mostly.
+
+```
+
+.some-class { 
+  background-image: url(<%= asset_path 'some-image.png' %>) 
+}
+
+```
+
+This image will be found if you have it in one of the load paths of the Asset Pipeline—usually somewhere under `app/assets/images`. The cool thing is, if this file has already been processed and fingerprinted, then Sprockets will use the path `public/assets` and find it there. The same goes for other types of assets as well of course. Don’t forget to use `<%= %>`, `<% %>` to interpolate Ruby code in there. It won’t work without them. During precompilation, Sprockets will interpolate the code used in the CSS or Sass files and output plain `.css` files again—with or without a fingerprint according to your settings of course. 
+
+Below are a few more options that might come in handy for linking to various asset categories:
 
 + asset_path
 + asset_url
@@ -270,7 +316,52 @@ Additionally you have the following options that might come in handy to link to 
 
 The difference between these siblings is that the ```_url``` version gives you the full path, like `http://example.com/assets/application.css` while the ```_path``` version translates to the relative path to an asset,  like `/assets/application.css`.
 
+### Sass Asset Helpers
 
+When you use the `sass-rails` gem you can also make use of `path` and `url` helpers for your assets. They are a no-brainer really. It’s as simple as this:
+
+#### some-stylesheet.css.erb
+
+``` css
+
+.some-class {
+  background-image: asset-path("some-image.png");
+}
+
+.some-class {
+  background-image: asset-url("some-image.png");
+}
+
+.some-class {
+  background-image: image-path("some-image.png");
+}
+
+.some-class {
+  background-image: image-url("some-image.png");
+}
+
+```
+
+#### Notice that these helpers use a hyphen ( - ) and not an underscore ( _ ).
+
+`image-path("some-image.png")` translates to `"/assets/some-image.png"`. `image-url("some-image.png")` will expand into `url(/assets/some-image.png)`—which in turn translates to the full url like `"http://www.example.com/assets/some-image.png"`. Same goes for `asset-path` of course.
+
+Interestingly, this gem also offers their own flavor of other asset helpers from Rails. That means you don’t have to use `.erb` files and do `<%= %>` interpolations in your stylesheets. You simply use these asset helpers from `sass-rails`, which feels a bit more elegant in my opinion. Also, less code-smelly.
+
++ asset-path
++ asset-url
++ image-path
++ image-url
++ audio-path
++ audio-url
++ font-path
++ font-url
++ video-path
++ video-url
+
+These helper methods know exactly where to find your assets—if you put it in the conventional directory, the search path basically. The difference between `path` and `url` is that you have relative paths and one one absolute path. A quick reminder. A relative path is the path to a certain file destination from some other file location. Absolute paths give you the location in reference to the root directory.
+
+## Final Thoughts
 
 The Asset Piple line was extracted since Rails 4 and is not a core functionality anymore. Sprockets is now in charge of it. It is enabled by default though.
 
@@ -292,42 +383,4 @@ Also, files placed in `app/assets` get precompiled automatically for going into 
 ?? require_tree
 
 
-## Pimped Styles
-
-### CSS & ERB
-
-You can enhance your stylesheets by using ERB in them. All you need to do is add the `.erb` extension to a css file and you are good to go—Sprockets will take care of the rest. So no to surprise for people who have written tons `.html.erb` files of course. It’s nevertheless not a technique that is widely used I believe. I would probably caution to overuse this, since you can take this very far if you start using Ruby too much inside your stylesheets. On ocassion this might come in handy though. These dynamic CSS files should probably not contain too much logic. Feels like a code smell but the damage seems to be contained if you rely on ERB helpers mostly.
-
-### Sass
-
-When you use `sass-rails` you can make use of `url` and `path` helpers for your assets. They are a no-brainer to use. It’s as simple as this:
-
-#### some-stylesheet.css.erb
-
-``` css
-
-.some-class {
-  background-image: image-path("some-image.png");
-}
-
-.some-class {
-  background-image: image-url("some-image.png");
-}
-
-```
-`image-path("some-image.png")` translates to `"/assets/rails.png"` while `image-url("some-image.png")` will expand into `url(/assets/some-image.png)`—which in turn translates to the full url like `"http://www.example.com/assets/some-image.png"`. These helper methods know exactly where to find your assets—if you put it in the conventional directory, the search path basically. The difference between them is that you have one absolute path and one relative path. A quick reminder. A relative path is the path to a certain file destination from some other file location. Absolute paths give you the location in reference to the root directory.
-
-
-
-
-
-During the precompilation, Sprockets will interpolate the code used in the CSS or Sass files and output plain `.css` files again—with or without a fingerprint according to your settings of course. 
-
-#### some-stylesheet.css.erb
-
-``` css
-
-
-
-```
 
