@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Getting Started With The Asset Pipleline 02
+title: Getting Started With The Asset Pipeline 02
 date: 2016-06-30 04:29:10 +0100
 comments: true
 sharing: true
@@ -12,11 +12,9 @@ categories: [Rails, RSpec, Ruby, Ruby on Rails, Asset Pipeline, Sass, CSS, JS, J
 
 + Sprockets?
 + Precompiling Assets
++ MD5 Fingerprinting
 + Asset Links
 + Pimped Styles
-+ CSS Compression
-+ JS Compression
-+ MD5 Fingerprinting
 
 ## Sprockets?
 
@@ -56,7 +54,7 @@ Having as few files as possible is beneficial for performance and speed. Compres
 
 ### Compilation
 
-You have two options where you  want to compile your assets. YOu compile on your production server or locally. Local compilation means that you exectute this process on your own machine first and then push it to production. This has the advantages that you don’t need write access to the file system on a production server and if you deploy to multiple servers you can do this process only once. Not needing to precompile your assets on the server if deployed changes do not include asset changes is another benefit of precompiling locally.
+You have two options where you  want to compile your assets. You compile on your production server or locally. Local compilation means that you execute this process on your own machine first and then push it to production. This has the advantages that you don’t need write access to the file system on a production server and if you deploy to multiple servers you can do this process only once. Not needing to precompile your assets on the server if deployed changes do not include asset changes is another benefit of precompiling locally.
 
 Precompiling assets is one of these things we need to do before we send them our “pure”, compiled CSS, HTML and JS. Servers should probably not need to know about how to deal with high-level languages like Sass, Slim and whatnot. They have enough responsibilities already. For that to work, you are responsible of having the compression and minifying gems ready on your machine. You can put these compiled assets in your Git repo—or whatever version control tool you prefer—and deploy only these final assets to production.
 
@@ -104,10 +102,7 @@ For production, the compiled files will still be placed into an `/assets` direct
 
 You will end up with single assets, aka manifest files like `application.js` and `application.css`. That way you don’t need to manually link to all your assets by hand in your markup and avoid having to load multiple asset files instead of one for each category. The long number you see that is attached is called the fingerprint. It is used to compare files and if their contents might have changed before they need to be cached again. What you can also see is that you get two versions of the same file. The one with the `.gz` file extension is the gzipped version of the assets. `gzip` is used for file compression and decompression and cut away a bit of the fat that we don’t want to have sent over the wire. Another improvement to increase speed basically.
 
-???
-If you ever feel the need to change the location for outputting these assets files, say from `public` to `some_other_place`, you need to update your configuration file with the new location.
-
-In case you feel the need to predcompile your assets on a production server, the following command below will create the assets directly on your server(s). However I only add this for completion sake. Not sure that you will have much need for this as a beginner right now.
+In case you feel the need to precompile your assets on a production server, the following command below will create the assets directly on your server(s). However I only add this for completion sake. Not sure that you will have much need for this as a beginner right now.
 
 #### Terminal
 
@@ -119,7 +114,7 @@ RAILS_ENV=production bin/rails assets:precompile
 
 ### Manifest Files & Directives
 
-These manifest files like `application.css` include the logic to import all the files its search path. Rails importes these partials first and then compiles into a single authorative file that the browser will use. That’s just a default though and you can change that of course.
+These manifest files like `application.css` include the logic to import all the files its search path. Rails imports these partials first and then compiles into a single authorative file that the browser will use. That’s just a default though and you can change that of course.
 
 Every manifest file has directives which are instructions that determine which files need to be required to build up these manifest files. The order in which they are imported is determined in there as well. The final result contains all the contents of all the files the directives have access to. Sprockets loads these files, does the necessary preprocessing and rounds the whole thing off by compressing the result. Pretty darn useful!
 
@@ -150,7 +145,7 @@ As you can see from this example, requiring jQuery first is a must if you rely o
 ## MD5 Fingerprinting?
 
 
-By default, Rails creates a fingerprint for each filename during the precompilation process. More specificaly, sprockets creates an MD5 hash from your files’ contents. The resulting 32 character long hexadecimmal string, aka a digest. It is then attached to the filenames of your assets. That means that if the contents of your files change, your filenames, the MD5 hash part of it, will change as well. Why is it called fingerprinting? Such hashes have a very high probability of being unique and can therefore be used to identify uniqueness of file—just like fingerprints.
+By default, Rails creates a fingerprint for each filename during the precompilation process. More specifically, sprockets creates an MD5 hash from your files’ contents. The resulting 32 character long hexadecimal string, aka a digest. It is then attached to the filenames of your assets. That means that if the contents of your files change, your filenames, the MD5 hash part of it, will change as well. Why is it called fingerprinting? Such hashes have a very high probability of being unique and can therefore be used to identify uniqueness of file—just like fingerprints.
 
 #### Filename Example
 
@@ -160,7 +155,7 @@ navbar-908e25f4bf641868d8683022a5b62f54.css
 
 ```
 
-We are not talking about a randomized hexademcial string. The contents of files are pushed though a mathematical function that converts it into a unique 32 character long sequence. That means that you get the same hashed result when you apply the function to the same content twice—or how often you like.
+We are not talking about a randomized hexadecimal string. The contents of files are pushed though a mathematical function that converts it into a unique 32 character long sequence. That means that you get the same hashed result when you apply the function to the same content twice—or how often you like.
 
 Through that clever mechanism it is possible to check for changes and only update files that would result in a different MD5 hash. For caching purposes, this is golden. If nothing has changed it is cached by the web browser for future requests. In that context, cache busting simply means that remote clients will request a new copy of a file because the fingerprint has changed. Of course, a new fingerprint will created and added to the filename of your asset.
 
@@ -196,7 +191,7 @@ config.assets.digest = false
 
 ## Asset Links
 
-Let’s not forget why it’s nice to have the Asset Pipeline. It aims at making it easy for you to deal with assets. Writing the styles and behaviours for apps has become increasingly more nuanced and complex. Some of the tools also have become more joyful to work with. Preparing assets for production and serving them should be at least a bit more trivial and save you some time.
+Let’s not forget why it’s nice to have the Asset Pipeline. It aims at making it easy for you to deal with assets. Writing the styles and behaviors for apps has become increasingly more nuanced and complex. Some of the tools also have become more joyful to work with. Preparing assets for production and serving them should be at least a bit more trivial and save you some time.
 
 Having a bit of automation and conventions to organize assets is truly nice because it makes your actual job easy along the way. The Asset Pipeline even sweetens the deal and rounds things off with a few sugary assets links. This makes it a blast to deal with assets in your code. Let’s look at a few of the usual suspects that hopefully increase your happiness level even more.: 
 
@@ -363,24 +358,10 @@ These helper methods know exactly where to find your assets—if you put it in t
 
 ## Final Thoughts
 
-The Asset Piple line was extracted since Rails 4 and is not a core functionality anymore. Sprockets is now in charge of it. It is enabled by default though.
+The Asset Pipeline was extracted since Rails 4 and is not a core functionality anymore. It is enabled by default but Sprockets is now in charge of it. You are free to skip it when you initiate a project.
 
-Enabled by default though
+Using the pipeline makes asset management and compilation a breeze. You don’t need to set up anything and can focus just on working with these assets. The cherry on top is that you get a lot of handy convenience methods as well.
 
-Skip pipeline when you initiate project
+Your files for your CSS, JS, CoffeeScript, Sass, Haml, Slim, etc are neatly organized in one central. They are conveniently placed, under `app/assets`. Sprockets is responsible for serving files from this directory. Files in there usually need some preprocessing, like turning Sass files into their equivalent CSS files.
 
-Rails 4 makes a couple of decisions for you though. It adds gems for Sass, CoffeeScript and compression
-
-Setting asset compression methods
-
-
-Your CSS, JS, CoffeeScript, Sass, Slim, etc files are now organized in one central and convenient place, under `app/assets`.
-
-The Sprockts middleware??? is reponsible for serving files in this directory—Sprockets is in charge. `app/assets` is the place to put files that still need preprocessing, like turning Sass files into their equivalent CSS files.
-
-Also, files placed in `app/assets` get precompiled automatically for going into production—before being deployed onto a server.That means that the files in your `assets` folder are never served as-is for production—they are expected to be processed first.
-
-?? require_tree
-
-
-
+By now you know most of the Asset Pipeline features that beginners usually have a tricky time to wrap their heads around. More important than knowing its functionality alone, you are now familiar with the why as well. You should have a good introductory grasp on compilation, fingerprinting, caching, minification and compression. I hope you will appreciate how much this pipeline does for you in order to make your developer lives a little bit more hassle-free.
