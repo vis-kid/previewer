@@ -17,6 +17,8 @@ categories: [Mechanic, Nokogiri, Ruby]
 
 # Web Scraping?
 
+Screen scraping
+
 There are fancier terms around, like web harvesting and web data extraction that pretty much tell you right away what’s going on. You can automate the extraction of data from web pages—and it’s not that complicated as well. In a way, these tools allow you to imitate and automate human web browsing. You write a program and give it specific instructions what sort of data is of interest to you. Targeting specific data is almost as easy as using CSS selectors.
 
 I remember a few years ago when I subscribed to some online video course that had like a million short videos to download but no option to do that in bulk. I had to go through every link on my own and do the dreaded ‘save as’ myself. It was sort of human web scraping—something that we often need to do when we lack the knowledge to automate that kinda stuff. The course itself was alright but I didn’t use their services anymore after that. Today, I wouldn’t care too much about such mind-melting UX. A scraper that would do the downloading for me would take me only a couple of minutes to throw together. No biggie!
@@ -70,6 +72,8 @@ What happens above is straightforward. This opens and fetches the designated pag
 
 Let’s put this to practice with a mini example:
 
+## at_css
+
 #### **some_podcast_scraper.rb**
 
 ``` ruby
@@ -109,7 +113,193 @@ This is the title of the latest episode: David Heinemeier Hansson
 
 ```
 
-Although this example has very limited applications, it possesses all the ingredients, all the steps that you need to understand. I think its kinda cool how simple this is. Because it might now be obvious from this example, I would like to point out how powerful this tool can be. 
+Although this example has very limited applications, it possesses all the ingredients, all the steps that you need to understand. I think its kinda cool how simple this is. Because it might not be obvious from this example, I would like to point out how powerful this tool can be. Let’s see what else we can do with a Nokogiri script.
 
+## css
+
+The `css` method will give us not only a single element of choice but any element that matches the search criteria on the page. Pretty neat and straightforward!
+
+#### **some_scraper.rb**
+
+``` ruby
+
+require 'nokogiri'
+require "open-uri"
+
+url = 'http://betweenscreens.fm/'
+
+page = Nokogiri::HTML(open(url))
+
+header = page.css("h2.post-title")
+
+header.each do |header|
+  puts "This is the raw title of the latest episode: #{header}"
+end
+
+header.each do |header|
+  puts "This is the title of the latest episode: #{header.text}"
+end
+
+```
+
+#### Output
+
+``` bash
+
+This is the raw title of the latest episode: <h2 class="post-title"><a href="episodes/142/">David Heinemeier Hansson</a></h2>
+This is the raw title of the latest episode: <h2 class="post-title"><a href="episodes/141/">Zach Holman</a></h2>
+This is the raw title of the latest episode: <h2 class="post-title"><a href="episodes/140/">Joel Glovier</a></h2>
+This is the raw title of the latest episode: <h2 class="post-title"><a href="episodes/139/">João Ferreira</a></h2>
+This is the raw title of the latest episode: <h2 class="post-title"><a href="episodes/138/">Corwin Harrell</a></h2>
+This is the raw title of the latest episode: <h2 class="post-title"><a href="episodes/137/">Roberto Machado</a></h2>
+This is the raw title of the latest episode: <h2 class="post-title"><a href="episodes/136/">James Edward Gray II</a></h2>
+
+This is the title of the latest episode: David Heinemeier Hansson
+This is the title of the latest episode: Zach Holman
+This is the title of the latest episode: Joel Glovier
+This is the title of the latest episode: João Ferreira
+This is the title of the latest episode: Corwin Harrell
+This is the title of the latest episode: Roberto Machado
+This is the title of the latest episode: James Edward Gray II
+
+```
+
+The only little difference in this example is that I iterate on the raw header first before I extract its inner text with the `text` method. Nokogiri automatically stops at the end of the page and does not attempt to follow its pagination anywhere.
+
+Let’s say we want to have a bit more information, say the date and the subtitle for each episode. We can simply expand on the example above. It is a good idea anyway to take this step by step. Get a little piece working and add in more complexity along the way.
+
+#### **some_scraper.rb**
+
+``` ruby
+
+require 'nokogiri'
+require "open-uri"
+
+url = 'http://betweenscreens.fm/'
+
+page = Nokogiri::HTML(open(url))
+
+articles = page.css("article.index-article")
+
+articles.each do |article|
+  header     = article.at_css("h2.post-title")
+  date       = article.at_css(".post-date")
+  subtitle   = article.at_css(".topic-list")
+
+  puts "This is the raw header:    #{header}"
+  puts "This is the raw date:      #{date}"
+  puts "This is the raw subtitle:  #{subtitle}\n\n"
+
+  puts "This is the text header:   #{header.text}"
+  puts "This is the text date:     #{date.text}"
+  puts "This is the text subtitle: #{subtitle.text}\n\n"
+end
+
+```
+
+#### Output
+
+``` bash
+
+This is the raw header: <h2 class="post-title"><a href="episodes/142/">David Heinemeier Hansson</a></h2>
+This is the raw date: <span class="post-date">Oct 18 | 2016</span>
+This is the raw subtitle: <h3 class="topic-list">Rails community | Tone | Technical disagreements | Community policing | Ungratefulness | No assholes allowed | Basecamp | Open source persona | Aspirations | Guarding motivations | Dealing with audiences | Pressure | Honesty | Diverse opinions | Small talk</h3>
+
+This is the text header: David Heinemeier Hansson
+This is the text date: Oct 18 | 2016
+This is the text subtitle: Rails community | Tone | Technical disagreements | Community policing | Ungratefulness | No assholes allowed | Basecamp | Open source persona | Aspirations | Guarding motivations | Dealing with audiences | Pressure | Honesty | Diverse opinions | Small talk
+
+This is the raw header: <h2 class="post-title"><a href="episodes/141/">Zach Holman</a></h2>
+This is the raw date: <span class="post-date">Oct 12 | 2016</span>
+This is the raw subtitle: <h3 class="topic-list">Getting Fired | Taboo | Transparency | Different Perspectives | Timing | Growth Stages | Employment &amp; Dating | Managers | At-will Employment | Tech Industry | Europe | Low hanging Fruits | Performance Improvement Plans | Meeting Goals | Surprise Firings | Firing Fast | Mistakes | Company Culture | Communication</h3>
+
+This is the text header: Zach Holman
+This is the text date: Oct 12 | 2016
+This is the text subtitle: Getting Fired | Taboo | Transparency | Different Perspectives | Timing | Growth Stages | Employment & Dating | Managers | At-will Employment | Tech Industry | Europe | Low hanging Fruits | Performance Improvement Plans | Meeting Goals | Surprise Firings | Firing Fast | Mistakes | Company Culture | Communication
+
+This is the raw header: <h2 class="post-title"><a href="episodes/140/">Joel Glovier</a></h2>
+This is the raw date: <span class="post-date">Oct 10 | 2016</span>
+This is the raw subtitle: <h3 class="topic-list">Digital Product Design | Product Design @ GitHub | Loving Design | Order &amp; Chaos | Drawing | Web Design | HospitalRun | Diversity | Startup Culture | Improving Lives | CURE International | Ember | Offline First | Hospital Information System | Designers &amp; Open Source</h3>
+
+This is the text header: Joel Glovier
+This is the text date: Oct 10 | 2016
+This is the text subtitle: Digital Product Design | Product Design @ GitHub | Loving Design | Order & Chaos | Drawing | Web Design | HospitalRun | Diversity | Startup Culture | Improving Lives | CURE International | Ember | Offline First | Hospital Information System | Designers & Open Source
+
+This is the raw header: <h2 class="post-title"><a href="episodes/139/">João Ferreira</a></h2>
+This is the raw date: <span class="post-date">Aug 26 | 2015</span>
+This is the raw subtitle: <h3 class="topic-list">Masters @ Work | Subvisual | Deadlines | Design personality | Design problems | Team | Pushing envelopes | Delightful experiences | Perfecting details | Company values</h3>
+
+This is the text header: João Ferreira
+This is the text date: Aug 26 | 2015
+This is the text subtitle: Masters @ Work | Subvisual | Deadlines | Design personality | Design problems | Team | Pushing envelopes | Delightful experiences | Perfecting details | Company values
+
+This is the raw header: <h2 class="post-title"><a href="episodes/138/">Corwin Harrell</a></h2>
+This is the raw date: <span class="post-date">Aug 06 | 2015</span>
+This is the raw subtitle: <h3 class="topic-list">Q&amp;A | 01 | University | Graphic design | Design setup | Sublime | Atom | thoughtbot | Working location | Collaboration &amp; pairing | Vim advocates | Daily routine | Standups | Clients | Coffee walks | Investment Fridays |</h3>
+
+This is the text header: Corwin Harrell
+This is the text date: Aug 06 | 2015
+This is the text subtitle: Q&A | 01 | University | Graphic design | Design setup | Sublime | Atom | thoughtbot | Working location | Collaboration & pairing | Vim advocates | Daily routine | Standups | Clients | Coffee walks | Investment Fridays |
+
+This is the raw header: <h2 class="post-title"><a href="episodes/137/">Roberto Machado</a></h2>
+This is the raw date: <span class="post-date">Aug 03 | 2015</span>
+This is the raw subtitle: <h3 class="topic-list">CEO @ Subvisual | RubyConf Portugal | Creators School | Consultancy | Company role models | Group Buddies | Portuguese startup | Rebranding | Technologies used | JS frameworks | TDD &amp; BDD | Startup mistakes | Culture of learning | Young entrepreneurs</h3>
+
+This is the text header: Roberto Machado
+This is the text date: Aug 03 | 2015
+This is the text subtitle: CEO @ Subvisual | RubyConf Portugal | Creators School | Consultancy | Company role models | Group Buddies | Portuguese startup | Rebranding | Technologies used | JS frameworks | TDD & BDD | Startup mistakes | Culture of learning | Young entrepreneurs
+
+This is the raw header: <h2 class="post-title"><a href="episodes/136/">James Edward Gray II</a></h2>
+This is the raw date: <span class="post-date">Jul 30 | 2015</span>
+This is the raw subtitle: <h3 class="topic-list">Screencasting | Less Code | Reading code | Getting unstuck | Rails’s codebase | CodeNewbie | Small examples | Future plans | PeepCode | Frequency &amp; pricing</h3>
+
+This is the text header: James Edward Gray II
+This is the text date: Jul 30 | 2015
+This is the text subtitle: Screencasting | Less Code | Reading code | Getting unstuck | Rails’s codebase | CodeNewbie | Small examples | Future plans | PeepCode | Frequency & pricing
+
+```
+
+At this point we already have some data to play with. We can structure or butcher it any way we like. The above should simply show what we have in a readable fashion. Of course we can dig deeper into each of these by using regular expressions with the `text` method. We will look into this a lot more in detail when we get to solving the actual problem. It won’t be a class on regexp but you will see some more of it in action—but no worries, not so much to make your brains bleed.
+
+What could be handy at this stage is extracting the `href` for the individual episodes. It couldn’t be any simpler.
+
+``` ruby
+
+require 'nokogiri'
+require "open-uri"
+
+url = 'http://betweenscreens.fm/'
+
+page = Nokogiri::HTML(open(url))
+
+articles = page.css("article.index-article")
+
+articles.each do |article|
+  header      = article.at_css("h2.post-title")
+  date        = article.at_css(".post-date")
+  subtitle    = article.at_css(".topic-list")
+  href        = article.at_css("h2.post-title a")
+  podcast_url = "http://betweenscreens.fm/"
+
+  puts "This is the raw header:    #{header}"
+  puts "This is the raw date:      #{date}"
+  puts "This is the raw subtitle:  #{subtitle}"
+  puts "This is the raw link:      #{href}\n\n"
+
+  puts "This is the text header:   #{header.text}"
+  puts "This is the text date:     #{date.text}"
+  puts "This is the text subtitle: #{subtitle.text}"
+  puts "This is the raw link:      #{podcast_url}#{href[:href]}\n\n"
+end
+
+```
+
+The most important bits to pay attention to here are `[:href]` and ```podcast_url```.  If you tag on `[:]` you can simply extract an attribute from the targeted selector. You can do the same to extract the `[:class]` of a selector.
+
+``` ruby
+
+header_classes = article.at_css("h2.post-title")[:class]
+
+```
 
 # Command Line Scraping
