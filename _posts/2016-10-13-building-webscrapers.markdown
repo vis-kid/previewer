@@ -8,7 +8,7 @@ published: true
 categories: [Mechanic, Nokogiri, Ruby]
 ---
 
-## Topics
+# Topics
 
 + Web Scraping?
 + Permission
@@ -45,7 +45,7 @@ This past summer I started to get serious and worked on a Middleman site that is
 
 # Nokogiri
 
-Even if you are completely new to Ruby / Rails land, chances are very good that you have already heard about this little gem. The name is dropped often and sticks with you easily. Not sure that any know that it is Japanese for “saw”. Fitting name once you understand what the tool does. The creator of this gem is the love Tenderlove, [Aaron Patterson](https://twitter.com/tenderlove). Nokogiri converts XML and HTML documents into a data structure—a tree data structure to be more precise. It is fast, offers a nice interface as well. Overall, it’s a very potent tool that takes care of a multitude of HTML scraping needs. You can use Nokogiri not only to parse HTML, XML is fair game as well.
+Even if you are completely new to Ruby / Rails land, chances are very good that you have already heard about this little gem. The name is dropped often and sticks with you easily. Not sure that any know that it is Japanese for “saw”. Fitting name once you understand what the tool does. The creator of this gem is the love Tenderlove, [Aaron Patterson](https://twitter.com/tenderlove). [Nokogiri](http://www.nokogiri.org/) converts XML and HTML documents into a data structure—a tree data structure to be more precise. It is fast, offers a nice interface as well. Overall, it’s a very potent tool that takes care of a multitude of HTML scraping needs. You can use Nokogiri not only to parse HTML, XML is fair game as well.
 
 Nokogiri gives you the options of both XML path language and CSS interfaces to traverse the documents you load. XML path Language, or XPath for short, is a query language. It allows us to select nodes from XML documents. CSS selectors are most likely more familiar to beginners. As with styles you write, they make it fantastically easy to target specific sections of pages that are of interest for extraction. With that powerful gem, XML trees are as easy to parse as the DOM. You just need to let Nokogiri know what you are after when you target a particular destination.
 
@@ -567,5 +567,9 @@ Oct 25 | 2016
     </div>
 
 ```
+
+# Final Thoughts
+
+Nokogiri is quite a large library but this little intro should get you well on your way to understand what you can do and how it works. I hope you will explore it a bit more on your own. It’s a rich tool that keeps on giving.
 
 # Command Line Scraping
