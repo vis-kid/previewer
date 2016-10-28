@@ -60,6 +60,10 @@ What happens here is that the mechanize agent got the podcast page and its cooki
 
 # Links
 
++ links
++ link_with
++ links_with
+
 We can also already navigate the whole page to our liking. Probably the most important part of mechanize is its ability to let you play with links. Otherwise you could pretty much stick with Nokogiri on its own. Let’s take a look what we get returned if we ask a page for its links.
 
 #### **some_scraper.rb**
@@ -134,3 +138,144 @@ Holy moly, let’s break this down. Since we haven’t told mechanize to look el
 #### **Screenshot**
 
 ![Alt text](/images/webscraper/mechanize-links1.png)
+
+As always, we can also extract just the text from that.
+
+#### **some_scraper.rb**
+
+``` ruby
+
+require 'mechanize'
+
+agent = Mechanize.new
+
+podcast_url = "http://betweenscreens.fm/"
+
+page = agent.get(podcast_url)
+
+page.links.each do |link|
+  puts link.text
+end
+
+```
+
+#### **Output**
+
+``` bash
+
+Logo cube
+fork!
+about
+design
+code
+Randy J. Hunt
+Jason Long
+David Heinemeier Hansson
+Zach Holman
+Joel Glovier
+João Ferreira
+Corwin Harrell
+Older Stuff »
+Exercise
+Company benefits
+Tmux
+FileTask
+Decision making
+Favorite feature
+Working out
+Scott Savarie
+Titles
+Erik Spiekermann
+Newbie mistakes
+Playbook
+Delegation
+Heat maps
+Europe
+Sizing type
+Focus
+Virtual assistants
+Writing
+Hacking
+Joel Glovier
+Corwin Harrell
+Mario C. Delgado
+Tom Dale
+Obie Fernandez
+Chad Pytel
+Zach Holman
+Max Luster
+Kyle Fiedler
+Roberto Machado
+
+```
+
+Getting all these links in bulk can be tedious and useless. Lucky for us, we have a few tools in place to fine tune what we need.
+
+#### **some_scraper.rb**
+
+``` ruby
+
+require 'mechanize'
+
+agent = Mechanize.new
+
+podcast_url = "http://betweenscreens.fm/"
+
+page = agent.get(podcast_url)
+
+page = agent.page.links.find { |l| l.text == 'Focus' }
+
+puts page
+
+```
+
+#### **Output**
+
+``` bash
+
+Focus
+
+```
+
+Boom! Now we are getting somwhere! What about following that fella and see what hides behind this link. Let’s `click` it!
+
+#### **some_scraper.rb**
+
+``` ruby
+
+require 'mechanize'
+
+agent = Mechanize.new
+
+podcast_url = "http://betweenscreens.fm/"
+
+page = agent.get(podcast_url)
+
+page = agent.page.links.find { |l| l.text == 'Focus' }.click.links
+
+puts page
+
+```
+
+This would get us another list of links like before. See how easy it was to combine `.click.links`.
+
+If we would have had multiple `Focus` links, we could have zoomed in on a particular number on the page.
+
+#### **some_scraper.rb**
+
+``` ruby
+
+require 'mechanize'
+
+agent = Mechanize.new
+
+podcast_url = "http://betweenscreens.fm/"
+
+page = agent.get(podcast_url)
+
+page = agent.page.links.find { |l| l.text == 'Focus'}
+
+puts page
+
+```
+
