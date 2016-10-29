@@ -57,7 +57,357 @@ page = agent.get(podcast_url)
 
 ```
 
-What happens here is that the mechanize agent got the podcast page and its cookies. We now have a page that is ready for extraction.
+What happens here is that the mechanize agent got the podcast page and its cookies. We now have a page that is ready for extraction. Before we do so, I recommend that we take a look under the hood using the `inspect` method.
+
+``` ruby
+
+require 'mechanize'
+
+agent = Mechanize.new
+
+podcast_url = "http://betweenscreens.fm/"
+
+page = agent.get(podcast_url)
+
+puts page.inspect
+
+```
+
+The output is quite substantive. Take a look and see for yourself what a `Mechanize::Page` consists of. Here you can see only a few of the pieces that you can play with.
+
+#### **Output**
+
+``` bash
+
+#<Mechanize::Page
+ {url #<URI::HTTP http://betweenscreens.fm/>}
+ {meta_refresh}
+ {title "Between | Screens "}
+ {iframes
+  #<Mechanize::Page::Frame
+   nil
+   "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/290328784&color=ff0000&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false">
+  #<Mechanize::Page::Frame
+   nil
+   "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/290126141&color=ff0000&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false">
+  #<Mechanize::Page::Frame
+   nil
+   "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/289018386&color=ff0000&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false">
+  #<Mechanize::Page::Frame
+   nil
+   "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/287425105&color=ff0000&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false">
+  #<Mechanize::Page::Frame
+   nil
+   "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/287105342&color=ff0000&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false">
+  #<Mechanize::Page::Frame
+   nil
+   "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/221003494&color=ff0000&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false">
+  #<Mechanize::Page::Frame
+   nil
+   "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/218101809&color=ff0000&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false">}
+ {frames}
+ {links
+  #<Mechanize::Page::Link "Logo cube" "/">
+  #<Mechanize::Page::Link "fork!" "https://github.com/vis-kid/betweenscreens">
+  #<Mechanize::Page::Link "about" "pages/about/">
+  #<Mechanize::Page::Link "design" "design/">
+  #<Mechanize::Page::Link "code" "code/">
+  #<Mechanize::Page::Link "Randy J. Hunt" "episodes/144/">
+  #<Mechanize::Page::Link "Jason Long" "episodes/143/">
+  #<Mechanize::Page::Link "David Heinemeier Hansson" "episodes/142/">
+  #<Mechanize::Page::Link "Zach Holman" "episodes/141/">
+  #<Mechanize::Page::Link "Joel Glovier" "episodes/140/">
+  #<Mechanize::Page::Link "João Ferreira" "episodes/139/">
+  #<Mechanize::Page::Link "Corwin Harrell" "episodes/138/">
+  #<Mechanize::Page::Link "Older Stuff »" "page/2/">
+  #<Mechanize::Page::Link "Exercise" "/tags/exercise/">
+  #<Mechanize::Page::Link "Company benefits" "/tags/company-benefits/">
+  #<Mechanize::Page::Link "Tmux" "/tags/tmux/">
+  #<Mechanize::Page::Link "FileTask" "/tags/filetask/">
+  #<Mechanize::Page::Link "Decision making" "/tags/decision-making/">
+  #<Mechanize::Page::Link "Favorite feature" "/tags/favorite-feature/">
+  #<Mechanize::Page::Link "Working out" "/tags/working-out/">
+  #<Mechanize::Page::Link "Scott Savarie" "/tags/scott-savarie/">
+  #<Mechanize::Page::Link "Titles" "/tags/titles/">
+  #<Mechanize::Page::Link "Erik Spiekermann" "/tags/erik-spiekermann/">
+  #<Mechanize::Page::Link "Newbie mistakes" "/tags/newbie-mistakes/">
+  #<Mechanize::Page::Link "Playbook" "/tags/playbook/">
+  #<Mechanize::Page::Link "Delegation" "/tags/delegation/">
+  #<Mechanize::Page::Link "Heat maps" "/tags/heat-maps/">
+  #<Mechanize::Page::Link "Europe" "/tags/europe/">
+  #<Mechanize::Page::Link "Sizing type" "/tags/sizing-type/">
+  #<Mechanize::Page::Link "Focus" "/tags/focus/">
+  #<Mechanize::Page::Link "Virtual assistants" "/tags/virtual-assistants/">
+  #<Mechanize::Page::Link "Writing" "/tags/writing/">
+  #<Mechanize::Page::Link "Hacking" "/tags/hacking/">
+  #<Mechanize::Page::Link "Joel Glovier" "/tags/joel-glovier/">
+  #<Mechanize::Page::Link "Corwin Harrell" "/tags/corwin-harrell/">
+  #<Mechanize::Page::Link "Mario C. Delgado" "/tags/mario-c-delgado/">
+  #<Mechanize::Page::Link "Tom Dale" "/tags/tom-dale/">
+  #<Mechanize::Page::Link "Obie Fernandez" "/tags/obie-fernandez/">
+  #<Mechanize::Page::Link "Chad Pytel" "/tags/chad-pytel/">
+  #<Mechanize::Page::Link "Zach Holman" "/tags/zach-holman/">
+  #<Mechanize::Page::Link "Max Luster" "/tags/max-luster/">
+  #<Mechanize::Page::Link "Kyle Fiedler" "/tags/kyle-fiedler/">
+  #<Mechanize::Page::Link "Roberto Machado" "/tags/roberto-machado/">}
+ {forms}>
+
+```
+
+
+
+If you want to take a look at the HTML page itself you can tag on the `.body` or `content` methods.
+
+``` ruby
+
+...
+
+print page.body
+
+...
+
+```
+
+#### **Output**
+
+```
+
+<!doctype html>
+<html>
+
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge;chrome=1' />
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="initial-scale=1">
+    <title>Between | Screens </title>
+    <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.xml" />
+    <link href="stylesheets/all-11b45acc.css" rel="stylesheet" />
+    <script src="javascripts/all-4c20da82.js"></script>
+  </head>
+
+  <body>
+
+    <header>
+      <div id="logo">
+        <a href="/"><img src="images/Between_Screens_Logo_Cube_Up-539d6997.svg" alt="Logo cube" /></a>
+      </div>
+      <nav class="navigation">
+        <ul class="nav-list">
+          <li><a href="https://github.com/vis-kid/betweenscreens">fork!</a></li>
+          <li><a href="pages/about/">about</a></li>
+          <li><a href="design/">design</a></li>
+          <li><a href="code/">code</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <div id="main" role="main">
+      <div class='posts'>
+
+        <ul>
+            <li>
+              <article class="index-article">
+                <span class='post-date'>Oct 27 | 2016</span><h2 class='post-title'><a href="episodes/144/">Randy J. Hunt</a></h2>
+                <h3 class='topic-list'>Organizing teams | Diversity | Desires | Pizza rule | Effective over clever | Novel solutions | Straightforwardness | Research | Coffeeshop test | Small changes | Reducing errors | Granular diffs</h3>
+                <div class='soundcloud-player-small'>
+                  <iframe width="100%"
+                    height="166"
+                    scrolling="no"
+                    frameborder="no"
+                    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/290328784&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
+                </div>
+              </article>
+            </li>
+
+            <li>
+              <article class="index-article">
+                <span class='post-date'>Oct 25 | 2016</span><h2 class='post-title'><a href="episodes/143/">Jason Long</a></h2>
+                <h3 class='topic-list'>Open source | Empathy | Lower barriers | Learning tool | Design contributions | Git website | Branding | GitHub | Neovim | Tmux | Design love | Knowing audiences | Showing work | Dribbble | Progressions | Ideas</h3>
+                <div class='soundcloud-player-small'>
+                  <iframe width="100%"
+                  height="166"
+                  scrolling="no"
+                  frameborder="no"
+                  src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/290126141&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
+                </div>
+              </article>
+            </li>
+
+            <li>
+              <article class="index-article">
+                <span class='post-date'>Oct 18 | 2016</span><h2 class='post-title'><a href="episodes/142/">David Heinemeier Hansson</a></h2>
+                <h3 class='topic-list'>Rails community | Tone | Technical disagreements | Community policing | Ungratefulness | No assholes allowed | Basecamp | Open source persona | Aspirations | Guarding motivations | Dealing with audiences | Pressure | Honesty | Diverse opinions | Small talk</h3>
+                <div class='soundcloud-player-small'>
+                  <iframe width="100%"
+                  height="166"
+                  scrolling="no"
+                  frameborder="no"
+                  src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/289018386&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
+                </div>
+              </article>
+            </li>
+
+            <li>
+              <article class="index-article">
+                <span class='post-date'>Oct 12 | 2016</span><h2 class='post-title'><a href="episodes/141/">Zach Holman</a></h2>
+                <h3 class='topic-list'>Getting Fired | Taboo | Transparency | Different Perspectives | Timing | Growth Stages | Employment & Dating | Managers | At-will Employment | Tech Industry | Europe | Low hanging Fruits | Performance Improvement Plans | Meeting Goals | Surprise Firings | Firing Fast | Mistakes | Company Culture | Communication</h3>
+                <div class='soundcloud-player-small'>  
+                  <iframe width="100%"
+                    height="166"
+                    scrolling="no"
+                    frameborder="no"
+                    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/287425105&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
+                </div>
+              </article>
+            </li>
+
+            <li>
+              <article class="index-article">
+                <span class='post-date'>Oct 10 | 2016</span><h2 class='post-title'><a href="episodes/140/">Joel Glovier</a></h2>
+                <h3 class='topic-list'>Digital Product Design | Product Design @ GitHub | Loving Design | Order & Chaos | Drawing | Web Design | HospitalRun | Diversity | Startup Culture | Improving Lives | CURE International | Ember | Offline First | Hospital Information System | Designers & Open Source</h3>
+
+                <div class='soundcloud-player-small'>
+                  <iframe width="100%"
+                    height="166"
+                    scrolling="no"
+                    frameborder="no"
+                    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/287105342&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
+                </div>
+              </article>
+            </li>
+
+            <li>
+              <article class="index-article">
+                <span class='post-date'>Aug 26 | 2015</span><h2 class='post-title'><a href="episodes/139/">João Ferreira</a></h2>
+                <h3 class='topic-list'>Masters @ Work | Subvisual | Deadlines | Design personality | Design problems | Team | Pushing envelopes | Delightful experiences | Perfecting details | Company values</h3>
+                <div class='soundcloud-player-small'>
+                  <iframe width="100%"
+                  height="166"
+                  scrolling="no"
+                  frameborder="no"
+                  src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/221003494&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
+                </div>
+              </article>
+            </li>
+
+            <li>
+              <article class="index-article">
+                <span class='post-date'>Aug 06 | 2015</span><h2 class='post-title'><a href="episodes/138/">Corwin Harrell</a></h2>
+                <h3 class='topic-list'>Q&A | 01 | University | Graphic design | Design setup | Sublime | Atom | thoughtbot | Working location | Collaboration & pairing | Vim advocates | Daily routine | Standups | Clients | Coffee walks | Investment Fridays |</h3>
+                <div class='soundcloud-player-small'>
+                  <iframe width="100%"
+                  height="166"
+                  scrolling="no"
+                  frameborder="no"
+                  src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/218101809&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
+                </div>
+              </article>
+            </li>
+        </ul>
+      </div>
+
+      <section>
+        <div class='pagination-link'><a href="page/2/">Older Stuff »</a></div>
+      </section>
+    </div>
+
+    <footer>
+
+      <div class='footer-tags'>
+        <h3>Random Tags</h3>
+        <ul class='random-tag-list'>
+          <li><a href="/tags/exercise/">Exercise</a></li>
+          <li><a href="/tags/company-benefits/">Company benefits</a></li>
+          <li><a href="/tags/tmux/">Tmux</a></li>
+          <li><a href="/tags/filetask/">FileTask</a></li>
+          <li><a href="/tags/decision-making/">Decision making</a></li>
+          <li><a href="/tags/favorite-feature/">Favorite feature</a></li>
+          <li><a href="/tags/working-out/">Working out</a></li>
+          <li><a href="/tags/scott-savarie/">Scott Savarie</a></li>
+          <li><a href="/tags/titles/">Titles</a></li>
+          <li><a href="/tags/erik-spiekermann/">Erik Spiekermann</a></li>
+          <li><a href="/tags/newbie-mistakes/">Newbie mistakes</a></li>
+          <li><a href="/tags/playbook/">Playbook</a></li>
+          <li><a href="/tags/delegation/">Delegation</a></li>
+          <li><a href="/tags/heat-maps/">Heat maps</a></li>
+          <li><a href="/tags/europe/">Europe</a></li>
+          <li><a href="/tags/sizing-type/">Sizing type</a></li>
+          <li><a href="/tags/focus/">Focus</a></li>
+          <li><a href="/tags/virtual-assistants/">Virtual assistants</a></li>
+          <li><a href="/tags/writing/">Writing</a></li>
+          <li><a href="/tags/hacking/">Hacking</a></li>
+        </ul>
+      </div>
+
+      <div class='recent-posts'>
+        <h3>Random Interviewees</h3>
+        <ul>
+          <li><a href="/tags/joel-glovier/">Joel Glovier</a></li>
+          <li><a href="/tags/corwin-harrell/">Corwin Harrell</a></li>
+          <li><a href="/tags/mario-c-delgado/">Mario C. Delgado</a></li>
+          <li><a href="/tags/tom-dale/">Tom Dale</a></li>
+          <li><a href="/tags/obie-fernandez/">Obie Fernandez</a></li>
+          <li><a href="/tags/chad-pytel/">Chad Pytel</a></li>
+          <li><a href="/tags/zach-holman/">Zach Holman</a></li>
+          <li><a href="/tags/max-luster/">Max Luster</a></li>
+          <li><a href="/tags/kyle-fiedler/">Kyle Fiedler</a></li>
+          <li><a href="/tags/roberto-machado/">Roberto Machado</a></li>
+        </ul>
+      </div>
+
+    </footer>
+  </body>
+</html>
+
+```
+
+You can also look at things like encodings, the HTTP response code, the URI or the response headers.
+
+``` ruby
+
+require 'mechanize'
+
+agent = Mechanize.new
+
+podcast_url = "http://betweenscreens.fm/"
+
+page = agent.get(podcast_url)
+
+puts 'Encodings'
+puts page.encodings
+puts 'Repsonse Headers'
+puts page.response
+puts 'HTTP response code'
+puts page.code
+puts 'URI'
+puts page.uri
+
+```
+
+#### **Output**
+
+``` bash
+
+Encodings
+EUC-JP
+utf-8
+utf-8
+
+Repsonse Headers
+{"server"=>"GitHub.com", "date"=>"Sat, 29 Oct 2016 17:56:00 GMT", "content-type"=>"text/html; charset=utf-8", "transfer-encoding"=>"chunked", "last-modified"=>"Fri, 28 Oct 2016 01:48:56 GMT", "access-control-allow-origin"=>"*", "expires"=>"Sat, 29 Oct 2016 18:06:00 GMT", "cache-control"=>"max-age=600", "content-encoding"=>"gzip", "x-github-request-id"=>"501C936D:C723:1631523C:5814E2B0"}
+
+HTTP response code
+200
+
+URI
+http://betweenscreens.fm/
+
+```
+
+There is lots more stuff if you wanna dig deeper. I’ll leave it at that.
+
+```
 
 # Links
 
