@@ -14,6 +14,7 @@ categories: [Mechanic, Nokogiri, Ruby]
 + Mechanize
 + Agent
 + Links
++ Click
 
 
 # Single Page vs Pagination
@@ -60,9 +61,9 @@ What happens here is that the mechanize agent got the podcast page and its cooki
 
 # Links
 
-+ links
-+ link_with
-+ links_with
++ `links`
++ `link_with`
++ `links_with`
 
 We can also already navigate the whole page to our liking. Probably the most important part of mechanize is its ability to let you play with links. Otherwise you could pretty much stick with Nokogiri on its own. Let’s take a look what we get returned if we ask a page for its links.
 
@@ -209,7 +210,7 @@ Roberto Machado
 
 ```
 
-Getting all these links in bulk can be tedious and useless. Lucky for us, we have a few tools in place to fine tune what we need.
+Getting all these links in bulk can be very useful or simply tedious. Lucky for us, we have a few tools in place to fine tune what we need.
 
 #### **some_scraper.rb**
 
@@ -223,9 +224,9 @@ podcast_url = "http://betweenscreens.fm/"
 
 page = agent.get(podcast_url)
 
-page = agent.page.links.find { |l| l.text == 'Focus' }
+focus_links = agent.page.links.find { |l| l.text == 'Focus' }
 
-puts page
+puts focus_links
 
 ```
 
@@ -234,10 +235,12 @@ puts page
 ``` bash
 
 Focus
+Focus
+Focus
 
 ```
 
-Boom! Now we are getting somwhere! What about following that fella and see what hides behind this link. Let’s `click` it!
+Boom! Now we are getting somwhere! We can zoom in on specific links like that. If we would have multiple `Focus` links, we could zoom in on a particular number on the page using brackets `[]`.
 
 #### **some_scraper.rb**
 
@@ -251,15 +254,36 @@ podcast_url = "http://betweenscreens.fm/"
 
 page = agent.get(podcast_url)
 
-page = agent.page.links.find { |l| l.text == 'Focus' }.click.links
+focus_link = agent.page.links_with(:text => 'News')[2]
 
-puts page
+puts focus_link
 
 ```
 
-This would get us another list of links like before. See how easy it was to combine `.click.links`.
+If you are not after the link text but the link itself, need simply specify a particular `href` to find a specific link. Mechanize won’t stand in your way. Instead of `text` you feed the methods with `href`.
 
-If we would have had multiple `Focus` links, we could have zoomed in on a particular number on the page.
+``` ruby
+
+page = agent.page.link_with(href: '/episodes/95/')
+
+page = agent.page.links_with(href: '/episodes/95/')
+
+
+```
+
+If you only want to find the first link with the desired text, you can also make use of this syntax. Very convenient and a bit more readable.
+
+#### **some_scraper.rb**
+
+``` ruby
+
+focus_links = agent.page.link_with(:text => 'Focus')
+
+```
+
+What about following that fella and see what hides behind this `Focus` link. Let’s `click` it!
+
+# Click
 
 #### **some_scraper.rb**
 
@@ -273,9 +297,53 @@ podcast_url = "http://betweenscreens.fm/"
 
 page = agent.get(podcast_url)
 
-page = agent.page.links.find { |l| l.text == 'Focus'}
+focus_links = agent.page.links.find { |l| l.text == 'Focus' }.click.links
 
-puts page
+puts focus_links
 
 ```
 
+This would get us another long list of links like before. See how easy it was to combine `.click.links`. Mechanize clicks the link for you and follows the page to the new destination. Since we also requested a list of links, we will get all the list that Mechanize can find on that new page.
+
+Let’s say I have two text links of the same interviewee. One that links to tags and one to a recent episode and I want to get the links from each of these pages. 
+
+#### **some_scraper.rb**
+
+``` ruby
+
+require 'mechanize'
+
+agent = Mechanize.new
+
+podcast_url = "http://betweenscreens.fm/"
+
+page = agent.get(podcast_url)
+
+links = agent.page.links_with(text: "Some interviewee")
+
+links.each do |link|
+  puts link.click.links
+end
+
+```
+
+This would give you a list of links for both. You iterate over each link for the interviewee, Mechanize follow the clicked link and collects the links it finds on the new page for you.
+
+
+
+Below you can find a list where you can compare a few combinations to get you started.
+
+``` ruby
+
+agent.page.links.find { |l| l.text == 'Focus' }
+agent.page.links.find { |l| l.text == 'Focus' }.click
+agent.page.link_with(text: 'Focus')
+agent.page.links_with(text: 'Focus')[0]
+agent.page.links_with(text: 'Focus')[1].click
+agent.page.links_with(text: 'Focus')[2].click.links
+agent.page.link_with(href: '/some-href')
+agent.page.link_with(href: '/some-href').click
+agent.page.links_with(href: '/some-href')
+agent.page.links_with(href: '/some-href').click
+
+```
