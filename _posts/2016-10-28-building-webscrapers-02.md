@@ -13,6 +13,7 @@ categories: [Mechanic, Nokogiri, Ruby]
 + Single Page vs Pagination
 + Mechanize
 + Agent
++ Page
 + Links
 + Click
 
@@ -57,7 +58,11 @@ page = agent.get(podcast_url)
 
 ```
 
-What happens here is that the mechanize agent got the podcast page and its cookies. We now have a page that is ready for extraction. Before we do so, I recommend that we take a look under the hood using the `inspect` method.
+What happens here is that the mechanize agent got the podcast page and its cookies.
+
+# Page
+
+We now have a page that is ready for extraction. Before we do so, I recommend that we take a look under the hood using the `inspect` method.
 
 ``` ruby
 
@@ -206,104 +211,104 @@ print page.body
       <div class='posts'>
 
         <ul>
-            <li>
-              <article class="index-article">
-                <span class='post-date'>Oct 27 | 2016</span><h2 class='post-title'><a href="episodes/144/">Randy J. Hunt</a></h2>
-                <h3 class='topic-list'>Organizing teams | Diversity | Desires | Pizza rule | Effective over clever | Novel solutions | Straightforwardness | Research | Coffeeshop test | Small changes | Reducing errors | Granular diffs</h3>
-                <div class='soundcloud-player-small'>
-                  <iframe width="100%"
-                    height="166"
-                    scrolling="no"
-                    frameborder="no"
-                    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/290328784&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
-                </div>
-              </article>
-            </li>
-
-            <li>
-              <article class="index-article">
-                <span class='post-date'>Oct 25 | 2016</span><h2 class='post-title'><a href="episodes/143/">Jason Long</a></h2>
-                <h3 class='topic-list'>Open source | Empathy | Lower barriers | Learning tool | Design contributions | Git website | Branding | GitHub | Neovim | Tmux | Design love | Knowing audiences | Showing work | Dribbble | Progressions | Ideas</h3>
-                <div class='soundcloud-player-small'>
-                  <iframe width="100%"
+          <li>
+            <article class="index-article">
+              <span class='post-date'>Oct 27 | 2016</span><h2 class='post-title'><a href="episodes/144/">Randy J. Hunt</a></h2>
+              <h3 class='topic-list'>Organizing teams | Diversity | Desires | Pizza rule | Effective over clever | Novel solutions | Straightforwardness | Research | Coffeeshop test | Small changes | Reducing errors | Granular diffs</h3>
+              <div class='soundcloud-player-small'>
+                <iframe width="100%"
                   height="166"
                   scrolling="no"
                   frameborder="no"
-                  src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/290126141&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
-                </div>
-              </article>
-            </li>
+                  src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/290328784&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
+              </div>
+            </article>
+          </li>
 
-            <li>
-              <article class="index-article">
-                <span class='post-date'>Oct 18 | 2016</span><h2 class='post-title'><a href="episodes/142/">David Heinemeier Hansson</a></h2>
-                <h3 class='topic-list'>Rails community | Tone | Technical disagreements | Community policing | Ungratefulness | No assholes allowed | Basecamp | Open source persona | Aspirations | Guarding motivations | Dealing with audiences | Pressure | Honesty | Diverse opinions | Small talk</h3>
-                <div class='soundcloud-player-small'>
-                  <iframe width="100%"
+          <li>
+            <article class="index-article">
+              <span class='post-date'>Oct 25 | 2016</span><h2 class='post-title'><a href="episodes/143/">Jason Long</a></h2>
+              <h3 class='topic-list'>Open source | Empathy | Lower barriers | Learning tool | Design contributions | Git website | Branding | GitHub | Neovim | Tmux | Design love | Knowing audiences | Showing work | Dribbble | Progressions | Ideas</h3>
+              <div class='soundcloud-player-small'>
+                <iframe width="100%"
+                height="166"
+                scrolling="no"
+                frameborder="no"
+                src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/290126141&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
+              </div>
+            </article>
+          </li>
+
+          <li>
+            <article class="index-article">
+              <span class='post-date'>Oct 18 | 2016</span><h2 class='post-title'><a href="episodes/142/">David Heinemeier Hansson</a></h2>
+              <h3 class='topic-list'>Rails community | Tone | Technical disagreements | Community policing | Ungratefulness | No assholes allowed | Basecamp | Open source persona | Aspirations | Guarding motivations | Dealing with audiences | Pressure | Honesty | Diverse opinions | Small talk</h3>
+              <div class='soundcloud-player-small'>
+                <iframe width="100%"
+                height="166"
+                scrolling="no"
+                frameborder="no"
+                src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/289018386&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
+              </div>
+            </article>
+          </li>
+
+          <li>
+            <article class="index-article">
+              <span class='post-date'>Oct 12 | 2016</span><h2 class='post-title'><a href="episodes/141/">Zach Holman</a></h2>
+              <h3 class='topic-list'>Getting Fired | Taboo | Transparency | Different Perspectives | Timing | Growth Stages | Employment & Dating | Managers | At-will Employment | Tech Industry | Europe | Low hanging Fruits | Performance Improvement Plans | Meeting Goals | Surprise Firings | Firing Fast | Mistakes | Company Culture | Communication</h3>
+              <div class='soundcloud-player-small'>  
+                <iframe width="100%"
                   height="166"
                   scrolling="no"
                   frameborder="no"
-                  src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/289018386&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
-                </div>
-              </article>
-            </li>
+                  src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/287425105&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
+              </div>
+            </article>
+          </li>
 
-            <li>
-              <article class="index-article">
-                <span class='post-date'>Oct 12 | 2016</span><h2 class='post-title'><a href="episodes/141/">Zach Holman</a></h2>
-                <h3 class='topic-list'>Getting Fired | Taboo | Transparency | Different Perspectives | Timing | Growth Stages | Employment & Dating | Managers | At-will Employment | Tech Industry | Europe | Low hanging Fruits | Performance Improvement Plans | Meeting Goals | Surprise Firings | Firing Fast | Mistakes | Company Culture | Communication</h3>
-                <div class='soundcloud-player-small'>  
-                  <iframe width="100%"
-                    height="166"
-                    scrolling="no"
-                    frameborder="no"
-                    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/287425105&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
-                </div>
-              </article>
-            </li>
+          <li>
+            <article class="index-article">
+              <span class='post-date'>Oct 10 | 2016</span><h2 class='post-title'><a href="episodes/140/">Joel Glovier</a></h2>
+              <h3 class='topic-list'>Digital Product Design | Product Design @ GitHub | Loving Design | Order & Chaos | Drawing | Web Design | HospitalRun | Diversity | Startup Culture | Improving Lives | CURE International | Ember | Offline First | Hospital Information System | Designers & Open Source</h3>
 
-            <li>
-              <article class="index-article">
-                <span class='post-date'>Oct 10 | 2016</span><h2 class='post-title'><a href="episodes/140/">Joel Glovier</a></h2>
-                <h3 class='topic-list'>Digital Product Design | Product Design @ GitHub | Loving Design | Order & Chaos | Drawing | Web Design | HospitalRun | Diversity | Startup Culture | Improving Lives | CURE International | Ember | Offline First | Hospital Information System | Designers & Open Source</h3>
-
-                <div class='soundcloud-player-small'>
-                  <iframe width="100%"
-                    height="166"
-                    scrolling="no"
-                    frameborder="no"
-                    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/287105342&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
-                </div>
-              </article>
-            </li>
-
-            <li>
-              <article class="index-article">
-                <span class='post-date'>Aug 26 | 2015</span><h2 class='post-title'><a href="episodes/139/">João Ferreira</a></h2>
-                <h3 class='topic-list'>Masters @ Work | Subvisual | Deadlines | Design personality | Design problems | Team | Pushing envelopes | Delightful experiences | Perfecting details | Company values</h3>
-                <div class='soundcloud-player-small'>
-                  <iframe width="100%"
+              <div class='soundcloud-player-small'>
+                <iframe width="100%"
                   height="166"
                   scrolling="no"
                   frameborder="no"
-                  src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/221003494&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
-                </div>
-              </article>
-            </li>
+                  src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/287105342&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
+              </div>
+            </article>
+          </li>
 
-            <li>
-              <article class="index-article">
-                <span class='post-date'>Aug 06 | 2015</span><h2 class='post-title'><a href="episodes/138/">Corwin Harrell</a></h2>
-                <h3 class='topic-list'>Q&A | 01 | University | Graphic design | Design setup | Sublime | Atom | thoughtbot | Working location | Collaboration & pairing | Vim advocates | Daily routine | Standups | Clients | Coffee walks | Investment Fridays |</h3>
-                <div class='soundcloud-player-small'>
-                  <iframe width="100%"
-                  height="166"
-                  scrolling="no"
-                  frameborder="no"
-                  src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/218101809&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
-                </div>
-              </article>
-            </li>
+          <li>
+            <article class="index-article">
+              <span class='post-date'>Aug 26 | 2015</span><h2 class='post-title'><a href="episodes/139/">João Ferreira</a></h2>
+              <h3 class='topic-list'>Masters @ Work | Subvisual | Deadlines | Design personality | Design problems | Team | Pushing envelopes | Delightful experiences | Perfecting details | Company values</h3>
+              <div class='soundcloud-player-small'>
+                <iframe width="100%"
+                height="166"
+                scrolling="no"
+                frameborder="no"
+                src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/221003494&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
+              </div>
+            </article>
+          </li>
+
+          <li>
+            <article class="index-article">
+              <span class='post-date'>Aug 06 | 2015</span><h2 class='post-title'><a href="episodes/138/">Corwin Harrell</a></h2>
+              <h3 class='topic-list'>Q&A | 01 | University | Graphic design | Design setup | Sublime | Atom | thoughtbot | Working location | Collaboration & pairing | Vim advocates | Daily routine | Standups | Clients | Coffee walks | Investment Fridays |</h3>
+              <div class='soundcloud-player-small'>
+                <iframe width="100%"
+                height="166"
+                scrolling="no"
+                frameborder="no"
+                src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/218101809&amp;color=ff0000&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false"></iframe>
+              </div>
+            </article>
+          </li>
         </ul>
       </div>
 
