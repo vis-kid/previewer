@@ -78,7 +78,7 @@ puts page.inspect
 
 ```
 
-The output is quite substantive. Take a look and see for yourself what a `Mechanize::Page` consists of. Here you can see only a few of the pieces that you can play with.
+The output is quite substantive. Take a look and see for yourself what a `Mechanize::Page` object consists of. Here you can see all the attributes for that page.
 
 #### **Output**
 
@@ -158,8 +158,6 @@ The output is quite substantive. Take a look and see for yourself what a `Mechan
  {forms}>
 
 ```
-
-
 
 If you want to take a look at the HTML page itself you can tag on the `.body` or `content` methods.
 
@@ -367,7 +365,87 @@ print page.body
 
 ```
 
-You can also look at things like encodings, the HTTP response code, the URI or the response headers.
+Since this podcast has only a small number of different elements on the page, here is the `Mechanize::Page` that get’s returned from github.com. It has a bigger variety for you to take a look at. Take a look! I think this is important to get a feel for.
+
+#### **Output github.com**
+
+``` bash
+
+#<Mechanize::Page
+ {url #<URI::HTTPS https://github.com/>}
+ {meta_refresh}
+ {title "How people build software · GitHub"}
+ {iframes}
+ {frames}
+ {links
+  #<Mechanize::Page::Link "Skip to content" "#start-of-content">
+  #<Mechanize::Page::Link "\n      \n    " "https://github.com/">
+  #<Mechanize::Page::Link "\n          Personal\n" "/personal">
+  #<Mechanize::Page::Link "\n          Open source\n" "/open-source">
+  #<Mechanize::Page::Link "\n          Business\n" "/business">
+  #<Mechanize::Page::Link "\n          Explore\n" "/explore">
+  #<Mechanize::Page::Link "Sign up" "/join?source=header-home">
+  #<Mechanize::Page::Link "Sign in" "/login">
+  #<Mechanize::Page::Link "Pricing" "/pricing">
+  #<Mechanize::Page::Link "Blog" "/blog">
+  #<Mechanize::Page::Link "Support" "https://help.github.com">
+  #<Mechanize::Page::Link "Search GitHub" "https://github.com/search">
+  #<Mechanize::Page::Link "terms of service" "https://help.github.com/terms">
+  #<Mechanize::Page::Link "privacy policy" "https://help.github.com/privacy">
+  #<Mechanize::Page::Link "Sign up for GitHub" "/join?source=button-home">
+  #<Mechanize::Page::Link
+   "\n      \n        \n      \n      \n        A whole new Universe\n        \n          Learn about the exciting features and announcements revealed at this year's GitHub Universe conference.\n        \n      \n    "
+   "/universe-2016">
+  #<Mechanize::Page::Link "Individuals " "/personal">
+  #<Mechanize::Page::Link "Communities " "/open-source">
+  #<Mechanize::Page::Link "Businesses " "/business">
+  #<Mechanize::Page::Link "NASA" "//github.com/nasa">
+  #<Mechanize::Page::Link "Sign up for GitHub" "/join?source=button-home">
+  #<Mechanize::Page::Link "Contact GitHub" "https://github.com/contact">
+  #<Mechanize::Page::Link "API" "https://developer.github.com">
+  #<Mechanize::Page::Link "Training" "https://training.github.com">
+  #<Mechanize::Page::Link "Shop" "https://shop.github.com">
+  #<Mechanize::Page::Link "Blog" "https://github.com/blog">
+  #<Mechanize::Page::Link "About" "https://github.com/about">
+  #<Mechanize::Page::Link "\n      \n" "https://github.com">
+  #<Mechanize::Page::Link "Terms" "https://github.com/site/terms">
+  #<Mechanize::Page::Link "Privacy" "https://github.com/site/privacy">
+  #<Mechanize::Page::Link "Security" "https://github.com/security">
+  #<Mechanize::Page::Link "Status" "https://status.github.com/">
+  #<Mechanize::Page::Link "Help" "https://help.github.com">
+  #<Mechanize::Page::Link "Reload" "">
+  #<Mechanize::Page::Link "Reload" "">}
+ {forms
+  #<Mechanize::Form
+   {name nil}
+   {method "GET"}
+   {action "/search"}
+   {fields
+    [hidden:0x3feb90f8297c type: hidden name: utf8 value: ✓]
+    [text:0x3feb90f827d8 type: text name: q value: ]}
+   {radiobuttons}
+   {checkboxes}
+   {file_uploads}
+   {buttons}>
+  #<Mechanize::Form
+   {name nil}
+   {method "POST"}
+   {action "/join"}
+   {fields
+    [hidden:0x3feb90f7be38 type: hidden name: utf8 value: ✓]
+    [hidden:0x3feb90f7bbb8 type: hidden name: authenticity_token value: vjRATKj7smXreq6Lt02r+MzW+ewWoi+fRzQXPedFAlOZgwzxQ0dZnChirhDfd7vyWZZZBO+ZFydLNedjIEDsrQ==]
+    [text:0x3feb90f7b9d8 type: text name: user[login] value: ]
+    [text:0x3feb90f7b7f8 type: text name: user[email] value: ]
+    [field:0x3feb90f7b654 type: password name: user[password] value: ]
+    [hidden:0x3feb90f7b474 type: hidden name: source value: form-home]}
+   {radiobuttons}
+   {checkboxes}
+   {file_uploads}
+   {buttons [button:0x3feb90f7a038 type: submit name:  value: ]}>}>
+
+```
+
+Back to the podcast, you can also look at things like encodings, the HTTP response code, the URI or the response headers.
 
 ``` ruby
 
