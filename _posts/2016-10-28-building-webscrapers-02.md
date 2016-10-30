@@ -496,7 +496,7 @@ There is lots more stuff if you wanna dig deeper. I’ll leave it at that.
 + `at`
 + `search`
 
-Mechanize uses Nokogiri to scrape data from pages. That means you can apply what you learned about Nokogiri in the first article and use it on Mechanize pages as well. That means that you generally use Mechanize to navigate pages and Nokogiri methods for your scraping needs. For example, if you want to search a single object you can  use `at` while `search` returns all objects that will match a selector on a particular page.
+Mechanize uses Nokogiri to scrape data from pages. That means you can apply what you learned about Nokogiri in the first article and use it on Mechanize pages as well. That means that you generally use Mechanize to navigate pages and Nokogiri methods for your scraping needs. For example, if you want to search a single object you can  use `at` while `search` returns all objects that will match a selector on a particular page. To rephrase that, these methods will work both on Nokogiri document objects and Mechanize page objects.
 
 ``` ruby
 
@@ -516,7 +516,7 @@ all_titles.each do |title|
   puts title
 end
 
-puts "*"*80
+puts " * "*33
 
 puts first_title
 
@@ -533,7 +533,7 @@ puts first_title
 <h2 class="post-title"><a href="episodes/140/">Joel Glovier</a></h2>
 <h2 class="post-title"><a href="episodes/139/">João Ferreira</a></h2>
 <h2 class="post-title"><a href="episodes/138/">Corwin Harrell</a></h2>
-********************************************************************************
+ *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * 
 <h2 class="post-title"><a href="episodes/144/">Randy J. Hunt</a></h2>
 
 ```
@@ -835,7 +835,187 @@ Set forms like ruby attributes
 
 
 
++ `submit`
 + `field_with`
 + `checkbox_with`
 + `radiobuttons_with`
 + `file_uploads`
+
+Let’s have a look at forms!
+
+#### **some_mechanizer.rb**
+
+``` ruby
+
+require 'mechanize'
+
+agent = Mechanize.new
+
+google_url = "http://google.com/"
+
+page = agent.get(google_url)
+
+form = page.forms
+
+puts form.inspect
+
+```
+
+#### **Output**
+
+``` bash
+[#<Mechanize::Form
+# Attention!!
+ {name "f"}
+# Attention!!
+ {method "GET"}
+ {action "/search"}
+ {fields
+  [hidden:0x3fea91d2eb08 type: hidden name: ie value: ISO-8859-1]
+  [hidden:0x3fea91d2e964 type: hidden name: hl value: es]
+  [hidden:0x3fea91d2e7e8 type: hidden name: source value: hp]
+  [hidden:0x3fea91d2e5f4 type: hidden name: biw value: ]
+  [hidden:0x3fea91d2e428 type: hidden name: bih value: ]
+# Attention!!
+  [text:0x3fea91d2e248 type:  name: q value: ]
+# Attention!!
+  [hidden:0x3fea91d2bcb4 type: hidden name: gbv value: 1]}
+ {radiobuttons}
+ {checkboxes}
+ {file_uploads}
+ {buttons
+  [submit:0x3fea91d2e0f4 type: submit name: btnG value: Buscar con Google]
+  [submit:0x3fea91d2be80 type: submit name: btnI value: Voy a tener suerte]}>
+]
+
+```
+
+Because we use the `forms` method, we get an array returned—even when we only have one form returned to us. Now that we know that the form has the name `"f"`, we can use the singular version `form` to hone in on that one. Using form('f') we singled out the particular form we wanna work with. As a result, we will not get an array returned.
+
+#### **some_mechanizer.rb**
+
+``` ruby
+
+require 'mechanize'
+
+agent = Mechanize.new
+
+google_url = "http://google.com/"
+
+page = agent.get(google_url)
+
+search_form = page.form('f')
+
+puts search_form.inspect
+
+```
+
+#### **Output**
+
+``` bash
+
+#<Mechanize::Form
+# Attention!!
+ {name "f"}
+# Attention!!
+ {method "GET"}
+ {action "/search"}
+ {fields
+  [hidden:0x3ffe9ce85ba4 type: hidden name: ie value: ISO-8859-1]
+  [hidden:0x3ffe9ce859d8 type: hidden name: hl value: es]
+  [hidden:0x3ffe9ce857bc type: hidden name: source value: hp]
+  [hidden:0x3ffe9ce85618 type: hidden name: biw value: ]
+  [hidden:0x3ffe9ce853e8 type: hidden name: bih value: ]
+# Attention!!
+  [text:0x3ffe9ce851cc type:  name: q value: ]
+# Attention!!
+  [hidden:0x3ffe9ce84bdc type: hidden name: gbv value: 1]}
+ {radiobuttons}
+ {checkboxes}
+ {file_uploads}
+ {buttons
+  [submit:0x3ffe9ce85078 type: submit name: btnG value: Buscar con Google]
+  [submit:0x3ffe9ce84e48 type: submit name: btnI value: Voy a tener suerte]}>
+
+```
+
+#### **some_mechanizer.rb**
+
+``` ruby
+
+require 'mechanize'
+
+agent = Mechanize.new
+
+google_url = "http://google.com/"
+
+page = agent.get(google_url)
+
+search_form = page.form('f')
+search_form.q = 'New Google Search'
+
+puts search_form.inspect
+
+```
+
+#### **Output**
+
+``` bash
+
+#<Mechanize::Form
+ {name "f"}
+ {method "GET"}
+ {action "/search"}
+ {fields
+  [hidden:0x3fcb85b6a784 type: hidden name: ie value: ISO-8859-1]
+  [hidden:0x3fcb85b6a57c type: hidden name: hl value: es]
+  [hidden:0x3fcb85b6a3b0 type: hidden name: source value: hp]
+  [hidden:0x3fcb85b6a16c type: hidden name: biw value: ]
+  [hidden:0x3fcb85b67f20 type: hidden name: bih value: ]
+# Attention!!
+  [text:0x3fcb85b67d18 type:  name: q value: New Search]
+# Attention!!
+  [hidden:0x3fcb85b67728 type: hidden name: gbv value: 1]}
+ {radiobuttons}
+ {checkboxes}
+ {file_uploads}
+ {buttons
+  [submit:0x3fcb85b67b9c type: submit name: btnG value: Buscar con Google]
+  [submit:0x3fcb85b67994 type: submit name: btnI value: Voy a tener suerte]}>
+
+```
+
+#### **some_mechanizer.rb**
+
+``` ruby
+
+require 'mechanize'
+
+agent = Mechanize.new
+
+google_url = "http://google.com/"
+page = agent.get(google_url)
+
+google_form = page.form('f')
+google_form.q = 'GitHub TouchFart'
+page = agent.submit(google_form)
+pp page.search('h3.r').map(&:text)
+
+```
+
+#### **Output**
+
+``` bash
+
+["GitHub - hungtruong/TouchFart: A fart app for the new Macbook ...",
+ "TouchFart/TouchFart at master · hungtruong/TouchFart · GitHub",
+ "Commits · hungtruong/TouchFart · GitHub",
+ "Projects · hungtruong/TouchFart · GitHub",
+ "Pull Requests · hungtruong/TouchFart · GitHub",
+ "Issues · hungtruong/TouchFart · GitHub",
+ "TouchFart/license.txt at master · hungtruong/TouchFart · GitHub",
+ "Add autoplay attribute to <audio> tag and touchfart (er ... - GitHub",
+ "Find file - File Finder · GitHub",
+ "Fart app for the new Macbook Pro's Touch... #3860 on topic touchfart ..."]
+
+```
