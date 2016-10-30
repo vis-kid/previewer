@@ -829,8 +829,6 @@ agent.page.links_with(href: '/some-href').click
 
 # Forms
 
-Set forms like ruby attributes
-
 `form_with` ???
 
 
@@ -855,9 +853,9 @@ google_url = "http://google.com/"
 
 page = agent.get(google_url)
 
-form = page.forms
+forms = page.forms
 
-puts form.inspect
+puts forms.inspect
 
 ```
 
@@ -890,7 +888,17 @@ puts form.inspect
 
 ```
 
-Because we use the `forms` method, we get an array returned—even when we only have one form returned to us. Now that we know that the form has the name `"f"`, we can use the singular version `form` to hone in on that one. Using form('f') we singled out the particular form we wanna work with. As a result, we will not get an array returned.
+Because we use the `forms` method, we get an array returned—even when we only have one form returned to us. Now that we know that the form has the name `"f"`, we can use the singular version `form` to hone in on that one.
+
+``` bash
+
+...
+
+{name "f"}
+
+...
+
+```
 
 #### **some_mechanizer.rb**
 
@@ -909,6 +917,9 @@ search_form = page.form('f')
 puts search_form.inspect
 
 ```
+
+
+Using `form('f')` we singled out the particular form we wanna work with. As a result, we will not get an array returned.
 
 #### **Output**
 
@@ -938,6 +949,20 @@ puts search_form.inspect
   [submit:0x3ffe9ce84e48 type: submit name: btnI value: Voy a tener suerte]}>
 
 ```
+
+We can also identify the name of the text input field (`q`).
+
+``` bash
+
+...
+
+[text:0x3ffe9ce851cc type:  name: q value: ]
+
+...
+
+```
+
+We can target it by that name and set its value like Ruby attributes. All we need to do is provide it with a new value. You can see from the output example above that it is empty by default.
 
 #### **some_mechanizer.rb**
 
@@ -973,7 +998,7 @@ puts search_form.inspect
   [hidden:0x3fcb85b6a16c type: hidden name: biw value: ]
   [hidden:0x3fcb85b67f20 type: hidden name: bih value: ]
 # Attention!!
-  [text:0x3fcb85b67d18 type:  name: q value: New Search]
+  [text:0x3fcb85b67d18 type:  name: q value: New Google Search]
 # Attention!!
   [hidden:0x3fcb85b67728 type: hidden name: gbv value: 1]}
  {radiobuttons}
@@ -984,6 +1009,8 @@ puts search_form.inspect
   [submit:0x3fcb85b67994 type: submit name: btnI value: Voy a tener suerte]}>
 
 ```
+
+As you can observe now, the value for the text field has changed to `New Google Search`. Now we only need to `submit` the form and collect the results from the page that Google returns. It couldn’t be any easier I think. Let’s search for something else this time!
 
 #### **some_mechanizer.rb**
 
@@ -1002,6 +1029,8 @@ page = agent.submit(google_form)
 pp page.search('h3.r').map(&:text)
 
 ```
+
+Here I identified the search results header using a CSS selector, mapped its `text` and pretty printed the results. Wasn’t that hard, was it? That is an easy example, sure, but think about the endless possibilities you have at your disposal with this!
 
 #### **Output**
 
