@@ -14,9 +14,10 @@ categories: [Mechanic, Nokogiri, Ruby]
 + Mechanize
 + Agent
 + Page
++ Nokogiri Methods
 + Links
 + Click
-
++ Forms
 
 # Single Page vs Pagination
 
@@ -78,7 +79,7 @@ puts page.inspect
 
 ```
 
-The output is quite substantive. Take a look and see for yourself what a `Mechanize::Page` object consists of. Here you can see all the attributes for that page.
+The output is quite substantive. Take a look and see for yourself what a `Mechanize::Page` object consists of. Here you can see all the attributes for that page. To me, this is a really handy object to slice up the data you want to extract.
 
 #### **Output**
 
@@ -490,6 +491,51 @@ http://betweenscreens.fm/
 
 There is lots more stuff if you wanna dig deeper. I’ll leave it at that.
 
+# Nokogiri methods
+
++ `at`
++ `search`
+
+Mechanize uses Nokogiri to scrape data from pages. That means you can apply what you learned about Nokogiri in the first article and use it on Mechanize pages as well. That means that you generally use Mechanize to navigate pages and Nokogiri methods for your scraping needs. For example, if you want to search a single object you can  use `at` while `search` returns all objects that will match a selector on a particular page.
+
+``` ruby
+
+require 'mechanize'
+
+agent = Mechanize.new
+
+podcast_url = "http://betweenscreens.fm/"
+
+page = agent.get(podcast_url)
+
+first_title = page.at('h2.post-title')
+
+all_titles = page.search('h2.post-title')
+
+all_titles.each do |title|
+  puts title
+end
+
+puts "*"*80
+
+puts first_title
+
+```
+
+#### **Output**
+
+``` bash
+
+<h2 class="post-title"><a href="episodes/144/">Randy J. Hunt</a></h2>
+<h2 class="post-title"><a href="episodes/143/">Jason Long</a></h2>
+<h2 class="post-title"><a href="episodes/142/">David Heinemeier Hansson</a></h2>
+<h2 class="post-title"><a href="episodes/141/">Zach Holman</a></h2>
+<h2 class="post-title"><a href="episodes/140/">Joel Glovier</a></h2>
+<h2 class="post-title"><a href="episodes/139/">João Ferreira</a></h2>
+<h2 class="post-title"><a href="episodes/138/">Corwin Harrell</a></h2>
+********************************************************************************
+<h2 class="post-title"><a href="episodes/144/">Randy J. Hunt</a></h2>
+
 ```
 
 # Links
@@ -673,7 +719,7 @@ Focus
 
 ```
 
-Boom! Now we are getting somwhere! We can zoom in on specific links like that. If we would have multiple `Focus` links, we could zoom in on a particular number on the page using brackets `[]`.
+Boom! Now we are getting somewhere! We can zoom in on specific links like that. We can target links that match a certain criteria—like its text for example—with a nicer API like `links_with` and `link_with`. Also, if we have multiple `Focus` links, we could zoom in on a particular number on the page using brackets `[]`.
 
 #### **some_scraper.rb**
 
@@ -780,3 +826,16 @@ agent.page.links_with(href: '/some-href')
 agent.page.links_with(href: '/some-href').click
 
 ```
+
+# Forms
+
+Set forms like ruby attributes
+
+`form_with` ???
+
+
+
++ `field_with`
++ `checkbox_with`
++ `radiobuttons_with`
++ `file_uploads`
