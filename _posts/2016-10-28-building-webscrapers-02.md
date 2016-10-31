@@ -733,20 +733,19 @@ podcast_url = "http://betweenscreens.fm/"
 
 page = agent.get(podcast_url)
 
-focus_link = agent.page.links_with(:text => 'News')[2]
+focus_link = agent.page.links_with(:text => 'Focus')[2]
 
 puts focus_link
 
 ```
 
-If you are not after the link text but the link itself, need simply specify a particular `href` to find a specific link. Mechanize won’t stand in your way. Instead of `text` you feed the methods with `href`.
+If you are not after the link text but the link itself, you only need to specify a particular `href` to find that link. Mechanize won’t stand in your way. Instead of `text` you feed the methods with `href`.
 
 ``` ruby
 
 page = agent.page.link_with(href: '/episodes/95/')
 
 page = agent.page.links_with(href: '/episodes/95/')
-
 
 ```
 
@@ -782,7 +781,7 @@ puts focus_links
 
 ```
 
-This would get us another long list of links like before. See how easy it was to combine `.click.links`. Mechanize clicks the link for you and follows the page to the new destination. Since we also requested a list of links, we will get all the list that Mechanize can find on that new page.
+This would get us another long list of links like before. See how easy it was to combine `.click.links`. Mechanize clicks the link for you and follows the page to the new destination. Since we also requested a list of links, we will get all the links that Mechanize can find on that new page.
 
 Let’s say I have two text links of the same interviewee. One that links to tags and one to a recent episode and I want to get the links from each of these pages. 
 
@@ -806,11 +805,7 @@ end
 
 ```
 
-This would give you a list of links for both. You iterate over each link for the interviewee, Mechanize follow the clicked link and collects the links it finds on the new page for you.
-
-
-
-Below you can find a list where you can compare a few combinations to get you started.
+This would give you a list of links for both pages. You iterate over each link for the interviewee, Mechanize follows the clicked link and collects the links it finds on the new page for you. Below you can find a few examples where you can compare combinations to get you started.
 
 ``` ruby
 
@@ -1010,7 +1005,7 @@ puts search_form.inspect
 
 ```
 
-As you can observe now, the value for the text field has changed to `New Google Search`. Now we only need to `submit` the form and collect the results from the page that Google returns. It couldn’t be any easier I think. Let’s search for something else this time!
+As you can observe above, the value for the text field has changed to `New Google Search`. Now we only need to `submit` the form and collect the results from the page that Google returns. It couldn’t be any easier. Let’s search for something else this time!
 
 #### **some_mechanizer.rb**
 
@@ -1023,14 +1018,16 @@ agent = Mechanize.new
 google_url = "http://google.com/"
 page = agent.get(google_url)
 
-google_form = page.form('f')
-google_form.q = 'GitHub TouchFart'
-page = agent.submit(google_form)
+search_form = page.form('f')
+search_form.q = 'GitHub TouchFart'
+
+page = agent.submit(search_form)
+
 pp page.search('h3.r').map(&:text)
 
 ```
 
-Here I identified the search results header using a CSS selector, mapped its `text` and pretty printed the results. Wasn’t that hard, was it? That is an easy example, sure, but think about the endless possibilities you have at your disposal with this!
+Here I identified the search results header using a CSS selector `h3.r`, mapped its `text` and pretty printed the results. Wasn’t that hard, was it? That is an easy example, sure, but think about the endless possibilities you have at your disposal with this!
 
 #### **Output**
 
@@ -1048,3 +1045,42 @@ Here I identified the search results header using a CSS selector, mapped its `te
  "Fart app for the new Macbook Pro's Touch... #3860 on topic touchfart ..."]
 
 ```
+
+Mechanize has different input fields available for you to play with. You can even upload files!
+
++ `field_with`
++ `checkbox_with`
++ `radiobuttons_with`
++ `file_uploads`
+
+You identify radio buttons and checkboxes also by their name and check them with—you guessed it—`check`.
+
+``` ruby
+
+form.radiobuttons_with(:name => 'gender')[3].check
+
+form.checkbox_with(:name => 'coder').check
+
+```
+
+Option tags offer users to select one item from a drop-down list. Again, we target them by name and select the option number we want.
+
+``` ruby
+
+form.field_with(:name => 'countries').options[22].select
+
+```
+
+File uploads work similarly to form submissions by setting it like Ruby attributes. You identify the upload field and then specify the file path (file name) you want to transfer. Sounds more complicated than it is. Let’s have a look!
+
+``` ruby
+
+form.file_uploads.first.file_name = "some-path/some-image.jpg"
+
+```
+
+# Final Thoughts
+
+See, no magic after all! You are now well equipped to have some fun on your own. I hope you could see how beautifully simple this gem is and how much power it offers. As we all know from popular culture by now, this also bears responsibilities. Use it within legal frameworks and when you have no access to an API. You probably won’t have a frequent use for these tools but boy the come in handy when you have some real scraping needs ahead of you.
+
+As promised, in the next article we will cover a real world example where I will scrape data off of my podcast site. I will extract it from an old Sinatra site and transfer it over to my new Middleman site that uses `.markdown` files for each episode. We will extract the dates, episodes numbers, interviewee names, headers, subheaders and so on. See you there!
