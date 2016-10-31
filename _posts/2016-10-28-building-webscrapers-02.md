@@ -1081,6 +1081,8 @@ form.file_uploads.first.file_name = "some-path/some-image.jpg"
 
 # Final Thoughts
 
-See, no magic after all! You are now well equipped to have some fun on your own. I hope you could see how beautifully simple this gem is and how much power it offers. As we all know from popular culture by now, this also bears responsibilities. Use it within legal frameworks and when you have no access to an API. You probably won’t have a frequent use for these tools but boy the come in handy when you have some real scraping needs ahead of you.
+See, no magic after all! You are now well equipped to have some fun on your own. There is certainly a bit more to learn about Nokogiri and Mechanize but instead of spending too much time on unnecessary aspects, play around with it and look into some more documentation when you run into problems beyond the scope of a beginner article.
+
+I hope you could see how beautifully simple this gem is and how much power it offers. As we all know from popular culture by now, this also bears responsibilities. Use it within legal frameworks and when you have no access to an API. You probably won’t have a frequent use for these tools but boy the come in handy when you have some real scraping needs ahead of you.
 
 As promised, in the next article we will cover a real world example where I will scrape data off of my podcast site. I will extract it from an old Sinatra site and transfer it over to my new Middleman site that uses `.markdown` files for each episode. We will extract the dates, episodes numbers, interviewee names, headers, subheaders and so on. See you there!
