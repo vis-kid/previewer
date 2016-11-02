@@ -27,7 +27,7 @@ So far we have spent some time figuring out how we can scrape the screen of a si
 
 Mechanize is another powerful tool that has lots of goodies to offer. It is essentially enabling you to automate interactions with websites you need to extract content from. In that sense it reminds me a bit of some functionality that you might know from testing with [Capybara](http://jnicklas.com/capybara/). Don’t get me wrong, playing with Nokogiri on a single page is awesome in itself, but for more spicy data extraction jobs, we need a bit more horsepower. We can essentially crawl through as many pages and we need and interact with its elements—imitating and automating human behavior. Pretty powerful stuff!
 
-This gem enables you to follow links, submit forms, populating form fields and submitting that data—even dealing with cookies is on the table. That means you can also imitate users login into private sessions and get content from a site only you have access to. You fill out the login with your credentials and tell Mechanize how to follow along. Since you can click links and submit forms, there is very little that you cannot do with this tool. It has a close relationship to Nokogiri and also depends on it. [Aaron Patterson](https://twitter.com/tenderlove?lang=de) is again one of the authors of this lovely gem.
+This gem enables you to follow links, fill out form fields and submit that data—even dealing with cookies is on the table. That means you can also imitate users login into private sessions and get content from a site only you have access to. You fill out the login with your credentials and tell Mechanize how to follow along. Since you can click links and submit forms, there is very little that you cannot do with this tool. It has a close relationship to Nokogiri and also depends on it. [Aaron Patterson](https://twitter.com/tenderlove?lang=de) is again one of the authors of this lovely gem.
  
 # Agent
 
@@ -64,6 +64,8 @@ What happens here is that the mechanize agent got the podcast page and its cooki
 # Page
 
 We now have a page that is ready for extraction. Before we do so, I recommend that we take a look under the hood using the `inspect` method.
+
+#### **some_scraper.rb**
 
 ``` ruby
 
@@ -160,7 +162,9 @@ The output is quite substantive. Take a look and see for yourself what a `Mechan
 
 ```
 
-If you want to take a look at the HTML page itself you can tag on the `.body` or `content` methods.
+If you want to take a look at the HTML page itself you can tag on the `body` or `content` methods.
+
+#### **some_scraper.rb**
 
 ``` ruby
 
@@ -366,7 +370,7 @@ print page.body
 
 ```
 
-Since this podcast has only a small number of different elements on the page, here is the `Mechanize::Page` that get’s returned from github.com. It has a bigger variety for you to take a look at. Take a look! I think this is important to get a feel for.
+Since this podcast has only a small number of different elements on the page, here is the `Mechanize::Page` that get’s returned from github.com. It has a bigger variety of content to take a look at. I think this is important to get a feel for.
 
 #### **Output github.com**
 
@@ -448,6 +452,8 @@ Since this podcast has only a small number of different elements on the page, he
 
 Back to the podcast, you can also look at things like encodings, the HTTP response code, the URI or the response headers.
 
+#### **some_scraper.rb**
+
 ``` ruby
 
 require 'mechanize'
@@ -496,7 +502,9 @@ There is lots more stuff if you wanna dig deeper. I’ll leave it at that.
 + `at`
 + `search`
 
-Mechanize uses Nokogiri to scrape data from pages. That means you can apply what you learned about Nokogiri in the first article and use it on Mechanize pages as well. That means that you generally use Mechanize to navigate pages and Nokogiri methods for your scraping needs. For example, if you want to search a single object you can  use `at` while `search` returns all objects that will match a selector on a particular page. To rephrase that, these methods will work both on Nokogiri document objects and Mechanize page objects.
+Mechanize uses Nokogiri to scrape data from pages. You can apply what you learned about Nokogiri in the first article and use it on Mechanize pages as well. That means that you generally use Mechanize to navigate pages and Nokogiri methods for your scraping needs. For example, if you want to search a single object you can  use `at` while `search` returns all objects that will match a selector on a particular page. To rephrase that, these methods will work both on Nokogiri document objects and Mechanize page objects.
+
+#### **some_scraper.rb**
 
 ``` ruby
 
@@ -544,7 +552,7 @@ puts first_title
 + `link_with`
 + `links_with`
 
-We can also already navigate the whole page to our liking. Probably the most important part of mechanize is its ability to let you play with links. Otherwise you could pretty much stick with Nokogiri on its own. Let’s take a look what we get returned if we ask a page for its links.
+We can also navigate the whole site to our liking. Probably the most important part of mechanize is its ability to let you play with links. Otherwise you could pretty much stick with Nokogiri on its own. Let’s take a look what we get returned if we ask a page for its links.
 
 #### **some_scraper.rb**
 
@@ -613,7 +621,7 @@ puts "#{page.links}"
 
 ```
 
-Holy moly, let’s break this down. Since we haven’t told mechanize to look elsewhere, we got an array of links from that very first page. Mechanize goes through that page in descending order and returns you this list of links from top to bottom. I have created a little image with green pointers to the various links that you can see in the output. Btw, this is already showing you the end result of the redesign for my podcast. I think this version is a bit better for demonstration purposes. You also get a glimpse how the final result looks like and why I needed to scrape my old Sinatra site.
+Holy moly, let’s break this down. Since we haven’t told mechanize to look elsewhere, we got an array of links from only that very first page. Mechanize goes through that page in descending order and returns you this list of links from top to bottom. I have created a little image with green pointers to the various links that you can see in the output. Btw, this is already showing you the end result of the redesign for my podcast. I think this version is a bit better for demonstration purposes. You also get a glimpse how the final result looks like and why I needed to scrape my old Sinatra site.
 
 #### **Screenshot**
 
@@ -703,9 +711,9 @@ podcast_url = "http://betweenscreens.fm/"
 
 page = agent.get(podcast_url)
 
-focus_links = agent.page.links.find { |l| l.text == 'Focus' }
+focus_link = agent.page.links.find { |link| link.text == 'Focus' }
 
-puts focus_links
+puts focus_link
 
 ```
 
@@ -713,8 +721,6 @@ puts focus_links
 
 ``` bash
 
-Focus
-Focus
 Focus
 
 ```
@@ -740,6 +746,8 @@ puts focus_link
 ```
 
 If you are not after the link text but the link itself, you only need to specify a particular `href` to find that link. Mechanize won’t stand in your way. Instead of `text` you feed the methods with `href`.
+
+#### **some_scraper.rb**
 
 ``` ruby
 
@@ -775,7 +783,7 @@ podcast_url = "http://betweenscreens.fm/"
 
 page = agent.get(podcast_url)
 
-focus_links = agent.page.links.find { |l| l.text == 'Focus' }.click.links
+focus_links = agent.page.links.find { |link| link.text == 'Focus' }.click.links
 
 puts focus_links
 
@@ -807,6 +815,8 @@ end
 
 This would give you a list of links for both pages. You iterate over each link for the interviewee, Mechanize follows the clicked link and collects the links it finds on the new page for you. Below you can find a few examples where you can compare combinations to get you started.
 
+#### **some_scraper.rb**
+
 ``` ruby
 
 agent.page.links.find { |l| l.text == 'Focus' }
@@ -824,10 +834,6 @@ agent.page.links_with(href: '/some-href').click
 
 # Forms
 
-`form_with` ???
-
-
-
 + `submit`
 + `field_with`
 + `checkbox_with`
@@ -836,7 +842,7 @@ agent.page.links_with(href: '/some-href').click
 
 Let’s have a look at forms!
 
-#### **some_mechanizer.rb**
+#### **some_scraper.rb**
 
 ``` ruby
 
@@ -895,7 +901,7 @@ Because we use the `forms` method, we get an array returned—even when we only 
 
 ```
 
-#### **some_mechanizer.rb**
+#### **some_scraper.rb**
 
 ``` ruby
 
@@ -959,7 +965,7 @@ We can also identify the name of the text input field (`q`).
 
 We can target it by that name and set its value like Ruby attributes. All we need to do is provide it with a new value. You can see from the output example above that it is empty by default.
 
-#### **some_mechanizer.rb**
+#### **some_scraper.rb**
 
 ``` ruby
 
@@ -1007,7 +1013,7 @@ puts search_form.inspect
 
 As you can observe above, the value for the text field has changed to `New Google Search`. Now we only need to `submit` the form and collect the results from the page that Google returns. It couldn’t be any easier. Let’s search for something else this time!
 
-#### **some_mechanizer.rb**
+#### **some_scraper.rb**
 
 ``` ruby
 
@@ -1055,6 +1061,8 @@ Mechanize has different input fields available for you to play with. You can eve
 
 You identify radio buttons and checkboxes also by their name and check them with—you guessed it—`check`.
 
+#### **some_scraper.rb**
+
 ``` ruby
 
 form.radiobuttons_with(:name => 'gender')[3].check
@@ -1065,13 +1073,17 @@ form.checkbox_with(:name => 'coder').check
 
 Option tags offer users to select one item from a drop-down list. Again, we target them by name and select the option number we want.
 
+#### **some_scraper.rb**
+
 ``` ruby
 
 form.field_with(:name => 'countries').options[22].select
 
 ```
 
-File uploads work similarly to form submissions by setting it like Ruby attributes. You identify the upload field and then specify the file path (file name) you want to transfer. Sounds more complicated than it is. Let’s have a look!
+File uploads work similar to inputing text into forms by setting it like Ruby attributes. You identify the upload field and then specify the file path (file name) you want to transfer. Sounds more complicated than it is. Let’s have a look!
+
+#### **some_scraper.rb**
 
 ``` ruby
 
@@ -1083,6 +1095,6 @@ form.file_uploads.first.file_name = "some-path/some-image.jpg"
 
 See, no magic after all! You are now well equipped to have some fun on your own. There is certainly a bit more to learn about Nokogiri and Mechanize but instead of spending too much time on unnecessary aspects, play around with it and look into some more documentation when you run into problems beyond the scope of a beginner article.
 
-I hope you could see how beautifully simple this gem is and how much power it offers. As we all know from popular culture by now, this also bears responsibilities. Use it within legal frameworks and when you have no access to an API. You probably won’t have a frequent use for these tools but boy the come in handy when you have some real scraping needs ahead of you.
+I hope you could see how beautifully simple this gem is and how much power it offers. As we all know from popular culture by now, this also bears responsibilities. Use it within legal frameworks and when you have no access to an API. You probably won’t have a frequent use for these tools but boy do they come in handy when you have some real scraping needs ahead of you.
 
 As promised, in the next article we will cover a real world example where I will scrape data off of my podcast site. I will extract it from an old Sinatra site and transfer it over to my new Middleman site that uses `.markdown` files for each episode. We will extract the dates, episodes numbers, interviewee names, headers, subheaders and so on. See you there!
