@@ -40,4 +40,13 @@ If you need to git push --force something with a rebase, it should be warning si
 
 Just remember to rebase only local changes and you and everybody else’s work will be safe.
 
+# git pull - -rebase
+
+git pull = git fetch and git merge
+
+git pull - - rebase = git fetch and git rebase
+this fetches new commits from a tracked remote branch and rebases them onto your branch
+
+In case you or somebody else did rebase a non local branch that other are affected by, there is one magic bullet you can give a shot.
+
 
