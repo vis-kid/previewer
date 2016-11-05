@@ -57,7 +57,7 @@ Using that scraped data, we want to populate the [frontmatter]() of markdown fil
 
 Below can you see a preview of how we will compose the new markdown files with the content we extacted. I think this will give you a good idea about the scope ahead of us. This represents the final step in our little script. Don’t worry, we will go over it in more detail. Along the way, I highly encourage you to start thinking about how you can improve the code in front of you. This will be your final task at the end of this article.
 
-#### **podcast_scraper**
+#### **podcast_scraper central piece**
 
 ``` ruby
 
@@ -115,19 +115,18 @@ What happens here is that I already extracted the necessary data using a bunch o
 
 
 
+Why didn’t we `require "Nokogiri"`? Mechanize provides us with all our scraping needs. As we discussed in the previous article, Mechanize builds on top of Nokogiri and allows us to extract content as well.
 
 
+## Helper Methods
 
+#### **podcast_scraper**
 
 ``` ruby
 
-require "HTTParty"
-require 'Nokogiri'
-require 'JSON'
-require 'Pry'
-require 'csv'
-require 'mechanize'
-require 'date'
+...
+
+# Helper Methods
 
 def strip_pipes(text)
   tags = text.tr('|', ',')
@@ -138,34 +137,11 @@ end
 def build_tags(text, interviewee)
   extracted_tags = strip_pipes(text)
   "#{interviewee}"+ ", #{extracted_tags}"
-
 end
 
 def extract_soundcloud_id(detail_page)
   sc = detail_page.iframes_with(href: /soundcloud.com/).to_s
   sc.scan(/\d{3,}/).first
-end
-
-#def slugerize(interviewee, title)
-#  slug = "#{interviewee.downcase.tr(' ','-')}-#{title.downcase.tr(' | ','-').tr('/','-').tr('?','-').tr('#','-').tr('&','-').tr('@','at').tr('ã','a')}"
-#  slug = slug.tr('---', '-')
-#  #slug = "#{interviewee.downcase.gsub(/\s/, '-')}-#{title.downcase.tr(' | ','-').gsub(/[?\/#&]/, '').gsub(/ã/, 'a').gsub(/@/, 'at')}"
-#end
-
-def compose_markdown(options={})
-<<-HEREDOC
---- 
-title:          #{options[:interviewee]}
-interviewee:    #{options[:interviewee]}
-topic_list:     #{options[:title]}
-tags:           #{options[:tags]}
-soundcloud_id:  #{options[:sc_id]}
-date:           #{options[:date]}
-episode_number: #{options[:episode_number]}
----
-
-#{options[:text]}
-HEREDOC
 end
 
 def clean_date(extracted_date)
@@ -206,6 +182,111 @@ def extract_subtitle(detail_page)
   detail_page.search(subheader_selector).text
 end
 
+def compose_markdown(options={})
+<<-HEREDOC
+--- 
+title:          #{options[:interviewee]}
+interviewee:    #{options[:interviewee]}
+topic_list:     #{options[:title]}
+tags:           #{options[:tags]}
+soundcloud_id:  #{options[:sc_id]}
+date:           #{options[:date]}
+episode_number: #{options[:episode_number]}
+---
+
+#{options[:text]}
+HEREDOC
+end
+
+...
+
+```
+
+## Full Code
+
+``` ruby
+
+require 'Pry'
+#require 'Nokogiri'
+require 'Mechanize'
+require 'date'
+
+# Helper Methods
+
+# Extraction Methods
+
+def extract_interviewee(detail_page)
+  interviewee_selector = '.episode_sub_title span'
+  detail_page.search(interviewee_selector).text.strip
+end
+
+def extract_title(detail_page)
+  title_selector = ".episode_title"
+  detail_page.search(title_selector).text.gsub(/[?#]/, '')
+end
+
+def extract_soundcloud_id(detail_page)
+  sc = detail_page.iframes_with(href: /soundcloud.com/).to_s
+  sc.scan(/\d{3,}/).first
+end
+
+def extract_shownotes_text(detail_page)
+  shownote_selector = "#shownote_container > p"
+  detail_page.search(shownote_selector)
+end
+
+def extract_subtitle(detail_page)
+  subheader_selector = ".episode_sub_title"
+  detail_page.search(subheader_selector).text
+end
+
+def extract_episode_number(episode_subtitle)
+  number = /[#]\d*/.match(episode_subtitle)
+  clean_episode_number(number)
+end
+
+# Utilities
+
+def clean_date(extracted_date)
+  string_date = /[^|]*([,])(.....)/.match(extracted_date).to_s
+  Date.parse(string_date)
+end
+
+def build_tags(text, interviewee)
+  extracted_tags = strip_pipes(text)
+  "#{interviewee}"+ ", #{extracted_tags}"
+end
+
+def strip_pipes(text)
+  tags = text.tr('|', ',')
+  tags = tags.gsub(/[@?#&]/, '')
+  tags.gsub(/[w\/]{2}/, 'with')
+end
+
+def clean_episode_number(number)
+  number.to_s.tr('#', '')
+end
+
+def dasherize(text)
+  text.lstrip.rstrip.tr(' ', '-')
+end
+
+def compose_markdown(options={})
+<<-HEREDOC
+--- 
+title: #{options[:interviewee]}
+interviewee: #{options[:interviewee]}
+topic_list: #{options[:title]}
+tags: #{options[:tags]}
+soundcloud_id: #{options[:sc_id]}
+date: #{options[:date]}
+episode_number: #{options[:episode_number]}
+---
+
+#{options[:text]}
+HEREDOC
+end
+
 def write_page(link)
 
   detail_page = link.click
@@ -233,17 +314,16 @@ end
 
 def scrape
     link_range = 1
+    agent ||= Mechanize.new
 
   #until link_range == 21
   until link_range == 2
-    agent ||= Mechanize.new
     #page = agent.get("http://betweenscreens.fm/?page=#{link_range}")
     page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
-
     link_range += 1
-    links = page.links
+    #links = page.links
 
-    links[2..8].map do |link|
+    page.links[2..8].map do |link|
       write_page(link)
     end
   end
@@ -275,6 +355,7 @@ scrape
 
 
 
+!!!! Old version
 
 ``` ruby
 
@@ -295,7 +376,6 @@ end
 def build_tags(text, interviewee)
   extracted_tags = strip_pipes(text)
   final_tag_list = "#{interviewee}"+ ", #{extracted_tags}"
-
 end
 
 def extract_soundcloud_id(detail_page)
