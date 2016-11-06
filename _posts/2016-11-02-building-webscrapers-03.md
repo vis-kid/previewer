@@ -324,7 +324,7 @@ The format I need for this to work is comprised of something called frontmatter.
 
 #### frontmatter
 
-``` ruby
+```
 
 ---
 key: value
@@ -341,7 +341,7 @@ In the `compose_markdown` method, I use a `HEREDOC` to compose that file with it
 
 #### def compose_markdown
 
-``` markdown
+```
 
 ...
 
@@ -365,6 +365,48 @@ HEREDOC
 
 This is the blueprint for a new podcast episode right there. This is what we came for. In case you are wondering about this syntax `#{options[:interviewee]}`. I interpolate as usual with strings but since I’m already inside a `<<-HEREDOC` I can leave the double quotes off.
 
+Just to orientate ourselves, we still in the loop, inside the `write_page` function for each clicked link to a detail page with the show notes of a singular episode. What happens next is prepping to write this blueprint to the file system. In other words, we create the actual episode by providing a file name and the composed `markdown_text`. 
+
+#### def write_page
+
+``` ruby
+
+...
+
+File.open(file_name, 'w') { |file| file.write(markdown_text) }
+
+...
+
+```
+
+For that final step, we just need to prepare the following ingredients. The date, the interviewee name and the episode number. Plust the `markdow_text` of course which we just got from `compose_markdown`.
+
+#### def write_page
+
+``` ruby
+
+...
+
+markdown_text = compose_markdown(extracted_data)
+date = extracted_data[:date]
+interviewee = extracted_data[:interviewee]
+episode_number = extracted_data[:episode_number]
+file_name = "#{date}-#{dasherize(interviewee)}-#{episode_number}.html.erb.md" 
+
+...
+
+```
+
+Let’s break this down as well. For each post I need a specific format. I want to write out files that start with the date, has the interviewee name and the episode number. Something like `2016-10-25-Avdi-Grimm-120`.
+
+Since the extracted content comes straight from an HTML site I can’t simply use `.md` or `.markdown` filename extension. I decided to go with `.html.erb.md`. For newer episodes that I compose without scraping, I can leave off the `.html.erb` part and only need `.md`.
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 What happens here is that I already extracted the necessary data using a bunch of smaller methods and feed it to this `compose_markdown` method through an options hash.
 
