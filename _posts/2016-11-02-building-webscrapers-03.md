@@ -57,17 +57,80 @@ Using that scraped data, we want to populate the [frontmatter]() of markdown fil
 
 Below can you see a preview of how we will compose the new markdown files with the content we extacted. I think this will give you a good idea about the scope ahead of us. This represents the final step in our little script. Don’t worry, we will go over it in more detail. Along the way, I highly encourage you to start thinking about how you can improve the code in front of you. This will be your final task at the end of this article.
 
-#### **podcast_scraper central piece**
+Let’s have a look at the complete code that I needed to scrape the content of my site. Look around and try to figure out the big picture what’s going on. Since I expect you to be on the beginner side of things, I stayed away from abstracting too much and err on the side of clarity of elegance. I did a couple of refactorings that were targeted at aiding code clarity but I also left a little bit of meat on the bone for you to play with when you are finished with this article.
+
+A little hint from me, breaking up large methods into smaller ones is a good place to start. If you understood how the code works, you should have a fun time honing in on that refactoring. I already started with extracting a bunch of methods into small, focused helpers. You should be able to easily apply what you have learned from my previous articles about code smells and their refactorings. If this still goes over your head right now, don’t worry, just keep at it and at some point things will start to click.
+
+# Full Code
 
 ``` ruby
 
-...
+#require 'Nokogiri'
+require 'Mechanize'
+require 'Pry'
+require 'date'
 
+# Helper Methods
 
-def write_page(link)
+# (Extraction Methods)
 
-  detail_page = link.click
+def extract_interviewee(detail_page)
+  interviewee_selector = '.episode_sub_title span'
+  detail_page.search(interviewee_selector).text.strip
+end
 
+def extract_title(detail_page)
+  title_selector = ".episode_title"
+  detail_page.search(title_selector).text.gsub(/[?#]/, '')
+end
+
+def extract_soundcloud_id(detail_page)
+  sc = detail_page.iframes_with(href: /soundcloud.com/).to_s
+  sc.scan(/\d{3,}/).first
+end
+
+def extract_shownotes_text(detail_page)
+  shownote_selector = "#shownote_container > p"
+  detail_page.search(shownote_selector)
+end
+
+def extract_subtitle(detail_page)
+  subheader_selector = ".episode_sub_title"
+  detail_page.search(subheader_selector).text
+end
+
+def extract_episode_number(episode_subtitle)
+  number = /[#]\d*/.match(episode_subtitle)
+  clean_episode_number(number)
+end
+
+# (Utilities)
+
+def clean_date(extracted_date)
+  string_date = /[^|]*([,])(.....)/.match(extracted_date).to_s
+  Date.parse(string_date)
+end
+
+def build_tags(text, interviewee)
+  extracted_tags = strip_pipes(text)
+  "#{interviewee}"+ ", #{extracted_tags}"
+end
+
+def strip_pipes(text)
+  tags = text.tr('|', ',')
+  tags = tags.gsub(/[@?#&]/, '')
+  tags.gsub(/[w\/]{2}/, 'with')
+end
+
+def clean_episode_number(number)
+  number.to_s.tr('#', '')
+end
+
+def dasherize(text)
+  text.lstrip.rstrip.tr(' ', '-')
+end
+
+def extract_data(detail_page)
   interviewee = extract_interviewee(detail_page)
   title = extract_title(detail_page)
   sc_id = extract_soundcloud_id(detail_page)
@@ -77,31 +140,98 @@ def write_page(link)
   date = clean_date(episode_subtitle)
   tags = build_tags(title, interviewee)
 
-  markdown_text = compose_markdown interviewee: interviewee,
-                                   title: title,
-                                   tags: tags,
-                                   sc_id: sc_id,
-                                   text: text,
-                                   date: date,
-                                   episode_number: episode_number
+  options = {
+    interviewee:    interviewee,
+    title:          title,
+    sc_id:          sc_id,
+    text:           text,
+    tags:           tags,
+    date:           date,
+    episode_number: episode_number
+  }
+end
 
-  #Pry.start(binding)
+def compose_markdown(options={})
+<<-HEREDOC
+--- 
+title: #{options[:interviewee]}
+interviewee: #{options[:interviewee]}
+topic_list: #{options[:title]}
+tags: #{options[:tags]}
+soundcloud_id: #{options[:sc_id]}
+date: #{options[:date]}
+episode_number: #{options[:episode_number]}
+---
+
+#{options[:text]}
+HEREDOC
+end
+
+def write_page(link)
+
+  detail_page = link.click
+
+  extracted_data = extract_data(detail_page)
+
+  markdown_text = compose_markdown(extracted_data)
+  date = extracted_data[:date]
+  interviewee = extracted_data[:interviewee]
+  episode_number = extracted_data[:episode_number]
+
   File.open("#{date}-#{dasherize(interviewee)}-#{episode_number}.html.erb.md", 'w') { |file| file.write(markdown_text) }
 end
 
 def scrape
-    link_range = 1
+  link_range = 1
+  agent ||= Mechanize.new
 
-  #until link_range == 21
-  until link_range == 2
-    agent ||= Mechanize.new
-    #page = agent.get("http://betweenscreens.fm/?page=#{link_range}")
+  until link_range == 21
     page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
-
     link_range += 1
-    links = page.links
 
-    links[2..8].map do |link|
+    page.links[2..8].map do |link|
+      write_page(link)
+    end
+  end
+end
+
+scrape
+
+#Pry.start(binding)
+
+```
+Now that you had a chance to familiarize yourself with the puzzle piece in place, I recommend we go over them one by one and clarify a few interesting points here and there. Let’s start with the central pieces here.
+
+#### **podcast_scraper.rb**
+
+``` ruby
+
+...
+
+def write_page(link)
+
+  detail_page = link.click
+
+  extracted_data = extract_data(detail_page)
+
+  markdown_text = compose_markdown(extracted_data)
+  date = extracted_data[:date]
+  interviewee = extracted_data[:interviewee]
+  episode_number = extracted_data[:episode_number]
+  file_name = "#{date}-#{dasherize(interviewee)}-#{episode_number}.html.erb.md" 
+
+  File.open(file_name, 'w') { |file| file.write(markdown_text) }
+end
+
+def scrape
+  link_range = 1
+  agent ||= Mechanize.new
+
+  until link_range == 21
+    page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
+    link_range += 1
+
+    page.links[2..8].map do |link|
       write_page(link)
     end
   end
@@ -110,6 +240,59 @@ end
 ...
 
 ```
+
+What happens is that in the `scrape` method, I loop over every page in the old podcast. FYI, I’m using the old url from the heroku app since the new site is already online at [Between \| Screens](http://betweenscreens.fm/). I had 20 pages of episodes that I needed to loop over. I delimited the loop via the `link_range` variable which I updated with each loop. Going from page to page was as simple as using this variable in the url of each page.
+
+``` ruby
+
+page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
+
+```
+
+That does all the pagination I needed. Simple and effective. Then, whenever I got a new page with another 8 episodes to scrape, I use `page.link` to identify the links we want to click and follow to the detail page for that podcast epside. I decided to go with a range of links (`links[2..8]`) since this was the easiest way to target the links I need on the page. No need to fumble around with CSS selectors here.
+
+In the loop itself, we feed that link for the detail page to the `write_page` method. This is where most of the work is done. We take that link, follow it to the detail page and start to extract its data. On that page we find all the info that I need to compose my new markdown episodes for the new site. 
+
+``` ruby
+
+extracted_data = extract_data(detail_page)
+
+```
+
+``` ruby
+
+def extract_data(detail_page)
+  interviewee = extract_interviewee(detail_page)
+  title = extract_title(detail_page)
+  sc_id = extract_soundcloud_id(detail_page)
+  text = extract_shownotes_text(detail_page)
+  episode_subtitle = extract_subtitle(detail_page)
+  episode_number = extract_episode_number(episode_subtitle)
+  date = clean_date(episode_subtitle)
+  tags = build_tags(title, interviewee)
+
+  options = {
+    interviewee:    interviewee,
+    title:          title,
+    sc_id:          sc_id,
+    text:           text,
+    tags:           tags,
+    date:           date,
+    episode_number: episode_number
+  }
+end
+
+```
+
+As you can see above, we take that `detail_page` and apply a bunch of extraction methods on it. We extract the `interviewee`, `title`, `sc_id`, `text`, `episode_title and `episode_number`. I extracted a bunch of focused helper methods who are in charge of these extraction responsibilities. 
+
+After that, I already start to prepare the data for composing the markdown. For example, I slice the `episode_subtitle` some more to get a clean date and build the `tags` with the `build_tags` method.  
+
+At the end, I return an options hash that I can feed the `compose_markdown` method that composes my markdown and gets it ready for writing out the file I need for my new site.
+
+
+
+
 
 What happens here is that I already extracted the necessary data using a bunch of smaller methods and feed it to this `compose_markdown` method through an options hash.
 
@@ -125,93 +308,6 @@ Why didn’t we `require "Nokogiri"`? Mechanize provides us with all our scrapin
 ``` ruby
 
 ...
-
-# Helper Methods
-
-def strip_pipes(text)
-  tags = text.tr('|', ',')
-  tags = tags.gsub(/[@?#&]/, '')
-  tags.gsub(/[w\/]{2}/, 'with')
-end
-
-def build_tags(text, interviewee)
-  extracted_tags = strip_pipes(text)
-  "#{interviewee}"+ ", #{extracted_tags}"
-end
-
-def extract_soundcloud_id(detail_page)
-  sc = detail_page.iframes_with(href: /soundcloud.com/).to_s
-  sc.scan(/\d{3,}/).first
-end
-
-def clean_date(extracted_date)
-  string_date = /[^|]*([,])(.....)/.match(extracted_date).to_s
-  Date.parse(string_date)
-end
-
-def clean_episode_number(episode_number)
-  episode_number.to_s.tr('#', '')
-end
-
-def extract_episode_number(episode_subtitle)
-  number = /[#]\d*/.match(episode_subtitle)
-  clean_episode_number(number)
-end
-
-def dasherize(text)
-  text.lstrip.rstrip.tr(' ', '-')
-end
-
-def extract_title(detail_page)
-  title_selector = ".episode_title"
-  detail_page.search(title_selector).text.gsub(/[?#]/, '')
-end
-
-def extract_interviewee(detail_page)
-  interviewee_selector = '.episode_sub_title span'
-  detail_page.search(interviewee_selector).text
-end
-
-def extract_shownotes_text(detail_page)
-  shownote_selector = "#shownote_container > p"
-  detail_page.search(shownote_selector)
-end
-
-def extract_subtitle(detail_page)
-  subheader_selector = ".episode_sub_title"
-  detail_page.search(subheader_selector).text
-end
-
-def compose_markdown(options={})
-<<-HEREDOC
---- 
-title:          #{options[:interviewee]}
-interviewee:    #{options[:interviewee]}
-topic_list:     #{options[:title]}
-tags:           #{options[:tags]}
-soundcloud_id:  #{options[:sc_id]}
-date:           #{options[:date]}
-episode_number: #{options[:episode_number]}
----
-
-#{options[:text]}
-HEREDOC
-end
-
-...
-
-```
-
-## Full Code
-
-``` ruby
-
-require 'Pry'
-#require 'Nokogiri'
-require 'Mechanize'
-require 'date'
-
-# Helper Methods
 
 # Extraction Methods
 
@@ -287,53 +383,7 @@ episode_number: #{options[:episode_number]}
 HEREDOC
 end
 
-def write_page(link)
-
-  detail_page = link.click
-
-  interviewee = extract_interviewee(detail_page)
-  title = extract_title(detail_page)
-  sc_id = extract_soundcloud_id(detail_page)
-  text = extract_shownotes_text(detail_page)
-  episode_subtitle = extract_subtitle(detail_page)
-  episode_number = extract_episode_number(episode_subtitle)
-  date = clean_date(episode_subtitle)
-  tags = build_tags(title, interviewee)
-
-  markdown_text = compose_markdown interviewee: interviewee,
-                                   title: title,
-                                   tags: tags,
-                                   sc_id: sc_id,
-                                   text: text,
-                                   date: date,
-                                   episode_number: episode_number
-
-  #Pry.start(binding)
-  File.open("#{date}-#{dasherize(interviewee)}-#{episode_number}.html.erb.md", 'w') { |file| file.write(markdown_text) }
-end
-
-def scrape
-    link_range = 1
-    agent ||= Mechanize.new
-
-  #until link_range == 21
-  until link_range == 2
-    #page = agent.get("http://betweenscreens.fm/?page=#{link_range}")
-    page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
-    link_range += 1
-    #links = page.links
-
-    page.links[2..8].map do |link|
-      write_page(link)
-    end
-  end
-
-end
-
-scrape
-
-#Pry.start(binding)
-
+...
 
 ```
 
@@ -353,6 +403,16 @@ scrape
 
 
 
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 !!!! Old version
