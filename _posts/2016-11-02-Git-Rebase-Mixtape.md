@@ -301,11 +301,41 @@ Interactive rebase comes in handy when you want to modify commits that are beyon
 -->
 
 
-
-
-
-
-
 # Cherry picking
 
 Animation: cherry icon on top of selected commits
+
+We saved the cherry for last. Cherry picking is a form of rebase that lets you fine tune individual commits you need.
+
+Say you have a branch that only has one or a couple of useful commits before you discard the rest of the branch. An ideal scenario for cherry picking.
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+### 15 Animation Laptop w/ Text Editor
+
+git cherry-pick commit-hash
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+### 16 Animation
+
+Cherry picking one commit and reapplying on master
+Cherry picking two commits and reapplying on master
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+![Alt text](/images/cherry-pick.png)
+![Alt text](/images/cherry-pick02.png)
+
+You can target a single commit by its hash number of define a range of commits that you wanna pick. Each picked commit get recreated on the for the rebase. You can observe that when git is changing their hash number.
+
+As you can see, cherry picking is easy as pie.
