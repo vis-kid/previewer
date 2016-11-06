@@ -243,6 +243,8 @@ end
 
 What happens is that in the `scrape` method, I loop over every page in the old podcast. FYI, I’m using the old url from the heroku app since the new site is already online at [Between \| Screens](http://betweenscreens.fm/). I had 20 pages of episodes that I needed to loop over. I delimited the loop via the `link_range` variable which I updated with each loop. Going from page to page was as simple as using this variable in the url of each page.
 
+#### def scrape
+
 ``` ruby
 
 page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
@@ -253,11 +255,15 @@ That does all the pagination I needed. Simple and effective. Then, whenever I go
 
 In the loop itself, we feed that link for the detail page to the `write_page` method. This is where most of the work is done. We take that link, follow it to the detail page and start to extract its data. On that page we find all the info that I need to compose my new markdown episodes for the new site. 
 
+#### def write_page
+
 ``` ruby
 
 extracted_data = extract_data(detail_page)
 
 ```
+
+#### Helper method
 
 ``` ruby
 
@@ -290,8 +296,74 @@ After that, I already start to prepare the data for composing the markdown. For 
 
 At the end, I return an options hash that I can feed the `compose_markdown` method that composes my markdown and gets it ready for writing out the file I need for my new site.
 
+#### Helper method
 
+``` ruby
 
+def compose_markdown(options={})
+<<-HEREDOC
+--- 
+title: #{options[:interviewee]}
+interviewee: #{options[:interviewee]}
+topic_list: #{options[:title]}
+tags: #{options[:tags]}
+soundcloud_id: #{options[:sc_id]}
+date: #{options[:date]}
+episode_number: #{options[:episode_number]}
+---
+
+#{options[:text]}
+HEREDOC
+end
+
+```
+
+For creating episodes on my middleman site, I opted to repurpose its blogging system. Instead of creating “pure” blog posts, I create show notes for my episodes that display the SoundCloud hosted episdes via iframes. On the index site, I only display that iframe plus title and stuff.  
+
+The format I need for this to work is comprised of something called frontmatter. This is basically a key / value store for my static sites. It is replacing my database needs from my old Sinatra site. Data like interviewee name, date, SoundCloud track id, episode number and so on goes in between three dashes (`---`) on top of our episodes files. Below comes the content for each episode. Stuff like questions, links, sponsor stuff…
+
+#### frontmatter
+
+``` ruby
+
+---
+key: value
+key: value
+key: value
+key: value
+---
+
+Episode content goes here.
+
+```
+
+In the `compose_markdown` method, I use a `HEREDOC` to compose that file with its frontmatter for each episode we loop through. From the options hash we feed this method, we extract all the data that we collected in the `extract_data` helper method.
+
+#### def compose_markdown
+
+``` markdown
+
+...
+
+<<-HEREDOC
+--- 
+title: #{options[:interviewee]}
+interviewee: #{options[:interviewee]}
+topic_list: #{options[:title]}
+tags: #{options[:tags]}
+soundcloud_id: #{options[:sc_id]}
+date: #{options[:date]}
+episode_number: #{options[:episode_number]}
+---
+
+#{options[:text]}
+HEREDOC
+
+...
+
+```
+
+This is the blueprint for a new podcast episode right there. This is what we came for. In case you are wondering about this syntax `#{options[:interviewee]}`. I interpolate as usual with strings but since I’m already inside a `<<-HEREDOC` I can leave the double quotes off.
 
 
 What happens here is that I already extracted the necessary data using a bunch of smaller methods and feed it to this `compose_markdown` method through an options hash.
@@ -415,6 +487,7 @@ end
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
+<!--
 !!!! Old version
 
 ``` ruby
@@ -553,3 +626,4 @@ dasherize
 strip_pipes
 
 ```
+-->
