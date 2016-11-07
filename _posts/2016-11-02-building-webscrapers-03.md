@@ -106,13 +106,13 @@ end
 
 # (Utilities)
 
-def clean_date(extracted_date)
-  string_date = /[^|]*([,])(.....)/.match(extracted_date).to_s
+def clean_date(episode_subtitle)
+  string_date = /[^|]*([,])(.....)/.match(episode_subtitle).to_s
   Date.parse(string_date)
 end
 
-def build_tags(text, interviewee)
-  extracted_tags = strip_pipes(text)
+def build_tags(title, interviewee)
+  extracted_tags = strip_pipes(title)
   "#{interviewee}"+ ", #{extracted_tags}"
 end
 
@@ -197,10 +197,83 @@ end
 
 scrape
 
-#Pry.start(binding)
 
 ```
-Now that you had a chance to familiarize yourself with the puzzle piece in place, I recommend we go over them one by one and clarify a few interesting points here and there. Let’s start with the central pieces here.
+
+# Pry
+
+Before we jump into our code here, I thought it was necessary to show you how you can efficiently check if your code works as expected every step of the way. As you have certainly noticed, I have added another tool to the mix. I added `Pry` which is really handy for debugging. If you place `Pry.start(binding)` anywhere in your code, you can inspect your application at exactly that point.
+
+It is really helpful to check every step along the way if you have the data you expected. For example, let’s place it right after our `write_page` function and check if `link` is what we expect.
+
+#### Pry
+
+``` ruby
+
+...
+
+def scrape
+  link_range = 1
+  agent ||= Mechanize.new
+
+  until link_range == 21
+    page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
+    link_range += 1
+
+    page.links[2..8].map do |link|
+      write_page(link)
+      Pry.start(binding)
+    end
+  end
+end
+
+...
+
+```
+
+If you run the script, we will get something like this.
+
+#### Output
+
+``` bash
+
+»$ ruby noko_scraper.rb
+
+    321: def scrape
+    322:     link_range = 1
+    323:     agent ||= Mechanize.new
+    324: 
+    326:   until link_range == 21
+    327:     page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
+    328:     link_range += 1
+    329: 
+    330:     page.links[2..8].map do |link|
+    331:       write_page(link)
+ => 332:     Pry.start(binding)
+    333:     end
+    334:   end
+    335: end
+
+[1] pry(main)>
+
+```
+
+When we then ask for the `link` object, we can check if we are on the right track before we move on to other implementation details.
+
+``` bash
+
+[2] pry(main)> link
+=> #<Mechanize::Page::Link
+ "Masters @ Work | Subvisual | Deadlines | Design personality | Design problems | Team | Pushing envelopes | Delightful experiences | Perfecting details | Company values"
+ "/episodes/139">
+
+```
+
+Looks like what we need. Great, we can move on. Doing this step by step through the whole application is an important practice not to get lost and really understand how it works. I won’t cover Pry here in any more detail since it would take me at least another fatty article to do so. I can only recommend using it as an alternative to the standard IRB shell. Back to our main task.
+
+# Scraper
+
+Now that you had a chance to familiarize yourself with the puzzle pieces in place, I recommend we go over them one by one and clarify a few interesting points here and there. Let’s start with the central pieces.
 
 #### **podcast_scraper.rb**
 
@@ -264,7 +337,7 @@ extracted_data = extract_data(detail_page)
 
 ```
 
-#### Helper method
+#### def extract_data
 
 ``` ruby
 
@@ -291,13 +364,227 @@ end
 
 ```
 
-As you can see above, we take that `detail_page` and apply a bunch of extraction methods on it. We extract the `interviewee`, `title`, `sc_id`, `text`, `episode_title and `episode_number`. I extracted a bunch of focused helper methods who are in charge of these extraction responsibilities. 
+As you can see above, we take that `detail_page` and apply a bunch of extraction methods on it. We extract the `interviewee`, `title`, `sc_id`, `text`, `episode_title and `episode_number`. I extracted a bunch of focused helper methods who are in charge of these extraction responsibilities. Let’s have a quick look at them:
 
-After that, I already start to prepare the data for composing the markdown. For example, I slice the `episode_subtitle` some more to get a clean date and build the `tags` with the `build_tags` method.  
+# Helper Methods 
 
-At the end, I return an options hash that I can feed the `compose_markdown` method that composes my markdown and gets it ready for writing out the file I need for my new site.
+## Extraction Methods
 
-#### Helper method
+I extracted these methods because it enabled me to have smaller methods overall. Encapsulating their behaviour was also important. The code reads better as well. Most of them take the `detail_page` as an argument and extract some specific data we need for our Middleman posts.
+
+``` ruby
+
+def extract_interviewee(detail_page)
+  interviewee_selector = '.episode_sub_title span'
+  detail_page.search(interviewee_selector).text.strip
+end
+
+```
+
+We search the page for a specific selector and get the text without unnecessary white space.
+
+``` ruby
+
+def extract_title(detail_page)
+  title_selector = ".episode_title"
+  detail_page.search(title_selector).text.gsub(/[?#]/, '')
+end
+
+```
+
+We return the title and clean it from `?` and `#` since this doesn’t play nice with the frontmatter in the posts for our episodes. More about frontmatter further below.
+
+``` ruby
+
+def extract_soundcloud_id(detail_page)
+  sc = detail_page.iframes_with(href: /soundcloud.com/).to_s
+  sc.scan(/\d{3,}/).first
+end
+
+```
+
+Here we needed to work a little harder to extract the SoundCloud id for our hosted trackes. First we need the Mechanize iframe with the `href` of soundcloud and make it a string for scanning..
+
+``` bash
+
+"[#<Mechanize::Page::Frame\n nil\n \"https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/221003494&amp;auto_play=false&amp;hide_related=false&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false&amp;visual=true\">\n]"
+
+```
+
+Then match a regular expression for its digits for the track id, our `soundcloud_id` `"221003494"`.
+
+``` ruby
+
+def extract_shownotes_text(detail_page)
+  shownote_selector = "#shownote_container > p"
+  detail_page.search(shownote_selector)
+end
+
+```
+
+Extracting show notes is again quite straightforward. All we need is look for show notes paragraphs in the detail page. No surprises here. 
+
+``` ruby
+
+def extract_subtitle(detail_page)
+  subheader_selector = ".episode_sub_title"
+  detail_page.search(subheader_selector).text
+end
+
+```
+
+Same goes for the subtitle, except that it is just a preparation to extract the episode number from it.
+
+``` ruby
+
+def extract_episode_number(episode_subtitle)
+  number = /[#]\d*/.match(episode_subtitle)
+  clean_episode_number(number)
+end
+
+```
+
+Here we need another round of regular expression. Let’s have a look before and after we applied the regex.
+
+#### Subheader
+
+``` bash
+
+" João Ferreira  | 12  Minutes |  Aug 26, 2015 | Episode #139  "
+
+```
+
+#### Extracted episode
+
+``` bash
+
+"#139"
+
+```
+
+One more step until we have a clean number.
+
+``` ruby
+
+def clean_episode_number(number)
+  number.to_s.tr('#', '')
+end
+
+```
+
+We take that number with a hash `#` and remove it. Voilà, we have our first episode number `139`` extracted as well. I suggest we look at the smaller utility methods as well before we bring it all together.
+
+## Utility Methods
+
+After all extraction business, we have some cleanup to do. We can already start to prepare the data for composing the markdown. For example, I slice the `episode_subtitle` some more to get a clean date and build the `tags` with the `build_tags` method.  
+
+``` ruby
+
+def clean_date(episode_subtitle)
+  string_date = /[^|]*([,])(.....)/.match(episode_subtitle).to_s
+  Date.parse(string_date)
+end
+
+```
+
+We run another regex that looks for dates like this `"  Aug 26, 2015"`. As you can see, this is not very helpful yet. From that `string_date` we get from the subtitle, we need to create a real `Date` object. Otherwise it would be useless for properly creating Middleman posts.
+
+#### sting_date
+
+``` bash
+
+"  Aug 26, 2015"
+
+```
+
+Therefore we take that string and do a `Date.parse`. The result looks a lot more promising.
+
+#### Date
+
+``` bash
+
+2015-08-26
+
+```
+
+
+``` ruby
+
+def build_tags(title, interviewee)
+  extracted_tags = strip_pipes(title)
+  "#{interviewee}"+ ", #{extracted_tags}"
+end
+
+```
+
+This take the `title` and `interviewee` we have built up inside the `extract_data` method and removes all pipe characters and junk. Then we include the interviewee name in the tag list as well and separate each tag by a comma.
+
+#### def strip_pipes
+
+``` ruby
+
+def strip_pipes(text)
+  tags = text.tr('|', ',')
+  tags = tags.gsub(/[@?#&]/, '')
+  tags.gsub(/[w\/]{2}/, 'with')
+end
+
+```
+
+We replace pipe characters with a comma, replace `@`, `?`, `#`, `&` with an empty string and finally take care of abbreviations for `with`..
+
+#### Before
+
+``` bash
+
+"Masters @ Work | Subvisual | Deadlines | Design personality | Design problems | Team | Pushing envelopes | Delightful experiences | Perfecting details | Company values"
+
+```
+
+#### After
+
+``` bash
+
+"João Ferreira, Masters  Work , Subvisual , Deadlines , Design personality , Design problems , Team , Pushing envelopes , Delightful experiences , Perfecting details , Company values"
+
+```
+
+Each of these tags will end up being a link to a collection of posts for that topic.
+
+All of this happened inside the `extract_data` method. Let’s have another look where we are:
+
+#### def extract_data
+
+``` ruby
+
+def extract_data(detail_page)
+  interviewee = extract_interviewee(detail_page)
+  title = extract_title(detail_page)
+  sc_id = extract_soundcloud_id(detail_page)
+  text = extract_shownotes_text(detail_page)
+  episode_subtitle = extract_subtitle(detail_page)
+  episode_number = extract_episode_number(episode_subtitle)
+  date = clean_date(episode_subtitle)
+  tags = build_tags(title, interviewee)
+
+  options = {
+    interviewee:    interviewee,
+    title:          title,
+    sc_id:          sc_id,
+    text:           text,
+    tags:           tags,
+    date:           date,
+    episode_number: episode_number
+  }
+end
+
+```
+
+
+
+All that is left to do here is return an options hash with the data we exracted. We can feed this returned options hash into the `compose_markdown` method which then composes my markdown. It gets it ready for writing out the file I need for my new site.
+
+#### def compose_markdown
 
 ``` ruby
 
@@ -509,13 +796,13 @@ end
 
 # Utilities
 
-def clean_date(extracted_date)
-  string_date = /[^|]*([,])(.....)/.match(extracted_date).to_s
+def clean_date(episode_subtitle)
+  string_date = /[^|]*([,])(.....)/.match(episode_subtitle).to_s
   Date.parse(string_date)
 end
 
-def build_tags(text, interviewee)
-  extracted_tags = strip_pipes(text)
+def build_tags(title, interviewee)
+  extracted_tags = strip_pipes(title)
   "#{interviewee}"+ ", #{extracted_tags}"
 end
 
@@ -600,8 +887,8 @@ def strip_pipes(text)
   tags = tags.gsub(/[w\/]{2}/, 'with')
 end
 
-def build_tags(text, interviewee)
-  extracted_tags = strip_pipes(text)
+def build_tags(title, interviewee)
+  extracted_tags = strip_pipes(title)
   final_tag_list = "#{interviewee}"+ ", #{extracted_tags}"
 end
 
@@ -626,8 +913,8 @@ episode_number: #{options[:episode_number]}
 HEREDOC
 end
 
-def clean_date(extracted_date)
-  string_date = /[^|]*([,])(.....)/.match(extracted_date).to_s
+def clean_date(episode_subtitle)
+  string_date = /[^|]*([,])(.....)/.match(episode_subtitle).to_s
   date = Date.parse(string_date)
 end
 
