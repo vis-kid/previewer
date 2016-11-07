@@ -11,6 +11,10 @@ categories: [Mechanic, Nokogiri, Ruby]
 # Topics
 
 + Scraping my Podcast
++ Pry
++ Scraper
++ Helper Methods
++ Writing Posts
 
 # Scraping my Podcast
 
@@ -38,9 +42,7 @@ After I worked on the Middleman site and invested a good amount of time on the n
 
 ![Alt text](/images/webscraper/between-screens-new-01.png)
 
-Let’s break down what we want to accomplish.
-
-We want to extract the following data from 21 pages:
+Let’s break down what we want to accomplish. We want to extract the following data from 21 pages:
 
 + the title
 + the interviewee
@@ -65,7 +67,6 @@ A little hint from me, breaking up large methods into smaller ones is a good pla
 
 ``` ruby
 
-#require 'Nokogiri'
 require 'Mechanize'
 require 'Pry'
 require 'date'
@@ -104,7 +105,7 @@ def extract_episode_number(episode_subtitle)
   clean_episode_number(number)
 end
 
-# (Utilities)
+# (Utility Methods)
 
 def clean_date(episode_subtitle)
   string_date = /[^|]*([,])(.....)/.match(episode_subtitle).to_s
@@ -200,9 +201,11 @@ scrape
 
 ```
 
+Why didn’t we `require "Nokogiri"`? Mechanize provides us with all our scraping needs. As we discussed in the previous article, Mechanize builds on top of Nokogiri and allows us to extract content as well.
+
 # Pry
 
-Before we jump into our code here, I thought it was necessary to show you how you can efficiently check if your code works as expected every step of the way. As you have certainly noticed, I have added another tool to the mix. I added `Pry` which is really handy for debugging. If you place `Pry.start(binding)` anywhere in your code, you can inspect your application at exactly that point.
+First things first. Before we jump into our code here, I thought it was necessary to show you how you can efficiently check if your code works as expected every step of the way. As you have certainly noticed, I have added another tool to the mix. I added `Pry` which is really handy for debugging. If you place `Pry.start(binding)` anywhere in your code, you can inspect your application at exactly that point.
 
 It is really helpful to check every step along the way if you have the data you expected. For example, let’s place it right after our `write_page` function and check if `link` is what we expect.
 
@@ -517,7 +520,7 @@ end
 
 ```
 
-This take the `title` and `interviewee` we have built up inside the `extract_data` method and removes all pipe characters and junk. Then we include the interviewee name in the tag list as well and separate each tag by a comma.
+This takes the `title` and `interviewee` we have built up inside the `extract_data` method and removes all pipe characters and junk. We replace pipe characters with a comma, replace `@`, `?`, `#`, `&` with an empty string and finally take care of abbreviations for `with`.
 
 #### def strip_pipes
 
@@ -531,7 +534,7 @@ end
 
 ```
 
-We replace pipe characters with a comma, replace `@`, `?`, `#`, `&` with an empty string and finally take care of abbreviations for `with`..
+In the end we include the interviewee name in the tag list as well and separate each tag by a comma.
 
 #### Before
 
@@ -549,9 +552,7 @@ We replace pipe characters with a comma, replace `@`, `?`, `#`, `&` with an empt
 
 ```
 
-Each of these tags will end up being a link to a collection of posts for that topic.
-
-All of this happened inside the `extract_data` method. Let’s have another look where we are:
+Each of these tags will end up being a link to a collection of posts for that topic. All of this happened inside the `extract_data` method. Let’s have another look where we are:
 
 #### def extract_data
 
@@ -583,6 +584,8 @@ end
 
 
 All that is left to do here is return an options hash with the data we exracted. We can feed this returned options hash into the `compose_markdown` method which then composes my markdown. It gets it ready for writing out the file I need for my new site.
+
+# Writing Posts
 
 #### def compose_markdown
 
@@ -750,122 +753,6 @@ This scraper would start at the last episode of course and loops until the first
 What happens here is that I already extracted the necessary data using a bunch of smaller methods and feed it to this `compose_markdown` method through an options hash.
 
 
-
-Why didn’t we `require "Nokogiri"`? Mechanize provides us with all our scraping needs. As we discussed in the previous article, Mechanize builds on top of Nokogiri and allows us to extract content as well.
-
-
-## Helper Methods
-
-#### **podcast_scraper**
-
-``` ruby
-
-...
-
-# Extraction Methods
-
-def extract_interviewee(detail_page)
-  interviewee_selector = '.episode_sub_title span'
-  detail_page.search(interviewee_selector).text.strip
-end
-
-def extract_title(detail_page)
-  title_selector = ".episode_title"
-  detail_page.search(title_selector).text.gsub(/[?#]/, '')
-end
-
-def extract_soundcloud_id(detail_page)
-  sc = detail_page.iframes_with(href: /soundcloud.com/).to_s
-  sc.scan(/\d{3,}/).first
-end
-
-def extract_shownotes_text(detail_page)
-  shownote_selector = "#shownote_container > p"
-  detail_page.search(shownote_selector)
-end
-
-def extract_subtitle(detail_page)
-  subheader_selector = ".episode_sub_title"
-  detail_page.search(subheader_selector).text
-end
-
-def extract_episode_number(episode_subtitle)
-  number = /[#]\d*/.match(episode_subtitle)
-  clean_episode_number(number)
-end
-
-# Utilities
-
-def clean_date(episode_subtitle)
-  string_date = /[^|]*([,])(.....)/.match(episode_subtitle).to_s
-  Date.parse(string_date)
-end
-
-def build_tags(title, interviewee)
-  extracted_tags = strip_pipes(title)
-  "#{interviewee}"+ ", #{extracted_tags}"
-end
-
-def strip_pipes(text)
-  tags = text.tr('|', ',')
-  tags = tags.gsub(/[@?#&]/, '')
-  tags.gsub(/[w\/]{2}/, 'with')
-end
-
-def clean_episode_number(number)
-  number.to_s.tr('#', '')
-end
-
-def dasherize(text)
-  text.lstrip.rstrip.tr(' ', '-')
-end
-
-def compose_markdown(options={})
-<<-HEREDOC
---- 
-title: #{options[:interviewee]}
-interviewee: #{options[:interviewee]}
-topic_list: #{options[:title]}
-tags: #{options[:tags]}
-soundcloud_id: #{options[:sc_id]}
-date: #{options[:date]}
-episode_number: #{options[:episode_number]}
----
-
-#{options[:text]}
-HEREDOC
-end
-
-...
-
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 <!--
