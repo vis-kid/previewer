@@ -218,6 +218,7 @@ def write_page(link)
   date = extracted_data[:date]
   interviewee = extracted_data[:interviewee]
   episode_number = extracted_data[:episode_number]
+
   file_name = "#{date}-#{dasherize(interviewee)}-#{episode_number}.html.erb.md" 
 
   File.open(file_name, 'w') { |file| file.write(markdown_text) }
@@ -367,18 +368,6 @@ This is the blueprint for a new podcast episode right there. This is what we cam
 
 Just to orientate ourselves, we still in the loop, inside the `write_page` function for each clicked link to a detail page with the show notes of a singular episode. What happens next is prepping to write this blueprint to the file system. In other words, we create the actual episode by providing a file name and the composed `markdown_text`. 
 
-#### def write_page
-
-``` ruby
-
-...
-
-File.open(file_name, 'w') { |file| file.write(markdown_text) }
-
-...
-
-```
-
 For that final step, we just need to prepare the following ingredients. The date, the interviewee name and the episode number. Plust the `markdow_text` of course which we just got from `compose_markdown`.
 
 #### def write_page
@@ -391,15 +380,59 @@ markdown_text = compose_markdown(extracted_data)
 date = extracted_data[:date]
 interviewee = extracted_data[:interviewee]
 episode_number = extracted_data[:episode_number]
+
 file_name = "#{date}-#{dasherize(interviewee)}-#{episode_number}.html.erb.md" 
 
 ...
 
 ```
 
-Let’s break this down as well. For each post I need a specific format. I want to write out files that start with the date, has the interviewee name and the episode number. Something like `2016-10-25-Avdi-Grimm-120`.
+Then we only need to take the `file_name` and the `markdown_text` and write the file.
 
-Since the extracted content comes straight from an HTML site I can’t simply use `.md` or `.markdown` filename extension. I decided to go with `.html.erb.md`. For newer episodes that I compose without scraping, I can leave off the `.html.erb` part and only need `.md`.
+#### def write_page
+
+``` ruby
+
+...
+
+File.open(file_name, 'w') { |file| file.write(markdown_text) }
+
+...
+
+```
+
+Let’s break this down as well. For each post I need a specific format. Something like `2016-10-25-Avdi-Grimm-120`. I want to write out files that start with the date, has the interviewee name and the episode number.
+
+To match the format Middleman expects for new posts, I needed to take the interviewee name and put it through my helper method to `dasherize` the name for me. From `Avdi Grimm` to `Avdi-Grimm`. Nothing magic, but worth a look:
+
+#### def dasherize
+
+``` ruby
+
+def dasherize(text)
+  text.lstrip.rstrip.tr(' ', '-')
+end
+
+```
+
+It removes whitespace from the text we scraped for the interviewee name and replaces the white space between Avdi and Grimm with a dash. The rest of the filename is dashed together in the string itself. `"date-interviewee-name-episodenumber"`
+
+#### def write_page
+
+``` ruby
+
+...
+
+"#{date}-#{dasherize(interviewee)}-#{episode_number}.html.erb.md"
+
+...
+
+```
+
+
+
+Since the extracted content comes straight from an HTML site I can’t simply use `.md` or `.markdown` as filename extension. I decided to go with `.html.erb.md`. For future episodes that I compose without scraping, I can leave off the `.html.erb` part and only need `.md`.
+
 
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
