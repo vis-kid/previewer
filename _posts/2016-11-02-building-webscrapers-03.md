@@ -429,10 +429,29 @@ It removes whitespace from the text we scraped for the interviewee name and repl
 
 ```
 
-
-
 Since the extracted content comes straight from an HTML site I can’t simply use `.md` or `.markdown` as filename extension. I decided to go with `.html.erb.md`. For future episodes that I compose without scraping, I can leave off the `.html.erb` part and only need `.md`.
 
+After this step, the loop in the `scrape` function ends and we should have something that looks like this:
+
+#### 2014-12-01-Avdi-Grimm-1.html.erb.md
+
+``` HTML
+
+--- 
+title: Avdi Grimm
+interviewee: Avdi Grimm
+topic_list: What is Rake | Origins | Jim Weirich | Common use cases | Advantages of Rake
+tags: Avdi Grimm, What is Rake , Origins , Jim Weirich , Common use cases , Advantages of Rake
+soundcloud_id: 179619755
+date: 2014-12-01
+episode_number: 1
+---
+
+<p class="show_notes_display"><b>Questions:</b><br>- What is Rake?<br>- What can you tell us about the origins of Rake?<br>- What can you tell us about Jim Weihrich?<br>- What are the most common use cases for Rake?<br>- What are the most notable advantages of Rake?<br><br><b>Links:</b><br><a rel="nofollow" target="_blank" href="http://www.youtube.com/watch?v=2ZHJSrF52bc">In memory of the great Jim Weirich</a><br><a rel="nofollow" target="_blank" href="https://github.com/jimweirich/rake">Rake on GitHub</a><br><a rel="nofollow" target="_blank" href="https://github.com/jimweirich">Jim Weirich on GitHub</a><br><a rel="nofollow" target="_blank" href="http://www.youtube.com/watch?v=AFPWDzHWjEY">Basic Rake</a> talk by Jim Weirich<br><a rel="nofollow" target="_blank" href="http://www.youtube.com/watch?v=KaEqZtulOus">Power Rake</a> talk by Jim Weirich<br><a rel="nofollow" target="_blank" href="http://devblog.avdi.org/2014/04/30/learn-advanced-rake-in-7-episodes/">Learn advanced Rake in 7 episodes - from Avdi Grimm ( free )</a><br><a rel="nofollow" target="_blank" href="http://about.avdi.org/">Avdi Grimm</a><br>Avdi Grimm’s screencasts: <a rel="nofollow" target="_blank" href="http://www.rubytapas.com/">Ruby Tapas</a><br><a rel="nofollow" target="_blank" href="http://devchat.tv/ruby-rogues/">Ruby Rogues</a> podcast with Avdi Grimm<br>Great ebook: <a rel="nofollow" target="_blank" href="http://www.amazon.com/Rake-Management-Essentials-Andrey-Koleshko/dp/1783280778">Rake Task Management Essentials</a> from<a rel="nofollow" target="_blank" href="https://twitter.com/ka8725"> Andrey Koleshko</a><br><br><br><br><br><br><br><br><br></p>
+
+```
+
+This scraper would start at the last episode of course and loops until the first. For demonstration purposes, episode 01 is as good as any. You can see on top the frontmatter with the data we extracted. All of that was previously locked in the database of my Sinatra app. Episode number, date, interviewee name and so on. Now we have it prepared to be part of my new static Middlman site. Everything below the two triple dashes (`---`) is the text from the show notes. Questions and links mostly.
 
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
