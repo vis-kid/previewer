@@ -28,7 +28,7 @@ Let’s be frank, I made the wrong choice technology-wise. I wanted to have a sm
 
 That means you have to spend a lot more time bug fixing than I was used to over the last couple of years. Overall, this is fine and dandy, it’s good practice after all. For a side project it was just a bit too time consuming when you also want to produce new episodes a few times per week. Sure, it was educational to build everything myself from the ground up but I left a lot of time on the table with needless fights.
 
-Don’t get me wrong, Sinatra is a nice tool, no it is a great tool, but for this job I should have chosen more wisely. This was not setup to scale. I should have either gone with a Rails app or a plain static site that uses Jekyll or Middleman and runs on GitHub pages. In hindsight, that would have made my podcasting life a whole lot more joyful. Anyway.
+Don’t get me wrong, Sinatra is a nice tool, no it is a great tool, but for this job I should have chosen more wisely. This was not setup to scale. I should have either gone with a Rails app or a plain static site that uses [Jekyll](https://jekyllrb.com/) or [Middleman](https://middlemanapp.com/) and runs on [GitHub pages](https://pages.github.com/). In hindsight, that would have made my podcasting life a whole lot more joyful. Anyway.
 
 For version two of my podcasting site I chose to build something with Middleman and host it with GitHub pages. I wanted a fast static site and the Git workflow for publishing new episodes. Simply deploying episodes through `.markdown` files that I can compose right here in Vim—just like a blog post—sounded like heaven to me. After all, show notes can result in quite a bit of text every day. This wasn’t something that I wanted to spend on a second more than necessary.
 
@@ -53,7 +53,7 @@ Let’s break down what we want to accomplish. We want to extract the following 
 + the text from the show notes
 + the links from the show notes
 
-We iterate through the pagination and let Mechanize click every link for an episode. On the following detail page we will find all the information from above that we need. Using that scraped data, we want to populate the [frontmatter](https://middlemanapp.com/basics/frontmatter/) and “body” of markdown files for each episode.
+We iterate through the pagination and let Mechanize click every link for an episode. On the following detail page we will find all the information from above that we need. Using that scraped data, we want to populate the [front matter](https://middlemanapp.com/basics/frontmatter/) and “body” of markdown files for each episode.
 
 Below can you see a preview of how we will compose the new markdown files with the content we extracted. I think this will give you a good idea about the scope ahead of us. This represents the final step in our little script. Don’t worry, we will go over it in more detail. 
 
@@ -223,13 +223,11 @@ scrape
 
 ```
 
-Why didn’t we `require "Nokogiri"`? Mechanize provides us with all our scraping needs. As we discussed in the previous article, Mechanize builds on top of Nokogiri and allows us to extract content as well.
+Why didn’t we `require "Nokogiri"`? Mechanize provides us with all our scraping needs. As we discussed in the previous article, Mechanize builds on top of Nokogiri and allows us to extract content as well. It was however important to cover that gem in the first article since we needed to build on top of it.
 
 # Pry
 
-First things first. Before we jump into our code here, I thought it was necessary to show you how you can efficiently check if your code works as expected every step of the way. As you have certainly noticed, I have added another tool to the mix. I added `Pry` which is really handy for debugging. If you place `Pry.start(binding)` anywhere in your code, you can inspect your application at exactly that point.
-
-It is really helpful to check every step along the way if you have the data you expected. For example, let’s place it right after our `write_page` function and check if `link` is what we expect.
+First things first. Before we jump into our code here, I thought it was necessary to show you how you can efficiently check if your code works as expected every step of the way. As you have certainly noticed, I have added another tool to the mix. Among other things, `Pry` which is really handy for debugging. If you place `Pry.start(binding)` anywhere in your code, you can inspect your application at exactly that point. You can pry into the objects at specific points in the application. This is really helpful to take your application step by step without tripping over your own feet. For example, let’s place it right after our `write_page` function and check if `link` is what we expect.
 
 #### Pry
 
@@ -340,7 +338,7 @@ end
 
 ```
 
-What happens is that in the `scrape` method, I loop over every page in the old podcast. FYI, I’m using the old url from the heroku app since the new site is already online at [Between \| Screens](http://betweenscreens.fm/). I had 20 pages of episodes that I needed to loop over. I delimited the loop via the `link_range` variable which I updated with each loop. Going from page to page was as simple as using this variable in the url of each page.
+What happens in the `scrape` method? First of all, I loop over every index page in the old podcast. FYI, I’m using the old url from the Heroku app since the new site is already online at [betweenscreens.fm](http://betweenscreens.fm/). I had 20 pages of episodes that I needed to loop over. I delimited the loop via the `link_range` variable which I updated with each loop. Going through the pagination was as simple as using this variable in the url of each page. Simple and effective.
 
 #### def scrape
 
@@ -350,9 +348,9 @@ page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
 
 ```
 
-That does all the pagination I needed. Simple and effective. Then, whenever I got a new page with another 8 episodes to scrape, I use `page.link` to identify the links we want to click and follow to the detail page for that podcast epside. I decided to go with a range of links (`links[2..8]`) since this was the easiest way to target the links I need on the page. No need to fumble around with CSS selectors here.
+Then, whenever I got a new page with another 8 episodes to scrape, I use `page.links` to identify the links we want to click and follow to the detail page for each episode. I decided to go with a range of links (`links[2..8]`) since it was consistent on every page. It was also the easiest way to target the links I need from each index page. No need to fumble around with CSS selectors here.
 
-In the loop itself, we feed that link for the detail page to the `write_page` method. This is where most of the work is done. We take that link, follow it to the detail page and start to extract its data. On that page we find all the info that I need to compose my new markdown episodes for the new site. 
+We then feed that link for the detail page to the `write_page` method. This is where most of the work is done. We take that link, click it and follow it to the detail page where we can start to extract its data. On that page we find all the info that I need to compose my new markdown episodes for the new site. 
 
 #### def write_page
 
@@ -389,13 +387,13 @@ end
 
 ```
 
-As you can see above, we take that `detail_page` and apply a bunch of extraction methods on it. We extract the `interviewee`, `title`, `sc_id`, `text`, `episode_title and `episode_number`. I extracted a bunch of focused helper methods who are in charge of these extraction responsibilities. Let’s have a quick look at them:
+As you can see above, we take that `detail_page` and apply a bunch of extraction methods on it. We extract the `interviewee`, `title`, `sc_id`, `text`, `episode_title` and `episode_number`. I refactored a bunch of focused helper methods who are in charge of these extraction responsibilities. Let’s have a quick look at them:
 
 # Helper Methods 
 
 ## Extraction Methods
 
-I extracted these methods because it enabled me to have smaller methods overall. Encapsulating their behaviour was also important. The code reads better as well. Most of them take the `detail_page` as an argument and extract some specific data we need for our Middleman posts.
+I extracted these helpers because it enabled me to have smaller methods overall. Encapsulating their behaviour was also important. The code reads better as well. Most of them take the `detail_page` as an argument and extract some specific data we need for our Middleman posts.
 
 ``` ruby
 
@@ -417,7 +415,7 @@ end
 
 ```
 
-We return the title and clean it from `?` and `#` since this doesn’t play nice with the frontmatter in the posts for our episodes. More about frontmatter further below.
+We take the title and clean it from `?` and `#` since this doesn’t play nice with the front matter in the posts for our episodes. More about front matter further below.
 
 ``` ruby
 
@@ -428,7 +426,7 @@ end
 
 ```
 
-Here we needed to work a little harder to extract the SoundCloud id for our hosted trackes. First we need the Mechanize iframe with the `href` of soundcloud and make it a string for scanning..
+Here we needed to work a little harder to extract the SoundCloud id for our hosted trackes. First we need the Mechanize iframes with the `href` of `soundcloud.com` and make it a string for scanning..
 
 ``` bash
 
@@ -436,7 +434,7 @@ Here we needed to work a little harder to extract the SoundCloud id for our host
 
 ```
 
-Then match a regular expression for its digits for the track id, our `soundcloud_id` `"221003494"`.
+Then match a regular expression for its digits of the track id—our `soundcloud_id` `"221003494"`.
 
 ``` ruby
 
@@ -447,7 +445,7 @@ end
 
 ```
 
-Extracting show notes is again quite straightforward. All we need is look for show notes paragraphs in the detail page. No surprises here. 
+Extracting show notes is again quite straightforward. We only need to look for show notes’ paragraphs in the detail page. No surprises here. 
 
 ``` ruby
 
@@ -458,7 +456,7 @@ end
 
 ```
 
-Same goes for the subtitle, except that it is just a preparation to extract the episode number from it.
+Same goes for the subtitle, except that it is just a preparation to cleanly extract the episode number from it.
 
 ``` ruby
 
@@ -471,7 +469,7 @@ end
 
 Here we need another round of regular expression. Let’s have a look before and after we applied the regex.
 
-#### Subheader
+#### episode_subtitle
 
 ``` bash
 
@@ -479,7 +477,7 @@ Here we need another round of regular expression. Let’s have a look before and
 
 ```
 
-#### Extracted episode
+#### number
 
 ``` bash
 
@@ -497,11 +495,13 @@ end
 
 ```
 
-We take that number with a hash `#` and remove it. Voilà, we have our first episode number `139`` extracted as well. I suggest we look at the smaller utility methods as well before we bring it all together.
+We take that number with a hash `#` and remove it. Voilà, we have our first episode number `139` extracted as well. I suggest we look at the other utility methods as well before we bring it all together.
 
 ## Utility Methods
 
-After all extraction business, we have some cleanup to do. We can already start to prepare the data for composing the markdown. For example, I slice the `episode_subtitle` some more to get a clean date and build the `tags` with the `build_tags` method.  
+After all that extraction business, we have some cleanup to do. We can already start to prepare the data for composing the markdown. For example, I slice the `episode_subtitle` some more to get a clean date and build the `tags` with the `build_tags` method.  
+
+#### def clean_date
 
 ``` ruby
 
@@ -512,7 +512,7 @@ end
 
 ```
 
-We run another regex that looks for dates like this `"  Aug 26, 2015"`. As you can see, this is not very helpful yet. From that `string_date` we get from the subtitle, we need to create a real `Date` object. Otherwise it would be useless for properly creating Middleman posts.
+We run another regex that looks for dates like this `"  Aug 26, 2015"`. As you can see, this is not very helpful yet. From the `string_date` we get from the subtitle, we need to create a real `Date` object. Otherwise it would be useless for creating Middleman posts.
 
 #### sting_date
 
@@ -532,6 +532,7 @@ Therefore we take that string and do a `Date.parse`. The result looks a lot more
 
 ```
 
+#### def build_tags
 
 ``` ruby
 
@@ -542,7 +543,7 @@ end
 
 ```
 
-This takes the `title` and `interviewee` we have built up inside the `extract_data` method and removes all pipe characters and junk. We replace pipe characters with a comma, replace `@`, `?`, `#`, `&` with an empty string and finally take care of abbreviations for `with`.
+This takes the `title` and `interviewee` we have built up inside the `extract_data` method and removes all pipe characters and junk. We replace pipe characters with a comma, `@`, `?`, `#`, `&` with an empty string and finally take care of abbreviations for `with`.
 
 #### def strip_pipes
 
@@ -603,9 +604,7 @@ end
 
 ```
 
-
-
-All that is left to do here is return an options hash with the data we exracted. We can feed this returned options hash into the `compose_markdown` method which then composes my markdown. It gets it ready for writing out the file I need for my new site.
+All that is left to do here is return an options hash with the data we extracted. We can feed this hash into the `compose_markdown` method—which gets our data ready for being writing out as a file that I need for my new site.
 
 # Writing Posts
 
@@ -631,11 +630,11 @@ end
 
 ```
 
-For creating episodes on my middleman site, I opted to repurpose its blogging system. Instead of creating “pure” blog posts, I create show notes for my episodes that display the SoundCloud hosted episdes via iframes. On the index site, I only display that iframe plus title and stuff.  
+For publishing podcast episodes on my Middleman site, I opted to repurpose its blogging system. Instead of creating “pure” blog posts, I create show notes for my episodes that display the SoundCloud hosted episdes via iframes. On index sites, I only display that iframe plus title and stuff.  
 
-The format I need for this to work is comprised of something called frontmatter. This is basically a key / value store for my static sites. It is replacing my database needs from my old Sinatra site. Data like interviewee name, date, SoundCloud track id, episode number and so on goes in between three dashes (`---`) on top of our episodes files. Below comes the content for each episode. Stuff like questions, links, sponsor stuff…
+The format I need for this to work is comprised of something called front matter. This is basically a key / value store for my static sites. It is replacing my database needs from my old Sinatra site. Data like interviewee name, date, SoundCloud track id, episode number and so on goes in between three dashes (`---`) on top of our episodes files. Below comes the content for each episode. Stuff like questions, links, sponsor stuff…
 
-#### frontmatter
+#### Front Matter
 
 ```
 
@@ -650,7 +649,7 @@ Episode content goes here.
 
 ```
 
-In the `compose_markdown` method, I use a `HEREDOC` to compose that file with its frontmatter for each episode we loop through. From the options hash we feed this method, we extract all the data that we collected in the `extract_data` helper method.
+In the `compose_markdown` method, I use a `HEREDOC` to compose that file with its front matter for each episode we loop through. From the options hash we feed this method, we extract all the data that we collected in the `extract_data` helper method.
 
 #### def compose_markdown
 
@@ -680,7 +679,7 @@ This is the blueprint for a new podcast episode right there. This is what we cam
 
 Just to orientate ourselves, we still in the loop, inside the `write_page` function for each clicked link to a detail page with the show notes of a singular episode. What happens next is prepping to write this blueprint to the file system. In other words, we create the actual episode by providing a file name and the composed `markdown_text`. 
 
-For that final step, we just need to prepare the following ingredients. The date, the interviewee name and the episode number. Plust the `markdow_text` of course which we just got from `compose_markdown`.
+For that final step, we just need to prepare the following ingredients. The date, the interviewee name and the episode number. Plus the `markdown_text` of course which we just got from `compose_markdown`.
 
 #### def write_page
 
@@ -743,7 +742,7 @@ It removes whitespace from the text we scraped for the interviewee name and repl
 
 Since the extracted content comes straight from an HTML site I can’t simply use `.md` or `.markdown` as filename extension. I decided to go with `.html.erb.md`. For future episodes that I compose without scraping, I can leave off the `.html.erb` part and only need `.md`.
 
-After this step, the loop in the `scrape` function ends and we should have something that looks like this:
+After this step, the loop in the `scrape` function ends and we should have a single episode that looks like this:
 
 #### 2014-12-01-Avdi-Grimm-1.html.erb.md
 
@@ -763,157 +762,4 @@ episode_number: 1
 
 ```
 
-This scraper would start at the last episode of course and loops until the first. For demonstration purposes, episode 01 is as good as any. You can see on top the frontmatter with the data we extracted. All of that was previously locked in the database of my Sinatra app. Episode number, date, interviewee name and so on. Now we have it prepared to be part of my new static Middlman site. Everything below the two triple dashes (`---`) is the text from the show notes. Questions and links mostly.
-
-
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-What happens here is that I already extracted the necessary data using a bunch of smaller methods and feed it to this `compose_markdown` method through an options hash.
-
-
-
-
-<!--
-!!!! Old version
-
-``` ruby
-
-require "HTTParty"
-require 'Nokogiri'
-require 'JSON'
-require 'Pry'
-require 'csv'
-require 'mechanize'
-require 'date'
-
-def strip_pipes(text)
-  tags = text.tr('|', ',')
-  tags = tags.gsub(/[@?#&]/, '')
-  tags = tags.gsub(/[w\/]{2}/, 'with')
-end
-
-def build_tags(title, interviewee)
-  extracted_tags = strip_pipes(title)
-  final_tag_list = "#{interviewee}"+ ", #{extracted_tags}"
-end
-
-def extract_soundcloud_id(detail_page)
-  sc = detail_page.iframes_with(href: /soundcloud.com/).to_s
-  sc = sc.scan(/\d{3,}/).first
-end
-
-def compose_markdown(options={})
-<<-HEREDOC
---- 
-title:          #{options[:interviewee]}
-interviewee:    #{options[:interviewee]}
-topic_list:     #{options[:title]}
-tags:           #{options[:tags]}
-soundcloud_id:  #{options[:sc_id]}
-date:           #{options[:date]}
-episode_number: #{options[:episode_number]}
----
-
-#{options[:text]}
-HEREDOC
-end
-
-def clean_date(episode_subtitle)
-  string_date = /[^|]*([,])(.....)/.match(episode_subtitle).to_s
-  date = Date.parse(string_date)
-end
-
-def extract_episode_number(text)
-  episode_number = /[#]\d*/.match(text).to_s
-end
-
-def dasherize(text)
-  text.lstrip.rstrip.tr(' ', '-')
-end
-
-def clean_episode_number(episode_number)
-  episode_number = episode_number.to_s.tr('#', '')
-end
-
-def write_page(link)
-
-  detail_page = link.click
-
-  sc_id = extract_soundcloud_id(detail_page)
-
-  title = detail_page.search('.episode_title').text
-  title = title.gsub(/[?#]/, '')
-  interviewee = detail_page.search('.episode_sub_title span').text
-  text = detail_page.search('#shownote_container > p')
-
-  episode_subtitle = detail_page.search('.episode_sub_title').text
-
-  date = clean_date(episode_subtitle)
-
-  tags = build_tags(title, interviewee)
-
-  episode_number = extract_episode_number(episode_subtitle)
-  episode_number = clean_episode_number(episode_number)
-
-  markdown_text = compose_markdown interviewee: interviewee,
-                                   title: title,
-                                   tags: tags,
-                                   sc_id: sc_id,
-                                   text: text,
-                                   date: date,
-                                   episode_number: episode_number
-
-  File.open("#{date}-#{dasherize(interviewee)}-#{episode_number}.html.erb.md", 'w') { |file| file.write(markdown_text) }
-end
-
-def scrape
-    link_range = 1
-
-  until link_range == 21
-    agent ||= Mechanize.new
-    page = agent.get("http://betweenscreens.fm/?page=#{link_range}")
-
-    link_range += 1
-    links = page.links
-
-    links[2..8].map do |link|
-      write_page(link)
-    end
-  end
-
-end
-
-scrape
-
-#Pry.start(binding)
-
-```
-
-``` ruby
-
-scrape
-
-write_page
-
-extract_soundcloud_id
-
-clean_date
-
-build_tags
-
-extract_episode_number
-
-clean_episode_number
-
-compose_markdown
-
-dasherize
-
-strip_pipes
-
-```
--->
+This scraper would start at the last episode of course and loops until the first. For demonstration purposes, episode 01 is as good as any. You can see on top the front matter with the data we extracted. All of that was previously locked in the database of my Sinatra app. Episode number, date, interviewee name and so on. Now we have it prepared to be part of my new static Middleman site. Everything below the two triple dashes (`---`) is the text from the show notes. Questions and links mostly.
