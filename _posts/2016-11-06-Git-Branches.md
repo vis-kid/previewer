@@ -292,8 +292,30 @@ git checkout -b some-branch-name origin/some-branch-name
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+# Tracking branches
 
+That in effect establishes something called a tracking branch. That means that the local branch and the remote branch have a direct relationship. git pull and git push will work without referencing the branch names themselves.
+
+When you clone or fork a repo, master is already set up to be tracking its remote version.
+If you want to fetch updates for all branches at once you can run 
+git fetch -- all
+
+If you want to see more info about each branch, how many commits you are behind or ahead of each remote branch, you can run
+git branch -vv
+
+How can we delete a remote branch. Once you have no need for a remote branch that is on yyour Git server, you should clean them up. Having tons of remote branches around that are dead isn’t very useful. The same goes for local branches of course.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+### 18 code editor
+
+git push origin --delete serverfix
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+You provide the git push command with the name of the server, the branch name and the --delete option.
 
 server communication
-
-# Tracking Branches
