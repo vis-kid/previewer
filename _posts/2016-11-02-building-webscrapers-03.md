@@ -283,6 +283,8 @@ If you run the script, we will get something like this.
 
 When we then ask for the `link` object, we can check if we are on the right track before we move on to other implementation details.
 
+#### Terminal
+
 ``` bash
 
 [2] pry(main)> link
@@ -426,7 +428,7 @@ end
 
 ```
 
-Here we needed to work a little harder to extract the SoundCloud id for our hosted trackes. First we need the Mechanize iframes with the `href` of `soundcloud.com` and make it a string for scanning..
+Here we needed to work a little harder to extract the SoundCloud id for our hosted tracks. First we need the Mechanize iframes with the `href` of `soundcloud.com` and make it a string for scanning..
 
 ``` bash
 
@@ -514,7 +516,7 @@ end
 
 We run another regex that looks for dates like this `"  Aug 26, 2015"`. As you can see, this is not very helpful yet. From the `string_date` we get from the subtitle, we need to create a real `Date` object. Otherwise it would be useless for creating Middleman posts.
 
-#### sting_date
+#### string_date
 
 ``` bash
 
@@ -630,7 +632,7 @@ end
 
 ```
 
-For publishing podcast episodes on my Middleman site, I opted to repurpose its blogging system. Instead of creating “pure” blog posts, I create show notes for my episodes that display the SoundCloud hosted episdes via iframes. On index sites, I only display that iframe plus title and stuff.  
+For publishing podcast episodes on my Middleman site, I opted to repurpose its blogging system. Instead of creating “pure” blog posts, I create show notes for my episodes that display the SoundCloud hosted episodes via iframes. On index sites, I only display that iframe plus title and stuff.  
 
 The format I need for this to work is comprised of something called front matter. This is basically a key / value store for my static sites. It is replacing my database needs from my old Sinatra site. Data like interviewee name, date, SoundCloud track id, episode number and so on goes in between three dashes (`---`) on top of our episodes files. Below comes the content for each episode. Stuff like questions, links, sponsor stuff…
 
@@ -768,4 +770,4 @@ This scraper would start at the last episode of course and loops until the first
 
 And we are done. My new podcast is already up and running. I’m really glad I took the time to redesign the thing from the ground up. It’s a lot cooler to publish new episodes now. Discovering new content should be smoother for users as well. As I mentioned earlier, this is the time where you should go into your code editor to have some fun. Take this code and wrestle with it a bit. Try to find ways to make it simpler. There are a few opportunities to refactor the code.
 
-Overall, I hope this little example gave you a good idea what you can do with your new webscraping chops. Of course you can achieve much more sophisticated challenges—I’m sure there are even plenty of small business opportunities to be made with these skills. But as always, take it one step at a time and don’t get too frustrated if things don’t click right away. This is not only normal for most people but to be expected. It’s part of the journey. Happy scraping!
+Overall, I hope this little example gave you a good idea what you can do with your new web scraping chops. Of course you can achieve much more sophisticated challenges—I’m sure there are even plenty of small business opportunities to be made with these skills. But as always, take it one step at a time and don’t get too frustrated if things don’t click right away. This is not only normal for most people but to be expected. It’s part of the journey. Happy scraping!
