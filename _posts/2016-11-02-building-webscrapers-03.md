@@ -763,3 +763,9 @@ episode_number: 1
 ```
 
 This scraper would start at the last episode of course and loops until the first. For demonstration purposes, episode 01 is as good as any. You can see on top the front matter with the data we extracted. All of that was previously locked in the database of my Sinatra app. Episode number, date, interviewee name and so on. Now we have it prepared to be part of my new static Middleman site. Everything below the two triple dashes (`---`) is the text from the show notes. Questions and links mostly.
+
+# Final Thoughts
+
+And we are done. My new podcast is already up and running. I’m really glad I took the time to redesign the thing from the ground up. It’s a lot cooler to publish new episodes now. Discovering new content should be smoother for users as well. As I mentioned earlier, this is the time where you should go into your code editor to have some fun. Take this code and wrestle with it a bit. Try to find ways to make it simpler. There are a few opportunities to refactor the code.
+
+Overall, I hope this little example gave you a good idea what you can do with your new webscraping chops. Of course you can achieve much more sophisticated challenges—I’m sure there are even plenty of small business opportunities to be made with these skills. But as always, take it one step at a time and don’t get too frustrated if things don’t click right away. This is not only normal for most people but to be expected. It’s part of the journey. Happy scraping!
