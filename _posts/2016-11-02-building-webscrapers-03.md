@@ -18,21 +18,21 @@ categories: [Mechanic, Nokogiri, Ruby]
 
 # Scraping my Podcast
 
-Let’s put what we learned into practice. For various  reasons, a re-design for my podcast [Between \| Screens](http://betweenscreens.fm/) was long overdue. There were issues that made me scream when I woke up in the morning. Also, I really disliked the whole publishing workflow and the site’s speed. The design also didn’t get the amount of love that I originally planned. The cherry on top came out of a quick fix. I went with a WYSIWYG editor and I could kick myself for that decision every day after I’m done screaming. Change was imperative! Even if I would need to stop podcasting for a while.
+Let’s put what we’ve learned so far into practice. For various  reasons, a redesign for my podcast [Between \| Screens](http://betweenscreens.fm/) was long overdue. There were issues that made me scream when I woke up in the morning. Also, I really disliked the whole publishing workflow, and the site’s speed, don’t get me started on that. The design also didn’t get the amount of love that I originally planned. The cherry on top came out of a quick fix. I went with a WYSIWYG editor for editing podcast episodes. I could kick myself for that decision every day after I’m done screaming. Change was imperative! Even if I would need to stop podcasting for a while. It was so worth it!
 
 #### **WYSIWYG Editor Mornings**
 
 ![Alt text](/images/webscraper/al-bundy.gif)
 
-Let’s be frank, I made the wrong choice technology-wise. I wanted to have a small project that is perfect for playing with Sinatra properly. A podcast seemed like the perfect choice for that. Reasonably small project with minor database needs. What could go wrong? Aside from pulling your hair out as a Vim addict when you prepare new episodes in the browser, the site never was a big pleasure to work with. When I ran into exotic errors, one can also not expect to consult Dr. Google like you can do with Rails for example. The amount of people running into the same errors is just a LOT smaller.
+Let’s be frank, I made the wrong choice technology-wise. I wanted to have a small project that is perfect for playing with [Sinatra](http://www.sinatrarb.com/) properly. A podcast seemed like the perfect choice for that. Reasonably small project with minor database needs. What could go wrong? Aside from pulling your hair out as a Vim addict when you prepare new episodes in the browser, the site never was a big pleasure to work with. When I ran into exotic errors, I couldn’t just expect to consult Dr. Google, like with Rails hiccups for example. The amount of people running into the same Sinatra issues is just a LOT smaller.
 
-That means you have to spend a lot more time bug fixing than I was used to over the last couple of years. Overall this is fine and dandy, after all it is good practice. For a side project it was just a bit too time consuming when you also want to produce new episodes a few times per week. Sure, it was educational to build everything myself from the ground up but I left a lot of time on the table with needless fights.
+That means you have to spend a lot more time bug fixing than I was used to over the last couple of years. Overall, this is fine and dandy, it’s good practice after all. For a side project it was just a bit too time consuming when you also want to produce new episodes a few times per week. Sure, it was educational to build everything myself from the ground up but I left a lot of time on the table with needless fights.
 
-Don’t get me wrong, Sinatra is a nice tool, no it is a great tool, but for this job I should have chosen more wisely. This was not setup to scale. I should have either gone with a Rails app or a plain static site that uses Jekyll or Middleman that runs on GitHub pages. In hindsight, that would have made my podcasting life a whole lot more joyful. Anyway.
+Don’t get me wrong, Sinatra is a nice tool, no it is a great tool, but for this job I should have chosen more wisely. This was not setup to scale. I should have either gone with a Rails app or a plain static site that uses Jekyll or Middleman and runs on GitHub pages. In hindsight, that would have made my podcasting life a whole lot more joyful. Anyway.
 
-For version two of my podcasting site I chose to build something with Middleman and host it with GitHub pages. I wanted a fast static site and the Git workflow for publishing new episodes. Simply deploying episodes through `.markdown` files that I can compose right here in Vim—just like a blog post—sounded like heaven to me. After all, show notes can result in quite a bit of text every day. This is not something that I wanted to spend any second more than necessary.
+For version two of my podcasting site I chose to build something with Middleman and host it with GitHub pages. I wanted a fast static site and the Git workflow for publishing new episodes. Simply deploying episodes through `.markdown` files that I can compose right here in Vim—just like a blog post—sounded like heaven to me. After all, show notes can result in quite a bit of text every day. This wasn’t something that I wanted to spend on a second more than necessary.
 
-After I worked on the Middleman site and invested a good amount of time on the new design, I needed to import the content from my database backed Sinatra app into my new static site. Doing this by hand like in schmuck fashion was not on the table—not even a question since I could rely on my friends Nokogiri and Mechanize to do the job for me. What is ahead of you is a reasonably small scrape job that is not too complicated but it has a few interesting twists that I thought could be educational for the web scraping newbies out there. Below are two screenshots from my podcast [Between \| Screens](http://betweenscreens.fm/). 
+I invested a good amount of time on the new design after I tweaked a Middleman blog to my needs. All that was left to do was importing the content from my database-backed Sinatra app. Scraping the existing content and transfer it into my new static site. Doing this by hand in schmuck fashion was not on the table—not even a question—since I could rely on my friends Nokogiri and Mechanize to do the job for me. What is ahead of you is a reasonably small scrape job that is not too complicated but offers a few interesting twists that should be educational for the web scraping newbies out there. Below are two screenshots from my podcast [Between \| Screens](http://betweenscreens.fm/). 
 
 #### **Screenshot Old Podcast**
 
@@ -42,7 +42,7 @@ After I worked on the Middleman site and invested a good amount of time on the n
 
 ![Alt text](/images/webscraper/between-screens-new-01.png)
 
-Let’s break down what we want to accomplish. We want to extract the following data from 21 pages:
+Let’s break down what we want to accomplish. We want to extract the following data from 139 episodes that are spread over 21 paginated index sites:
 
 + the title
 + the interviewee
@@ -53,15 +53,37 @@ Let’s break down what we want to accomplish. We want to extract the following 
 + the text from the show notes
 + the links from the show notes
 
-We iterate through the pagination and let Mechanize click every link for an episode. On the following detail page we will find all the information that we need.
+We iterate through the pagination and let Mechanize click every link for an episode. On the following detail page we will find all the information from above that we need. Using that scraped data, we want to populate the [frontmatter](https://middlemanapp.com/basics/frontmatter/) and “body” of markdown files for each episode.
 
-Using that scraped data, we want to populate the [frontmatter]() of markdown files for each episode and add a few tricks that the old site didn’t play. Having a comprehensive tagging system in place was crucial for me. I wanted listeners who use the site to have a deep discovery tool.  Therefore, I wanted to create tags for every interviewee and out of the subheader. Since I produced around 140 episodes in the first season alone, I wanted to prep the site for a time when the content becomes harder to comb through. A deep tagging system with intelligently placed recommendations was the way to go for me.
+Below can you see a preview of how we will compose the new markdown files with the content we extracted. I think this will give you a good idea about the scope ahead of us. This represents the final step in our little script. Don’t worry, we will go over it in more detail. 
 
-Below can you see a preview of how we will compose the new markdown files with the content we extacted. I think this will give you a good idea about the scope ahead of us. This represents the final step in our little script. Don’t worry, we will go over it in more detail. Along the way, I highly encourage you to start thinking about how you can improve the code in front of you. This will be your final task at the end of this article.
+#### def compose_markdown
 
-Let’s have a look at the complete code that I needed to scrape the content of my site. Look around and try to figure out the big picture what’s going on. Since I expect you to be on the beginner side of things, I stayed away from abstracting too much and err on the side of clarity of elegance. I did a couple of refactorings that were targeted at aiding code clarity but I also left a little bit of meat on the bone for you to play with when you are finished with this article.
+``` ruby
 
-A little hint from me, breaking up large methods into smaller ones is a good place to start. If you understood how the code works, you should have a fun time honing in on that refactoring. I already started with extracting a bunch of methods into small, focused helpers. You should be able to easily apply what you have learned from my previous articles about code smells and their refactorings. If this still goes over your head right now, don’t worry, just keep at it and at some point things will start to click.
+def compose_markdown(options={})
+<<-HEREDOC
+--- 
+title: #{options[:interviewee]}
+interviewee: #{options[:interviewee]}
+topic_list: #{options[:title]}
+tags: #{options[:tags]}
+soundcloud_id: #{options[:sc_id]}
+date: #{options[:date]}
+episode_number: #{options[:episode_number]}
+---
+
+#{options[:text]}
+HEREDOC
+end
+
+```
+
+I also wanted to add a few tricks that the old site couldn’t play. Having a customized, comprehensive tagging system in place was crucial for me. I wanted listeners to have a deep discovery tool. Therefore, I needed tags for every interviewee and split the subheader into tags as well. Since I produced 139 episodes in the first season alone, I had to prep the site for a time when the amount of content becomes harder to comb through. A deep tagging system with intelligently placed recommendations was the way to go. This allowed me to keep the site lightweight and fast.
+
+Let’s have a look at the complete code for scraping the content of my site. Look around and try to figure out the big picture of what’s going on. Since I expect you to be on the beginner side of things, I stayed away from abstracting too much and err on the side of clarity of elegance. I did a couple of refactorings that were targeted at aiding code clarity but I also left a little bit of meat on the bone for you to play with when you are finished with this article. After all, quality learning happens when you go beyond reading and toy around with some code on your own.
+
+Along the way, I highly encourage you to start thinking about how you can improve the code in front of you. This will be your final task at the end of this article. A little hint from me, breaking up large methods into smaller ones is a always good starting point. Once you understand how the code works, you should have a fun time honing in on that refactoring. I already started with extracting a bunch of methods into small, focused helpers. You should be able to easily apply what you have learned from my previous articles about code smells and their refactorings. If this still goes over your head right now, don’t worry, we’ve all been there. Just keep at it and at some point things will start to click faster.
 
 # Full Code
 
