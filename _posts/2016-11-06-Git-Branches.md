@@ -14,36 +14,69 @@ categories: [Git]
 ### 01 Animation: Tokyo Subway map
 
 Small HEADs moving along like trains??
+Branches that make up trunk with bonsai leaves on top??
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Development always has a main line for development, the master branch. Branching in Git is not only very easy, it is also cheap. You can create an endless number of branches without any serious side effects—except that housekeeping is a good idea.
+# Intro
 
-With a branch, we can savely diverge from the main line of development and work on new features that we want to propose to be integrated into the master branch. If acceptable, it is just a merge or a rebase away from being pushed into production.
+The whole Git workflow is around creating and fusing branches together. Branching is a killer feature of Git. As a beginner it is important to understand its power and potential.
+Development always has a main line for development, the master branch. Branching in Git is not only very easy, it is also very cheap.
 
-If on the other hand, the work on the branch does not fullfill the requirements needed, you can simply continue your work on that branch or abandom it altogether.
+You can create an endless number of branches without any serious side effects—except that housekeeping is a good idea.
 
-Branching is a killer feature of Git and as a beginner it is important to understand its power and potential.
+With a branch, we can savely diverge from the main line of development and work on new features that can be proposed to be integrated into the master branch. If acceptable, it is just a merge or a rebase away from being pushed into production.
 
+If on the other hand, the work on the branch does not fullfill the requirements needed, you can simply continue your work on that branch or abandon it altogether.
+
+<!--
+???
 Since branching is so cheap and fast, you 
+???
+-->
 
-What is a branch? It is a moveable pointer to a commit. A bit less cryptic, a branch is a plain old file that contains the 40 character hash of the commit it points to. That’s why people say that branches are cheap and easy to create. All it takes is 41 bytes. Very efficient, isn’t it?
+# Branch?
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+### Animation: A large white file with a long 40 character hash.
+
+A tree with white files with hash??
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+What is a branch? A branch is a plain old file that contains the 40 character hash of the commit it points to.
+
+That’s why people say that branches are cheap and easy to create. All it takes is 41 bytes. 
 
 Being able to branch that easy and therefore that often makes our coding lives a lot more efficient and stable.
 
-Master is nothing else than a branch itself. It’s just a convention to call that particular branch master. When you run `git init`, this master branch gets created for you as a default.
+Also, a branch is a moveable pointer to a commit. You can switch easily between branches using the git checkout command. Switching between branches is not only super fast, it is easy as well.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+### Animation: show pointer moving between master and feature branches
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Master for example is nothing else than a branch itself. It’s just a convention to call that particular branch master. When you run `git init`, this master branch gets created for you as a default.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+### Animation: Focus on master. Jumping HEAD??
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # Local Branches
 
-Lets talk about local branches first.
-
-# Basic Branching
-
-The whole Git workflow is around creating and fusing branches together.
-
-Switching between branches is not only super fast, it is easy as well.
-
+We can have local and remote branches. Lets talk about local branches first.
 
 You create a new branch simply by typing git branch with a branch-name. This creates a new pointer that can be occupied by HEAD.
 
@@ -55,6 +88,7 @@ You only created the branch though and didn’t switch to it. That is accomplish
 ### 02 Animation: Laptop with code editor
 
 git branch branch-name
+
 git checkout branch-name
 
 git checkout -b branch-name
@@ -64,7 +98,10 @@ git checkout -b branch-name
 
 The shortcut to create a branch and check to it at the same time is git checkout -b branch-name. One step instead of two.
 
- We have covered HEAD in another short video but I should say this. In this context, Git uses HEAD to know which branch we are on. So when you switch to a new branch, HEAD is coming along.
+We have covered HEAD in another short video but I should say this. In this context, Git uses HEAD to know which branch we are on. So when you switch to a new branch, HEAD is coming along.
+
+
+When you switch branches, you also change the index and working directory underneath. It adjusts to the history of a particular branch
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -74,87 +111,45 @@ The shortcut to create a branch and check to it at the same time is git checkout
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-When you continue your work on that new branch, HEAD will move forward to its latest commit.
+The important thing to understand as a beginner is that your working directory and your index are changing all the time when you check out various branches.
+
+The files adapt to their respective state represented by the latest commit HEAD is pointing at at any given moment. That way you can recreate all kinds of different points in time of development. 
+
+Branches also act as discrete silos for your work. They are not interrupting each other.
+
+The different versions of your work are separated by the branches you create. Every branch is a silo of its own until you fuse them into each other—by a merge or rebase of course.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+### 0 Animation: Background of branches become highlighted with yellow black to imply they are locked from each other.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+So far, so good.
+
+What is also cool about branching is that you can do a lot of different work in parallel. Say you are working on some database work on one branch and some front-end code in another.
+
+Both of these, or even more, can be in place simultaneously without affecting each other in any way. You just switch between branches whenever you decide to work on something specifically—and however long it takes I might add.
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ### 04 Animation: New commit on feature branch and HEAD moves forward.
+
 Switch branch back to master as well.
 back and forth??
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Although you moved forward on the new branch, you can easily switch back. The cool thing to understand as a beginner is that your file system are changing all the time when you check out various branches.
-
-The files adapt to their respective state represented by the latest commit HEAD is pointing at at any given moment. That way you can recreate all kinds of different points in time of development. So far, so good.
-
-The different versions of your work are separated by the branches you create. Every branch is a silo of its own until you fuse them into each other—by a merge or rebase of course.
-
-What is cool about branching is that you can do a lot of different work in parallel. Say you are working on some database fix on one branch and some extraction for your front-end code in another.
-
-Both of these, or more, can be in place similataneously wihtout affecting each other in any way. You just switch between branches whenever you decide to work on something specifically—and however long it takes I might add.
-
-# Branch Management
-
-The git branch command shows you a list of all branches in your repo.
-
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-### 05 Animation: Laptop w/ code editor
-
-git branch
-
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-In a real world scenario, you will most likely not only have to deal with two branches. It is likely that you have at least one branch between a new feature branch and master. Something to test your changes and see if they are stable before you are merged into master.
-
-![Alt text](/images/silo-branches.png)
-
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-### 05 Animation: 3 branches. Master, Develop, topic-branch
-
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-Each of them are contained silos that gives the team of working in parallel without interrupting each other. All of these silos represent different levels of stability—at least ideally. 
-
-You can take this a lot further of course. It simply depends on the size of your team, the complexity of the project and the preferences you agree upon.
-
-I should clear up two terms you will often hear. The distinction between topic branches and long running branches is simple. master and branches that are basically set up to test new features are long running ones.
-
-Topic branches on the other hand are most of the time much shorter lived ones. You work on some new feature, get it ready to be integrated and you get rid of them after that. They represent the bleeding edge so to speak.
-
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-### 06 Animation: Many branches.
-
-three branches: small-fix branch, big-feature with a lot of commits, medium sized some-issue branch
-
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+When you continue your work on that new branch, HEAD will move forward to its latest commit.
 
 
 
-The order in which you integrate your various topic branches is super flexible as well. You can work for a few hours on one branch but maybe take weeks for a bigger feature on another.
 
-Even branching off from other branches is no biggie. When you think about it, we do it all the time from master.
 
-![Alt text](/images/branching-off-branch.png)
-
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-### 07 Animation: Branching off from one topic-branch
-
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # Remote Branches
 
@@ -168,6 +163,8 @@ Remote branches point to the state of branches that are part of your remote repo
 ### 08 Animation: Code editor 
 
 git push
+
+pushing a single commit that moves between local and remote branch with github icon
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -292,7 +289,18 @@ git checkout -b some-branch-name origin/some-branch-name
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
+
+
+<!--
+
 # Tracking branches
+???
+git branch -u origin/serverfix???
+Branch serverfix set up to track remote branch serverfix from origin
+
+That tells the already existing branch you are on to track the remote origin/serverfix branch.
+???
 
 That in effect establishes something called a tracking branch. That means that the local branch and the remote branch have a direct relationship. git pull and git push will work without referencing the branch names themselves.
 
@@ -319,3 +327,73 @@ git push origin --delete serverfix
 You provide the git push command with the name of the server, the branch name and the --delete option.
 
 server communication
+-->
+
+
+
+
+
+
+<!--
+
+# Branch Management
+
+The git branch command shows you a list of all branches in your repo.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+### 05 Animation: Laptop w/ code editor
+
+git branch
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+In a real world scenario, you will most likely not only have to deal with two branches. It is likely that you have at least one branch between a new feature branch and master. Something to test your changes and see if they are stable before you are merged into master.
+
+![Alt text](/images/silo-branches.png)
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+### 05 Animation: 3 branches. Master, Develop, topic-branch
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Each of them are contained silos that gives the team of working in parallel without interrupting each other. All of these silos represent different levels of stability—at least ideally. 
+
+You can take this a lot further of course. It simply depends on the size of your team, the complexity of the project and the preferences you agree upon.
+
+I should clear up two terms you will often hear. The distinction between topic branches and long running branches is simple. master and branches that are basically set up to test new features are long running ones.
+
+Topic branches on the other hand are most of the time much shorter lived ones. You work on some new feature, get it ready to be integrated and you get rid of them after that. They represent the bleeding edge so to speak.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+### 06 Animation: Many branches.
+
+three branches: small-fix branch, big-feature with a lot of commits, medium sized some-issue branch
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+The order in which you integrate your various topic branches is super flexible as well. You can work for a few hours on one branch but maybe take weeks for a bigger feature on another.
+
+Even branching off from other branches is no biggie. When you think about it, we do it all the time from master.
+
+![Alt text](/images/branching-off-branch.png)
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+### 07 Animation: Branching off from one topic-branch
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-->
+
