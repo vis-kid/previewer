@@ -11,7 +11,7 @@ categories: [Git]
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 01 Animation: Tokyo Subway map
+### 01 Animation: Branches with Tree top
 
 Small HEADs moving along like trains??
 Branches that make up trunk with bonsai leaves on top??
@@ -22,11 +22,12 @@ Branches that make up trunk with bonsai leaves on top??
 # Intro
 
 The whole Git workflow is around creating and fusing branches together. Branching is a killer feature of Git. As a beginner it is important to understand its power and potential.
+
 Development always has a main line for development, the master branch. Branching in Git is not only very easy, it is also very cheap.
 
 You can create an endless number of branches without any serious side effects—except that housekeeping is a good idea.
 
-With a branch, we can savely diverge from the main line of development and work on new features that can be proposed to be integrated into the master branch. If acceptable, it is just a merge or a rebase away from being pushed into production.
+With a branch, we can savely diverge from the main line of development and work on new features that can be proposed to be integrated into the master branch. If acceptable, it is just a merge or a rebase away from getting into production.
 
 If on the other hand, the work on the branch does not fullfill the requirements needed, you can simply continue your work on that branch or abandon it altogether.
 
@@ -41,7 +42,7 @@ Since branching is so cheap and fast, you
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### Animation: A large white file with a long 40 character hash.
+### 02 Animation: A large white file with a long 40 character hash.
 
 A tree with white files with hash??
 
@@ -59,7 +60,7 @@ Also, a branch is a moveable pointer to a commit. You can switch easily between 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### Animation: show pointer moving between master and feature branches
+### 03 Animation: show pointer moving between master and feature branches
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -69,7 +70,7 @@ Master for example is nothing else than a branch itself. It’s just a conventio
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### Animation: Focus on master. Jumping HEAD??
+### 04 Animation: Focus on master. Jumping HEAD??
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -85,7 +86,7 @@ You only created the branch though and didn’t switch to it. That is accomplish
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 02 Animation: Laptop with code editor
+### 05 Animation: Laptop with code editor
 
 git branch branch-name
 
@@ -106,14 +107,14 @@ When you switch branches, you also change the index and working directory undern
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 03 Animation: Checkout branch: HEAD moving between tips of two branches
+### 06 Animation: Checkout branch: HEAD moving between tips of two branches
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-The important thing to understand as a beginner is that your working directory and your index are changing all the time when you check out various branches.
+This is important to understand as a beginner. Your working directory and your index are changing all the time when you check out various branches.
 
-The files adapt to their respective state represented by the latest commit HEAD is pointing at at any given moment. That way you can recreate all kinds of different points in time of development. 
+The files adapt to their respective state represented by the latest commit HEAD is pointing at at any given moment. That way you can easily switch between contexts and recreate all kinds of different points in time for development. 
 
 Branches also act as discrete silos for your work. They are not interrupting each other.
 
@@ -122,7 +123,7 @@ The different versions of your work are separated by the branches you create. Ev
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 0 Animation: Background of branches become highlighted with yellow black to imply they are locked from each other.
+### 07 Animation: Background of branches become highlighted with yellow black to imply they are locked from each other.
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -131,12 +132,12 @@ So far, so good.
 
 What is also cool about branching is that you can do a lot of different work in parallel. Say you are working on some database work on one branch and some front-end code in another.
 
-Both of these, or even more, can be in place simultaneously without affecting each other in any way. You just switch between branches whenever you decide to work on something specifically—and however long it takes I might add.
+Both of these, or even more branches, can exist simultaneously without affecting each other in any way. You just switch between branches whenever you decide to work on something specifically. Branches can be kept around as long as you need them.
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 04 Animation: New commit on feature branch and HEAD moves forward.
+### 08 Animation: New commit on feature branch and HEAD moves forward.
 
 Switch branch back to master as well.
 back and forth??
@@ -146,21 +147,25 @@ back and forth??
 
 When you continue your work on that new branch, HEAD will move forward to its latest commit.
 
-
-
-
-
-
 # Remote Branches
 
 So far, we have only discussed branches that are local to your computer. We can expand our branches into the cloud via remote branches.
 
-Remote branches point to the state of branches that are part of your remote repo. Someting like GitHub for example. 
+Remote branches point to the state of branches that are part of your remote repo. Something like GitHub for example. You can setup your own Git server as well of course. 
+
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 08 Animation: Code editor 
+### 09 Animation: 3 branches. local, github, own server(server icon with git logo)
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+### 10 Animation: Code editor 
 
 git push
 
@@ -169,20 +174,30 @@ pushing a single commit that moves between local and remote branch with github i
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-You can see these remote branches as bookmarks and backups. Services like GitHub are much more sophisticated and powerful but at their core they just function as Git servers. 
+You can see these remote branches as bookmarks and backups. Services like GitHub are much more sophisticated and powerful but at their core they function as Git servers. 
 
 That way you can communicate and share your commits through a centralized hub that you share with your team.
 
-The remote repo has a default name called origin and is followed by its branch name. You can name it anything you like of course.
+Your own remote repo has a default name. It’s called origin. You can name it anything you like of course.
 
+We identify a branch by prefixing it with that server name. Like origin / master for example. 
+
+<!--
+???
 So your local branch might have the name new-feature and the remote version would be origin/new-feature.
+???
+-->
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 10 Animation: Code editor 
+### 11 Animation: Code editor 
 
 remote / branch
+
+git fetch origin
+
+git checkout origin / new-feature
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -192,28 +207,32 @@ You can even check them out and see if the updates on a particular remote branch
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 11 Animation: Check out remote branch.
+### 12 Animation: Check out remote branch.
 
 Branch has octocat. HEAD moves to latest commit on that branch.
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-How do you create a such remote branches? When you fork or clone a repo, you will have automatically access to the branches that are on that remote repo. Git creates these references for you.
+How do you create a such remote branches? When you fork or clone a repo, you will have automatically access to the branches that are on that remote repo. Git creates the necessary references for you.
 
-All the data such remote repo hold are pulled down. Git creates a local master for you that has all the info from the remote repo. That way you can immediately build upon that.
+All the data such remote repo holds are pulled down. Git creates a local master for you that has all the info from the remote repo. That way you can immediately build upon that. You also have access to the remote version under origin / master
 
 ![Alt text](/images/local-and-remote-branches.png)
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 12 Animation: Both remote and local branch after git clone. Remote branch has cat HEAD instead of Max Headroom.
+### 13 Animation: Both remote and local branch after git clone. Remote branch has cat HEAD instead of Max Headroom.
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+<!--
+???
 Git also gives you access to all the remote branches of that remote repo.
+???
+-->
 
 Through the remote branches you gain access to the work of others—and vice versa of course. The pointer of a remote branch doesn’t move unless you synchronize with the remote repo.
 
@@ -224,51 +243,58 @@ Through the remote branches you gain access to the work of others—and vice ver
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 13 Animation: Remote branch falls behind local branch with new commits
+### 14 Animation: Remote branch falls behind local branch with new commits
 
+<!--
 ??? Fetch in changes that you don’t have
 ??? Push master, and update remote branch
+-->
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-You update these branches by pushing to them. They don’t automatically update when you commit locally. That way you share your work with your team as well.
+You update these branches by pushing to them. They don’t automatically update when you commit locally. By pushing to your remote, you share your work with your team as well.
 
 You can only push if you have write access to that remote repo of course. Once branches are up on a Git server, they are ready for collaboration.
 
-
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 14 Animation: Code editor
+### 15 Animation: Code editor
 
 git push origin branch-name
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-You specify the name of the git server, here origin and the branch-name you wanna push. That pushes the local branch-name to the remote repos branch-name.
-
 From now on, you can push to that remote branch  simply by using git push when you checked out that local version of it.  
+
+<!--
+???
+You specify the name of the git server, here origin and the branch-name you wanna push. That pushes the local branch-name to the remote repos branch-name.
+???
+-->
 
 After that, when somebody fetches from this shared repo, they will have a reference to that new branch of yours. They can fetch it down and check it out as well.
 
-So the branches that you wanna share get pushed up to some remote repo. The branches that stay on your machine are not only private, other team members have no access to them. They don’t even know they exist.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+### 16 Animation: Push to remote  branch 
+
+Collaborators can get access to new remote branch???
+
+Using the icons from the rails world train. Different developers get branches you pushed ot git hub branch icon.
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 15 Animation: Collaborators can get access to new remote branch???
+To sum it up, the branches that you wanna share get pushed up to some remote repo. The branches that stay on your machine are private. Other team members have no access to them until you push them as well. They don’t even know they exist.
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-
-
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-### 16 Animation: Push to remote branch ??
+### 17 Animation: Merge changes from remote repo into own local master
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -280,16 +306,24 @@ Even cooler, you can create a new local branch that is based on the remote versi
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 17 Animation: Code editor
+### 18 Animation: Code editor
 
-merge origin/some-branch-name
+git merge origin/some-branch-name
 
 git checkout -b some-branch-name origin/some-branch-name
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+### 19 Animation: Create new branch from remote one.
+
+Remote branch copies itself and moves over to master and docks onto it.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 <!--
@@ -343,7 +377,7 @@ The git branch command shows you a list of all branches in your repo.
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 05 Animation: Laptop w/ code editor
+### 20 Animation: Laptop w/ code editor
 
 git branch
 
@@ -357,7 +391,7 @@ In a real world scenario, you will most likely not only have to deal with two br
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 05 Animation: 3 branches. Master, Develop, topic-branch
+### 21 Animation: 3 branches. Master, Develop, topic-branch
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -373,7 +407,7 @@ Topic branches on the other hand are most of the time much shorter lived ones. Y
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 06 Animation: Many branches.
+### 22 Animation: Many branches.
 
 three branches: small-fix branch, big-feature with a lot of commits, medium sized some-issue branch
 
@@ -391,7 +425,7 @@ Even branching off from other branches is no biggie. When you think about it, we
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### 07 Animation: Branching off from one topic-branch
+### 23 Animation: Branching off from one topic-branch
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
