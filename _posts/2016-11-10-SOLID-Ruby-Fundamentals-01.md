@@ -23,11 +23,13 @@ SOLID is an acronym for five design principles in object oriented design in prog
 + Interface Segregation Principle.
 + Dependency Inversion Principle.
 
-A lot of principles, I hear ya! You are new to this and are maybe still dealing with a lot of basic programming concepts. The last thing you wanna stuff your brain with are coding principles. Fair point! I would say though that you are maybe missing out on an opportunity to step up your game from the very beginning.
+A lot of principles, I hear ya! Don’t let you discourage by their academic sex appeal. You are new to this and are maybe still dealing with a lot of basic programming concepts. The last thing you wanna stuff your brain with are coding principles. Fair point! I would say though that you are maybe missing out on an opportunity to step up your game from the very beginning.
+
+minimal entanglements
 
 It is not uncommon to think that you need to wait until you are ready, until you are more advanced to jump into more advanced waters. And you may be right in some regards. These design principles are different though. On the one hand, I feel like they are beginner-friendly to grasp and on the other hand, they will improve the quality of your code from day one. They will help you to design your code the way professionals do—at least you will start looking at your code as the big girls do. What’s not to like?
 
-If I would attempt to sum up the SOLID principles in one sentence, I would probably fail—miserably. What question do these principles address? This might be easier to answer. They were a result of thinking about how we can better manage dependencies. This is a question that is of equal importance for beginners and pros alike.
+If I would attempt to sum up the SOLID principles in one sentence, I would probably fail—miserably. What question do these principles address? This might be easier to answer. They were a result of thinking about how we can better manage dependencies. How can we prevent to create fast-rotting software? These are questions that are of equal importance for beginners and pros alike.
 
 Are these principles appropriate for a dynamic language like Ruby? After all, when SOLID was formed, it was in an era of statically typed Java and C++ programming. Good question! Yes, static languages have stronger dependencies but there is no reason to throw these principles out the window when you write Ruby code. You will learn basic techniques how you can modularize and stabilize your code.
 
@@ -143,3 +145,79 @@ Many dependencies create a sort of pressure to not change things. Worse if yo do
 If you need “and” or “or” in the description, the purpose of the functionality in a particular class, you can start thinking about applying SRP. Both scenarios imply that it does more than one focused thing. 
 
 As mentioned above, nothing is set in stone, there is no one truth fits all scenario, but at least it should raise the question if it might be a good idea to refactor your code to follow only one responsibility.
+
+## But it is Hard
+
+I give you that. In the beginning it will be relatively easy to break models into focused classes that do one thing. That will be your foundation to move forward into more complex waters. Take the time to build this base with smarts. Once complexity kicks in, it becomes a lot harder to break objects apart. I mean, there is no way around it. It will happen anyway, but with a good foundation, not only buildings get to be built taller and more stable. It will get harder over time, that is probably for sure. But at the same time, the problems also get more interesting, more challenging. It is a fun process that you might actually enjoy.
+
+## Benefits
+
+Breaking classes into focused components have a few benefits that can easily go unnoticed among the upside mentioned above. A few benefits that I can see are the following: 
+
++ Method names can often stay simpler due to fewer dependencies referenced.
++ Better organization because you grouped functionality more coherently.
++ Namespace clashes are easier to avoid.
++ Classes are easier to read and digest.
++ Same might apply for variable names.
++ Simpler, more readable APIs.
++ Smaller objects.
++ Faster objects.
+
+## Changes
+
+The question about inevitable change is, how would you like the ride to be? Crazy as hell or fun and interesting. Do you wanna feel like the world is doomed or just another day at the office with an interesting problem. The design of your application will strongly influence the experience of change. If you have an unflexible, rigid system in place, you can count on creating a cascade of related changes that pop up during that process. Fragile systems are not your friend.
+
+We don’t want application where everything is connected to everything else. That is a nightmare for anybody to work with. It’s basically a fancier way of saying it’s “Spaghetti code”. That does not sound like a four star 20 course menu, does it? You don’t want to build incredible long domino lines that all fall by tripping over a single piece.
+
+https://commons.wikimedia.org/wiki/File:Toppledominos.jpg
+
+![Alt text](/images/SOLID/Toppledominos.jpg)
+
+
+
+https://www.flickr.com/photos/baccharus/5817342671
+
+![Alt text](/images/SOLID/cable-mess.jpg)
+
+image. hammer arcade game
+
+## Payoff
+
+Good design will pay off. As with having a test suite around. It might cost you a little bit of extra effort in the beginning, but you will be glad going forward to have built on solid ground. Once you start to feel the need to fight your app all the time, you will wish back the good times where the application was young and perfect where you had an easy opportunity to apply solid design.
+
+Good design takes time in the beginning, as does TDD. But you can count on being better prepared for changing conditions down the line. Actually, it will most likely cost you extra money to not pay attention to design in your application. Cleaning up spaghetti code takes time and costs big bucks.
+
+## SRP Symtoms
+
+When your code is
+
++ loosely coupled
++ highly cohesive
++ easily composeable
++ context independent
+
+
+It keeps your classes and methods small. That directly leads to better maintainability
+
+Coupling is dependency
+
+Managing dependencies is a huge chunk of your actual work as a software writer.
+
+## What should I do?
+
+As a consequence of applying SRP, you will very often extract classes. If you have a bigger class with many responsibilities, you will end up needing more classes that have smaller, more focused jobs.
+
+# Extract Class
+
+
+
+
+You don’t go fast by writing bad code. That’s for sure. Chances are pretty good that the opposite is adequate.
+
+Rigidity in your code means that you need to modify a bunch of seemingly unrelated stuff when you touch one thing. You can only create a new state of consistency once the other dpendencies are taken care of. There are various degrees of course, but the treashold, the line to cross is not that big.
+
+You cannot make an isolated change without changing everything around it. Bad dependencies. 
+
+Fragility. Breaking things in many places that seem unrelated to the one place that actually changed. like butterfly effect.
+
+Don’t put functions that change for different reasons into the same class. That means you can organize you classes around functions that change for the same reason.
