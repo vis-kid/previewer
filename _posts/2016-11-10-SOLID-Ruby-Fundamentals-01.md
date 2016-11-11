@@ -15,9 +15,31 @@ categories: [Mechanic, Nokogiri, Ruby]
 
 # SOLID?
 
+SOLID is an acronym for five design principles in object oriented design in programming.
+
++ SRP, or the “Single Responsibility Principle”.
++ Open/Closed Principle.
++ Liskov Substitution Principle.
++ Interface Segregation Principle.
++ Dependency Inversion Principle.
+
+A lot of principles, I hear ya! You are new to this and are maybe still dealing with a lot of basic programming concepts. The last thing you wanna stuff your brain with are coding principles. Fair point! I would say though that you are maybe missing out on an opportunity to step up your game from the very beginning.
+
+It is not uncommon to think that you need to wait until you are ready, until you are more advanced to jump into more advanced waters. And you may be right in some regards. These design principles are different though. On the one hand, I feel like they are beginner-friendly to grasp and on the other hand, they will improve the quality of your code from day one. They will help you to design your code the way professionals do—at least you will start looking at your code as the big girls do. What’s not to like?
+
+If I would attempt to sum up the SOLID principles in one sentence, I would probably fail—miserably. What question do these principles address? This might be easier to answer. They were a result of thinking about how we can better manage dependencies. This is a question that is of equal importance for beginners and pros alike.
+
+Are these principles appropriate for a dynamic language like Ruby? After all, when SOLID was formed, it was in an era of statically typed Java and C++ programming. Good question! Yes, static languages have stronger dependencies but there is no reason to throw these principles out the window when you write Ruby code. You will learn basic techniques how you can modularize and stabilize your code.
+
+Stabilize? Yes, in the sense that you will be netter equipped to write code that is less brittle and better prepared for the inevitable change down the line. The ease with which you are able to change a code base is in direct correlation to its quality. I recommend that you start early in your developer career to think about this by starting to give these OO design principles an early look.
+
 # SRP: Single Responsibility Principle
 
 > A class should have only one reason  to change
+
+(https://www.flickr.com/photos/redjar/113974357)
+
+![Alt text](/images/SOLID/swiss-army-knife.jpg)
 
 In short, it is the opposite of spaghetti code I’d say. You decrease your chances of creating unwanted entanglements and hanging your app with code that has too many intermingled responsibilities.
 
@@ -80,7 +102,7 @@ O.K., let’s not overdramatize these things, I was just trying to find a strong
 
 So we want to have a class that has everything to do with forecasting the weather, one that is in charge of sending email, one that creates a session and one that handles the responsibility of calculating the weather forecast. Maybe even two for that. One that handles the weather forecast for a week and another who is in charge of the next 24 hours.
 
-In Rails, stuff that people often put in ApplicatioController or ApplicationHelper are often not very cohesive by nature. It often acts as a dumpster of stuff that the lazy fix didn’t compose a better home for. This can quickly get out of hand and pile on stuff from all over the place. Just because it’s easy to use these compartments for “global” stuff, doesn’t meant that we should stop there. Also, even as beginners, we already know that global stuff is rarely in our best self-interest.
+In Rails, stuff that people often put in ApplicatioController or ApplicationHelper are often not very cohesive by nature. It’s a top-level object that often collects a bunch of inconvenient stuff. You will often see applications where it acts as a dumpster of stuff that the lazy fix didn’t compose a better home for. This can quickly get out of hand and pile on stuff from all over the place. Just because it’s easy to use these compartments for “global” stuff, doesn’t meant that we should stop there. Also, even as beginners, we already know that global stuff is rarely in our best self-interest.
 
 ## Boundries
 
@@ -107,3 +129,17 @@ Always think hard before you add something to the User model. It is such an attr
 ## One ... bullet
 
 You will often have to weigh different principles against each other. SRP is no golden bullet that fits every occasion. It is often a very good starting point though. Figuring out a balanced middle ground will always be part of your job when you design applications. That also expands to applying code quality principles.
+
+## How do we recognize good design?
+
+
+
+Dependencies tell you how change is gonna propagate throughout your code.
+
+Many dependencies create a sort of pressure to not change things. Worse if yo don’t know what the extend is that a little change here or there  can cause.
+
+## And / Or
+
+If you need “and” or “or” in the description, the purpose of the functionality in a particular class, you can start thinking about applying SRP. Both scenarios imply that it does more than one focused thing. 
+
+As mentioned above, nothing is set in stone, there is no one truth fits all scenario, but at least it should raise the question if it might be a good idea to refactor your code to follow only one responsibility.
