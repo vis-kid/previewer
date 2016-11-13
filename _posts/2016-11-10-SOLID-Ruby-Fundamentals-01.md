@@ -512,7 +512,7 @@ class PageWriter
   end
 
   def extract_data
-    PageExtractor.new(detail_page_link).extract_data
+    extracted_data ||= PageExtractor.new(detail_page_link).extract_data
   end
 
   def compose_markdown(extracted_data)
@@ -671,7 +671,7 @@ end
 
 ## PageWriter
 
-Again, only one job, writing out the actual page for a new podcast episode with the scraped data composed in the `MarkdownComposer`. It uses a few private methods to extract behaviour and to keep things more readable. We needed a few of the `ExtractionUtilites` as well. So the module paid off already.
+Again, only one job, writing out the actual page for a new podcast episode with the scraped data composed in the `MarkdownComposer`. Wait, is that really the case? At first glace it looks like it, but it has one than one reason to change. Yes, this class only writes out the page but it is also involved in logic that belongs to extracting data. It uses a few private methods to extract behaviour which kept things readable and succinct. See, it is not as easy as looking at the number of methods the API provides. The private methods can also mess with your responsibilities. We have more work to do. 
 
 #### class PageWriter
 
@@ -707,7 +707,7 @@ class PageWriter
   end
 
   def extract_data
-    PageExtractor.new(detail_page_link).extract_data
+    extracted_data ||= PageExtractor.new(detail_page_link).extract_data
   end
 
   def compose_markdown(extracted_data)
@@ -717,11 +717,98 @@ class PageWriter
   def compose_filename(date, interviewee, episode_number)
     "#{date}-#{dasherize(interviewee)}-#{episode_number}.html.erb.md" 
   end
-
 end
 
+```
+
+Back to the drawing board. The private method above needs another look.
+
+``` ruby
+
+class MarkdownComposer
+  include ExtractionUtilities
+
+  attr_reader :detail_page_link
+
+  def initialize(detail_page_link)
+    @detail_page_link = detail_page_link
+  end
+
+  def prepare_markdown
+    compose_markdown(extract_data)
+  end
+
+  def prepare_filename
+    compose_filename
+  end
+
+  private
+
+  def compose_markdown(options={})
+<<-HEREDOC
+--- 
+title: #{options[:interviewee]}
+interviewee: #{options[:interviewee]}
+topic_list: #{options[:title]}
+tags: #{options[:tags]}
+soundcloud_id: #{options[:sc_id]}
+date: #{options[:date]}
+episode_number: #{options[:episode_number]}
+---
+
+#{options[:text]}
+HEREDOC
+  end
+
+  def compose_filename
+    "#{date}-#{interviewee}-#{episode_number}.html.erb.md" 
+  end
+
+  def extract_data
+    extracted_data ||= PageExtractor.new(detail_page_link).extract_data
+  end
+
+  def date
+    extract_data[:date]
+  end
+
+  def interviewee
+    dasherize(extract_data[:interviewee])
+  end
+
+  def episode_number
+    extract_data[:episode_number]
+  end
+end
+
+class PageWriter
+
+  attr_reader :detail_page_link
+
+  def initialize(detail_page_link)
+    @detail_page_link = detail_page_link
+  end
+
+  def write_page
+    text          = MarkdownComposer.new(detail_page_link).prepare_markdown
+    file_name     = MarkdownComposer.new(detail_page_link).prepare_filename
+
+    File.open(file_name, 'w') { |file| file.write(text) }
+  end
+end
 
 ```
+
+
+
+
+
+
+
+
+
+
+
 
 module
 
