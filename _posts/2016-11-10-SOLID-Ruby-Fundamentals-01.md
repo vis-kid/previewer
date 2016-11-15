@@ -222,7 +222,7 @@ Fragility. Breaking things in many places that seem unrelated to the one place t
 
 Don’t put functions that change for different reasons into the same class. That means you can organize you classes around functions that change for the same reason.
 
-## Scraper Example
+# Scraper Example
 
 In my last article about scraping websites, I built a small scraper to get data off my podcast [Between \| Screens](http://betweenscreens.fm/). I left the readers with a small exercise to play with. Since it was another article that was targeted at coding newbies, I wanted the readers to take the code and play with it. The exercise was to find ways to refactor that piece of code once they wrapped their heads around it. 
 
@@ -230,7 +230,7 @@ In the article I focused solely on the functionality, the API and how readers ca
 
 I gave a little hint that extracting classes is a good way to start getting this code in better shape. Let’s use this code and see how we can encapsulate it into objects that focus on simple responsibilities. If the example feels a little dense, I recommend that you go back to at least the third article in the series. You will find detailed explanations for every method this webscraper is executing. 
 
-#### Raw Scraper
+## Raw Podcast Scraper
 
 ``` ruby
 
@@ -367,7 +367,7 @@ scrape
 
 Now that is one blob of code. I hear you. I wouldn’t say it’s spaghetti, but it certainly is a good opportunity to play with SRP. I hope the readers of the last article gave the exercise some thought and came up with a few refactorings that simplified things or improved readability. The code above works as is, but only focuses on functionality. It does not comply with the things we discussed above. Cohesion and encapsulation is not strongly represented. In short, this does not scale well. For an article about Nokogiri and Mechanize for beginners or a first spike, this is alright, but we can and should do better. Let’s have a look how extracting a few classes can make a difference. 
 
-#### Scraper with Extracted Classes
+## Podcast Scraper with Extracted Classes v.1
 
 ``` ruby
 
@@ -556,7 +556,44 @@ We now have four classes and one module that handles a few utilities.
 
 Let’s go over each of them and check their responsibilities. If you would like to see a more detailed explanation about their functionality, please check out my previous article where I go more into the nitty gritty details.
 
-## PageExtractor
+## module ExtractionUtilities
+
+We could have extracted some more but for now I felt it would be overkill to split the module up. If I would amass more methods like dasherize, I would start thinking to find a better home for them. Since I need these utilities in more than one place I chose a module for now and include these methods where needed. I felt the `class PageExtractor` shouldn’t be concerned about stuff like striping pipe characters or building tags from the extracted data. That way we also increase the likelihood that we can reuse them.
+
+#### module ExtractionUtilities
+
+``` ruby
+
+module ExtractionUtilities
+
+  def build_tags(title, interviewee)
+    extracted_tags = strip_pipes(title)
+    "#{interviewee}"+ ", #{extracted_tags}"
+  end
+
+  def strip_pipes(title)
+    tags = title.tr('|', ',')
+    tags = tags.gsub(/[@?#&]/, '')
+    tags.gsub(/[w\/]{2}/, 'with')
+  end
+
+  def clean_episode_number(number)
+    number.to_s.tr('#', '')
+  end
+
+  def clean_date(episode_subtitle)
+    string_date = /[^|]*([,])(.....)/.match(episode_subtitle).to_s
+    Date.parse(string_date)
+  end
+
+  def dasherize(text)
+    text.lstrip.rstrip.tr(' ', '-')
+  end
+end
+
+```
+
+## class PageExtractor
 
 This class now has one responsibility, extracting the data from the link it was fed in the loop that visits every podcast episode. It returns an options hash that stores the data we needed from the shownotes site. It has a few private methods that are cohesive enough to not extract into another object on their own.
 
@@ -640,7 +677,7 @@ end
 
 ```
 
-## MarkdownComposer
+## class MarkdownComposer
 
 The next class is even smaller. It takes the extracted info from the options hash and fills them into a blueprint for a `.markdown` file with [front matter](https://jekyllrb.com/docs/frontmatter/). It has one simple job and therefore only one reason to change.
 
@@ -669,9 +706,9 @@ end
 
 ```
 
-## PageWriter
+## class PageWriter
 
-Again, only one job, writing out the actual page for a new podcast episode with the scraped data composed in the `MarkdownComposer`. Wait, is that really the case? At first glace it looks like it, but it has one than one reason to change. Yes, this class only writes out the page but it is also involved in logic that belongs to extracting data. It uses a few private methods to extract behaviour which kept things readable and succinct. See, it is not as easy as looking at the number of methods the API provides. The private methods can also mess with your responsibilities. We have more work to do. 
+Again, only one job, writing out the actual page for a new podcast episode with the scraped data composed in the `MarkdownComposer`. Wait, is that really the case? At first glace it looks like it, but it has more than one reason to change. Yes, on the surface this class only writes out the page but it is also involved in logic that belongs to extracting data. It uses a few private methods to extract behaviour which kept things readable and succinct. See, it is not as easy as looking at the number of methods the API provides. The private methods can also mess with your responsibilities. We have more work to do. 
 
 #### class PageWriter
 
@@ -722,6 +759,8 @@ end
 ```
 
 Back to the drawing board. The private method above needs another look.
+
+## PageWriter Refactored
 
 ``` ruby
 
@@ -799,17 +838,226 @@ end
 
 ```
 
+So we shifted things around a bit. Big deal! Sure, that is one way to see it, but now we have a `PageWriter` class that is not dabbling in the responsibilities of composing markdown. Since the bulk of the work that we wanna achieve culminated in the creation of `.markdown` files with the data for each episode, it is more appropriate to let `MarkdownComposer do the heavy lifting. Clear cut responsibilities. And these decisions can frequently be necessary to keep the size of classes in check. Good class design will lead to touch tangential classes less and less when you introduce new code, or delete old one.
+
+## class Scraper
+
+As you can  see below, the `Scraper` class was unaffected by the changes we made in the previous little refactoring. That means the coupling between these classes is acceptably low in this case. The API for `Pagewriter#write_page` changed internally, but the `Scrape` class does not care a bit. It’s none of its concerns.
+
+Here we only get Mechanize ready and loop over the pagination to extract links for each episode. Every link gets fed to the `PageWriter` class that is in charge of orchestrating the whole data extraction and writing processes.
+
+``` ruby
+
+class Scraper
+
+  def scrape
+    link_range = 1
+    agent ||= Mechanize.new
+
+    until link_range == 21
+      page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
+      link_range += 1
+
+      page.links[2..8].map do |link|
+        PageWriter.new(link).write_page
+      end
+    end
+  end
+end
+
+```
+
+Below is again the full code with extracted classes that now better manage their responsibilities. Not perfect but something beginners can do pretty early in their trajectory. Extracting classes is one refactoring method to deal with a bunch of code smells and should be in your bag of tricks from the start.
+
+## Refactored Podcast Scraper
+
+``` ruby
+
+require 'Mechanize'
+require 'Pry'
+require 'date'
+
+module ExtractionUtilities
+
+  def build_tags(title, interviewee)
+    extracted_tags = strip_pipes(title)
+    "#{interviewee}"+ ", #{extracted_tags}"
+  end
+
+  def strip_pipes(title)
+    tags = title.tr('|', ',')
+    tags = tags.gsub(/[@?#&]/, '')
+    tags.gsub(/[w\/]{2}/, 'with')
+  end
+
+  def clean_episode_number(number)
+    number.to_s.tr('#', '')
+  end
+
+  def clean_date(episode_subtitle)
+    string_date = /[^|]*([,])(.....)/.match(episode_subtitle).to_s
+    Date.parse(string_date)
+  end
+
+  def dasherize(text)
+    text.lstrip.rstrip.tr(' ', '-')
+  end
+end
+
+class PageExtractor
+  attr_reader :detail_page
+  include ExtractionUtilities
+
+  def initialize(detail_page_link)
+    @detail_page = detail_page_link.click
+  end
+
+  def extract_data
+
+    options = {
+      interviewee:    interviewee,
+      title:          title,
+      sc_id:          soundcloud_id,
+      text:           shownotes_text,
+      tags:           tags,
+      date:           date,
+      episode_number: episode_number
+    }
+  end
+
+  private
+
+  def interviewee
+    interviewee_selector = '.episode_sub_title span'
+    detail_page.search(interviewee_selector).text.strip
+  end
+
+  def title
+    title_selector = ".episode_title"
+    detail_page.search(title_selector).text.gsub(/[?#]/, '')
+  end
+
+  def soundcloud_id
+    sc = detail_page.iframes_with(href: /soundcloud.com/).to_s
+    sc.scan(/\d{3,}/).first
+  end
+
+  def shownotes_text
+    shownote_selector = "#shownote_container > p"
+    detail_page.search(shownote_selector)
+  end
+
+  def tags
+    build_tags(title, interviewee)
+  end
+
+  def date
+    clean_date(subtitle)
+  end
+
+  def episode_number
+    number = /[#]\d*/.match(subtitle)
+    clean_episode_number(number)
+  end
+
+  def subtitle
+    subheader_selector = ".episode_sub_title"
+    detail_page.search(subheader_selector).text
+  end
+end
+
+class MarkdownComposer
+  include ExtractionUtilities
+
+  attr_reader :detail_page_link
+
+  def initialize(detail_page_link)
+    @detail_page_link = detail_page_link
+  end
+
+  def prepare_markdown
+    compose_markdown(extract_data)
+  end
+
+  def prepare_filename
+    compose_filename
+  end
+
+  private
+
+  def compose_markdown(options={})
+<<-HEREDOC
+--- 
+title: #{options[:interviewee]}
+interviewee: #{options[:interviewee]}
+topic_list: #{options[:title]}
+tags: #{options[:tags]}
+soundcloud_id: #{options[:sc_id]}
+date: #{options[:date]}
+episode_number: #{options[:episode_number]}
+---
+
+#{options[:text]}
+HEREDOC
+  end
+
+  def compose_filename
+    "#{date}-#{interviewee}-#{episode_number}.html.erb.md" 
+  end
+
+  def extract_data
+    extracted_data ||= PageExtractor.new(detail_page_link).extract_data
+  end
+
+  def date
+    extract_data[:date]
+  end
+
+  def interviewee
+    dasherize(extract_data[:interviewee])
+  end
+
+  def episode_number
+    extract_data[:episode_number]
+  end
+end
+
+class PageWriter
+
+  attr_reader :detail_page_link
+
+  def initialize(detail_page_link)
+    @detail_page_link = detail_page_link
+  end
+
+  def write_page
+    text          = MarkdownComposer.new(detail_page_link).prepare_markdown
+    file_name     = MarkdownComposer.new(detail_page_link).prepare_filename
+
+    File.open(file_name, 'w') { |file| file.write(text) }
+  end
+end
+
+class Scraper
+
+  def scrape
+    link_range = 1
+    agent ||= Mechanize.new
+
+    until link_range == 21
+      page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
+      link_range += 1
+
+      page.links[2..8].map do |link|
+        PageWriter.new(link).write_page
+      end
+    end
+  end
+end
 
 
+Scraper.new.scrape
 
+```
 
-
-
-
-
-
-
-
-module
-
-we could have extracted some more but for now I felt it would be overkill. If I would amass more methods like dasherize, I would start thinking to find a better home for them.
+Let’s stop here and call it a day. I recommend that you play with this code a bit on your own and see if you can come up with other strategies than class extraction to simplify things even more. There are other things to optimize for. Let’s see if we can take this a step further in the next SOLID article about the “Open/Closed Principle”. See you there.
