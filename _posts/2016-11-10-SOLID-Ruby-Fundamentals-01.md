@@ -12,6 +12,9 @@ categories: [Mechanic, Nokogiri, Ruby]
 
 + SOLID?
 + SRP: Single Responsibility Principle
++ Semi-Random Thoughts
++ Extract Class
++ Scraper Example
 
 # SOLID?
 
@@ -23,31 +26,81 @@ SOLID is an acronym for five design principles in object oriented design in prog
 + Interface Segregation Principle.
 + Dependency Inversion Principle.
 
-A lot of principles, I hear ya! Don’t let you discourage by their academic sex appeal. You are new to this and are maybe still dealing with a lot of basic programming concepts. The last thing you wanna stuff your brain with are coding principles. Fair point! I would say though that you are maybe missing out on an opportunity to step up your game from the very beginning.
+A lot of principles, I hear ya! Don’t let you discourage by their academic sex appeal. I assume you are new to this and are probably still dealing with a lot of basic programming concepts. The last thing you wanna stuff your into your brain right now are coding principles. Fair point! I would say though that you are maybe missing out on an opportunity to step up your game from the very beginning.
 
-minimal entanglements
+If I would attempt to sum up the SOLID principles in one sentence, I would probably fail—miserably. What question do these principles address? This might be easier to answer. They were the result of thinking about how we can better manage dependencies. How can we prevent ourselves to create fast-rotting software? How can we write software with minimal entanglements? For that matter, these questions are of equal importance for beginners and pros alike.
 
-It is not uncommon to think that you need to wait until you are ready, until you are more advanced to jump into more advanced waters. And you may be right in some regards. These design principles are different though. On the one hand, I feel like they are beginner-friendly to grasp and on the other hand, they will improve the quality of your code from day one. They will help you to design your code the way professionals do—at least you will start looking at your code as the big girls do. What’s not to like?
+It is not uncommon for newbies to think that they need to wait until they are ready to jump into more advanced waters. And that might be right in some regards. These design principles are different though. I feel like they are beginner-friendly and they will improve the quality of your code from day one. They will help you to design your code the way professionals do—at least you will start looking at your code as the big boys & girls do. What’s not to like?
 
-If I would attempt to sum up the SOLID principles in one sentence, I would probably fail—miserably. What question do these principles address? This might be easier to answer. They were a result of thinking about how we can better manage dependencies. How can we prevent to create fast-rotting software? These are questions that are of equal importance for beginners and pros alike.
+Are these principles appropriate for a dynamic language like Ruby? After all, when SOLID was formed, it was in an era of statically typed Java and C++ programming. Good question! Yes, static languages have stronger dependencies but there is no reason to throw these principles out the window when you write Ruby code. They will teach you basic techniques of how you can modularize and stabilize your code.
 
-Are these principles appropriate for a dynamic language like Ruby? After all, when SOLID was formed, it was in an era of statically typed Java and C++ programming. Good question! Yes, static languages have stronger dependencies but there is no reason to throw these principles out the window when you write Ruby code. You will learn basic techniques how you can modularize and stabilize your code.
-
-Stabilize? Yes, in the sense that you will be netter equipped to write code that is less brittle and better prepared for the inevitable change down the line. The ease with which you are able to change a code base is in direct correlation to its quality. I recommend that you start early in your developer career to think about this by starting to give these OO design principles an early look.
+Stabilize? Yes, in the sense that you will be better equipped to write code that is less brittle and better prepared for the inevitable changes down the line. The ease with which you are able to change a code base is in direct correlation to its quality. I recommend that you start thinking about this early in your developer career. You can start by giving these OO design principles a little sneak peak.
 
 # SRP: Single Responsibility Principle
 
 > A class should have only one reason  to change
 
+Your classes have ideally only one responsibility. If a class is focused on only one job, there is no other reason to change it. In short, I’d say this is the opposite of spaghetti code. You decrease your chances of creating unwanted entanglements and hanging your app with code that has too many intermingled responsibilities. If you would follow only a single one principle in your coding journey, SRP would be a good candidate. It brings a lot of benefits to the table—at literally little to no cost. Almost as a byproduct, it also encourages other positive behaviour in your code. Neat!
+
+## Reasons to Change
+
+Reasons to change roughly equal responsibilities. If you have a class with five different jobs, you have a good chance of ending up with five reasons to change. Say we have a class that sets a session, sends email which also gets validated and does the weather forecast for the next week? If any of these things change, the rest of the class is possibly affected by that. This is exactly what SRP wants us to avoid. This is the brittleness we talk about.
+
+So we want to have one class that handles everything in regards to forecasting the weather, one that is in charge of sending email, one that creates a session and one that handles calculating the weather forecast. Maybe even two for that. One that handles the weather forecast for a week and another who is in charge of the next 24 hours.
+
+When you look at this picture below, you can clearly see what you should avoid. This is a tool that tries to be too many things. It sure looks funny, I give you that, but at the same time it doesn’t look that useful either, does it?. Try to carry that around in your pocket, hell, even  holding it in your hands is an artistic challenge. That is the kind of class design we want to avoid. We want to keep things simple and organized. In terms of swiss army knife, we prefer one tool at a time.
+
 (https://www.flickr.com/photos/redjar/113974357)
 
 ![Alt text](/images/SOLID/swiss-army-knife.jpg)
 
-In short, it is the opposite of spaghetti code I’d say. You decrease your chances of creating unwanted entanglements and hanging your app with code that has too many intermingled responsibilities.
+## Cohesive Classes
 
-If you would follow only once principle in your coding journey, SRP would be a good candidate. It brings a lot of benefits to the table, at literally little to no cost while encouraging other development in your code that is good. As a byproduct almost.
+Classes should be highly cohesive. Every piece of a class should be highly related to other pieces of a class. In our imaginary example from above, the weather forecast is not highly related to email validation, sending email or creating a session. So we end up with weak cohesion which basically let’s your app rot from the inside. You are setting up the dynamite to blow up the house you are living in yourself.
 
-That means your classes have only one responsibility. If this class is focused on only one job, there can be another reason to change it.
+O.K., let’s not overdramatize these things, I was just trying to find a strong metaphor that sticks with you. Nobody is gonna loose his life or anything, but some people might loose their minds if these things pile up for years and suddenly the need for change hits you hard. Entangling large pieces of spaghetti code could literally break a product if people loose the ability to rebuild the application with the components at hand.
+
+Let’s talk Rails for a second. In Rails, people often put stuff in ApplicatioController or ApplicationHelper that often are not very cohesive by nature. It’s a top-level object that can easily collect a bunch of inconvenient stuff. You will often see applications where they act as a dumpsters for stuff that the lazy fix didn’t compose a better home for. This can quickly get out of hand and pile on stuff from all over the place. Just because it’s easy to use these compartments for “global” stuff, doesn’t mean that we should stop there. We need to take the time to compose our objects with their dedicated responsibilities in mind. Also, even as beginners, we already know that global stuff is rarely in our best self-interest.
+
+## Changes
+
+The question about inevitable change is, how would you like the ride to be? Crazy as hell or fun and interesting. Do you wanna feel like the world is doomed or just another day at the office with an interesting problem. The design of your application will strongly influence the experience of change. If you have an unflexible, rigid system in place, you can count on creating a cascade of related changes that pop up during that process. Fragile systems are not your friend.
+
+https://commons.wikimedia.org/wiki/File:Toppledominos.jpg
+
+![Alt text](/images/SOLID/Toppledominos.jpg)
+
+We don’t want to create applications where everything is connected to everything else. That is a nightmare to work with. It’s basically a fancier way of saying it’s “Spaghetti code”. That does not sound like a four star 20 course menu, does it? You don’t want to build incredible long domino lines that all fall by tripping over a single piece.
+
+https://www.flickr.com/photos/baccharus/5817342671
+
+![Alt text](/images/SOLID/cable-mess.jpg)
+
+image. hammer arcade game
+
+
+# Semi-Random Thoughts
+
+In this section I just wanna quickly discuss a few topics that fit into this whole context. The “Single Responsiblity Principle” has everything to do with the following considerations:
+
++ Clarity
++ Reuseability
++ Easy Tests
++ Easy to Change
++ Code Quality
++ Downloading Context
++ Boundries
++ Gem Churn
++ Bugs
++ God Classes
++ Golden Bullet
++ Good Design
++ Hard
++ Benefits
++ Changes
++ Payoff
++ SRP Symptoms
+
 
 ## Clarity
 
@@ -88,23 +141,6 @@ For senior software writers, the ease of being able to change code when the requ
 If the classes are smaller, you will give other team members and your future self an easier time to get familiarized with its behaviour as well. Nobody wan’t to open a class and sit there for 15 minutes before they have a general sense of what’s going on. That will make people—you guessed it—put funny stuff in your coffee at some point.
 
 Also, what developers need to load into their heads in this context, is often what you will end up needing to load as dependencies in your tests. Not exactly ideal in many ways..
-## Reasons to Change
-
-Reasons to change roughly equal responsibilities. If you have a class with five different jobs, you have a good chance of ending up with five reasons to change. You class sets a session, sends email that also get validated and does the weather forecast for the next week?
-
-If any of these things change, the rest of the class is possibly affected by that. This is exactly what SRP wants us to avoid. This is the brittleness we talk about.
-
-## Cohesive Classes
-
-Classes should be highly cohesive. You are setting up the dynamite to blow up the house you are living in yourself. O.K., let’s not overdramatize these things, I was just trying to find a strong metaphor that sticks with you. Nobody is gonna loose his life or anything, but some people might loose their minds if these things pile up for years and then something happens. Entangling that large piece of spaghetti code could literally break a product if people loose the ability to rebuild the application with the components at hand.
-
-Every piece of a class should be highly related to other pieces of a class. In our imaginary example from above, the weather forecast is not highly related to email validation, sending email or creating a session. So we end up with weak cohesion which basically let’s your app rot from the inside. You are setting up the dynamite to blow up the house you are living in yourself.
-
-O.K., let’s not overdramatize these things, I was just trying to find a strong metaphor that sticks with you. Nobody is gonna loose his life or anything, but some people might loose their minds if these things pile up for years and then something happens. Entangling that large piece of spaghetti code could literally break a product if people loose the ability to rebuild the application with the components at hand.
-
-So we want to have a class that has everything to do with forecasting the weather, one that is in charge of sending email, one that creates a session and one that handles the responsibility of calculating the weather forecast. Maybe even two for that. One that handles the weather forecast for a week and another who is in charge of the next 24 hours.
-
-In Rails, stuff that people often put in ApplicatioController or ApplicationHelper are often not very cohesive by nature. It’s a top-level object that often collects a bunch of inconvenient stuff. You will often see applications where it acts as a dumpster of stuff that the lazy fix didn’t compose a better home for. This can quickly get out of hand and pile on stuff from all over the place. Just because it’s easy to use these compartments for “global” stuff, doesn’t meant that we should stop there. Also, even as beginners, we already know that global stuff is rarely in our best self-interest.
 
 ## Boundries
 
@@ -162,24 +198,6 @@ Breaking classes into focused components have a few benefits that can easily go 
 + Simpler, more readable APIs.
 + Smaller objects.
 + Faster objects.
-
-## Changes
-
-The question about inevitable change is, how would you like the ride to be? Crazy as hell or fun and interesting. Do you wanna feel like the world is doomed or just another day at the office with an interesting problem. The design of your application will strongly influence the experience of change. If you have an unflexible, rigid system in place, you can count on creating a cascade of related changes that pop up during that process. Fragile systems are not your friend.
-
-We don’t want application where everything is connected to everything else. That is a nightmare for anybody to work with. It’s basically a fancier way of saying it’s “Spaghetti code”. That does not sound like a four star 20 course menu, does it? You don’t want to build incredible long domino lines that all fall by tripping over a single piece.
-
-https://commons.wikimedia.org/wiki/File:Toppledominos.jpg
-
-![Alt text](/images/SOLID/Toppledominos.jpg)
-
-
-
-https://www.flickr.com/photos/baccharus/5817342671
-
-![Alt text](/images/SOLID/cable-mess.jpg)
-
-image. hammer arcade game
 
 ## Payoff
 
