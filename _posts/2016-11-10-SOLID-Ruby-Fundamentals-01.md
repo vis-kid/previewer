@@ -78,6 +78,19 @@ https://www.flickr.com/photos/baccharus/5817342671
 
 image. hammer arcade game
 
+## Benefits
+
+Breaking classes into focused components have a few benefits that can easily go unnoticed. A few benefits that I can see are the following: 
+
++ Method names can often stay simpler due to fewer dependencies referenced.
++ Better organization because you grouped functionality more coherently.
++ Namespace clashes are easier to avoid.
++ Classes are easier to read and digest.
++ Same might apply for variable names.
++ Simpler, more readable APIs.
++ Smaller objects.
++ Faster objects.
+
 
 # Semi-Random Thoughts
 
@@ -93,119 +106,89 @@ In this section I just wanna quickly discuss a few topics that fit into this who
 + Gem Churn
 + Bugs
 + God Classes
-+ Golden Bullet
-+ Good Design
++ Silver Bullet
++ Good Design?
 + Hard
 + Benefits
 + Changes
 + Payoff
 + SRP Symptoms
 
-
 ## Clarity
 
-Optimized for readablity
-
-Big classes are very often a smell that they are not following SRP.
-
-You want to avoid classes that have too much going on. If they start to feel blobby and you need to take some time to figure out what’s actually going on, it’s probably a good time to refactor its responsibilities. 
+You want to avoid classes that have too much going on. If they start to feel blobby and you need to take some time to figure out what’s actually going on, it’s probably a good time to refactor its responsibilities. SRP aids the need for readable classes as well. Long, convoluted classes are not exactly as easy read. In that sense, big classes can often be a smell they they took on too many responsibilities. Applying SRP will have an immediate effect on the clarity of these objects. They will end up being more focused and succinct. Always optimize for readability. Your fellow coders are still human. 
 
 ## Reuseability
 
-Ideally, you want your classes to handle one responsibility well so that you can reuse that functionality in other places as well.
-
-A good guideline is to build small components because they increase the chance of being useful to be recycled some place else in your code.
-
-Keeping things isolated, in the own little scope
+Ideally, you want your classes to handle one responsibility well so that you can reuse that functionality in other places as well. Keeping things isolated, in the own little scope, is a good guideline to end up with small components that increase the chance of being useful some place else. Ideally they can be recycled in your code.
 
 ## Easier to Test
 
-When you don’t have classes that are too involved and frankly all over the place, you can write much more focused and readable tests as well. Your tests are probably a good indicator of your classes quality of state. They run faster as well because of reduced dependencies.
+When you don’t have classes that are too involved and frankly all over the place, you can write much more focused and readable tests as well. Your tests are probably a good indicator of the quality of your your classes’ design. With single responsibilities, they also run faster because of reduced dependencies. This really is all about exposure.
 
-But not only are such tests slower if classes don’t follow SRP, they will also be more brittle along they way. Your classes and your tests will change, this is the one certainty you have. The less responsibilities you encapsulate in classes, the less brittle your code will end up being.
-
-Look out for tests that are hard to set up and involve a lot of dependencies. That’s a good indicator that you should spend some time on simplifying the class design.
+Look out for tests that are hard to set up and involve a lot of dependencies. That’s a good indicator that you should spend some time on simplifying the class design. Besides tests being slower, if classes don’t follow SRP, they will also be more brittle along they way. Your classes and your tests will change, this is the one certainty you have. The less responsibilities you encapsulate in classes, the less brittle your code will end up being.
 
 ## Easy to Change
 
-Classes with tons of responsibilities are a pain to change. Since this is expected future behaviour of your application, you should plan for it. SRP classes are more flexible to change. They are easy to refactor or to completely rewrite if your application goes through growing pains for example.
+Classes with tons of responsibilities are a pain to change. Since this is expected future behaviour of your applications, you should plan for it. SRP classes are more flexible to deal with that scenario. They are easy to refactor if your application goes through growing pains for example.
 
-Flexibility and resiliency are two important qualities you want to have from every piece of your code. The Single Responsibility Principle hands you these benefits on a silver platter without much effort. Rewriting you work becomes less and less of a liability—or even of a necessity when reuse and modularity are built in from the start.
+Flexibility and resiliency are two important qualities you want to have from every piece of your code. The Single Responsibility Principle hands you these benefits on a silver platter without much effort. Rewriting you work becomes less and less of a liability—or even a necessity when reuse and modularity are baked in from the start.
 
 ## Code Quality
 
-For senior software writers, the ease of being able to change code when the requirements necessitate that, is one of their highest metric to assess code quality.
+For senior software writers, the ease of being able to change code when the requirements necessitate that, is one of their highest metric to assess code quality. They have seen all kinds of trends and cool new stuff. What they often look out for is simplicity and elegance. Code that has adaptability built in is a good indicator of a software writer that aims to produce quality software—not only quick fixes that cater to short-term needs only.
 
 ## Downloading Context
 
-If the classes are smaller, you will give other team members and your future self an easier time to get familiarized with its behaviour as well. Nobody wan’t to open a class and sit there for 15 minutes before they have a general sense of what’s going on. That will make people—you guessed it—put funny stuff in your coffee at some point.
+If the classes are smaller, you will give other team members and your future self an easier time to get familiarized with its behaviour as well. Nobody wants to open a class and sit there for 15 minutes before they have a general sense of what’s going on. That will make people—you guessed it—put funny stuff in your coffee at some point.
 
 Also, what developers need to load into their heads in this context, is often what you will end up needing to load as dependencies in your tests. Not exactly ideal in many ways..
 
 ## Boundries
 
-It’s best to evolve your code to become SRP friendly. Often you don’t know from the beginning how the responsibilities are spread and you should not over-optimize from the start without knowing where the journey is headed.
+Often you don’t know from the beginning how the responsibilities are spread. Therefore you should not over-optimize from the start. It’s really hoard to know the journey is headed. It’s best to evolve your code to become SRP friendly step by step. Some classes will end up being magnets for responsibilities while others are likely to be a lot more lazy in piling stuff up.
 
-Some classes will end up being magnets for responsibilities while others are like a lot more lazy in piling them on.
+## God Classes
+
+White we’re at it. Always think hard before you add something to models like User. It is such an attractive magnet for all sorts of things in most applications. This and the class that tackles the heart of the business logic logic, like bookmarking in a bookmarking app for example. You should be especially hawk-eyed with these. If you don’t pay attention they can quickly become black holes in your code, devouring tons of responsibilities at once. We call them god classes because they know too much about other classes’ inner businesses.
 
 ## Gem churn
 
-It will show you how often particular classes have been changed. These statistics can help you to identify which classes might be in need of an SRP treatment. Your god classes and the ones that cover the central business proposition will often end up being high on that list.
-
-When these classes change often it tells you that they have many reasons to change.
-
-This gives you an easy peek into your core models and updates you that the rate of change might be alarming or not.
+When classes change often it tells you that they have many reasons to change. [Churn](https://github.com/danmayer/churn) is a gem that, among other things, will show you how often particular classes have been changed. This gives you an easy peek into your core models and updates you that the rate of change might be alarming or not. These statistics can help you to identify which classes might be in need of an SRP treatment. Your god classes and the ones that cover the central business proposition will often end up being high on that list.
 
 ## Bugs
 
-Intermingling and churn is an open door for bugs. It’s almost like inviting cock roaches into your home by laying out food at your doorstep.
+Intermingling and churn is an open door for bugs. It’s almost like inviting cockroaches into your home by laying out food at your doorstep. SRP is one of the most effective strategies to minimize the risk for serious insect hazard. All that spaghetti code is a feeding frenzy for bugs.
 
-## God Classes and User
+## Silver Bullet
 
-Always think hard before you add something to the User model. It is such an attractive magnet for all sorts of things in most applications.
+You will often have to weigh different principles against each other. SRP is no silver bullet that fits every occasion. It is often a very good starting point though. Finding some balanced middle ground will always be part of your job when you design applications. That also expands to applying code quality principles. The more you know, the more you might need to weigh. Having said that, I don’t want this to sound bleak at all. It is actually quite fun to sandblast your code like that. As with professional writers, the first couple of drafts are often just the beginning of some heavy editing. That is not only normal but to be expected and fun.
 
-## One ... bullet
+## Good design?
 
-You will often have to weigh different principles against each other. SRP is no golden bullet that fits every occasion. It is often a very good starting point though. Figuring out a balanced middle ground will always be part of your job when you design applications. That also expands to applying code quality principles.
+Dependencies tell you how change is gonna propagate throughout your code. Many dependencies create a sort of pressure to not change things. Worse if yo don’t know what to what extend a little change will ripple through your code.
 
-## How do we recognize good design?
-
-
-
-Dependencies tell you how change is gonna propagate throughout your code.
-
-Many dependencies create a sort of pressure to not change things. Worse if yo don’t know what the extend is that a little change here or there  can cause.
+The SOLID design principles are a great way to start thinking about good design. People with decades of experience extracted some real hard lessons for you to reap. Keeping dependencies in check is on top of their list when it comes to code quality. We should not try to reinvent the wheel too much and build upon their shoulders.
 
 ## And / Or
 
-If you need “and” or “or” in the description, the purpose of the functionality in a particular class, you can start thinking about applying SRP. Both scenarios imply that it does more than one focused thing. 
-
-As mentioned above, nothing is set in stone, there is no one truth fits all scenario, but at least it should raise the question if it might be a good idea to refactor your code to follow only one responsibility.
+If you need “and” or “or” in the description of the purpose, the functionality in a particular class, you can bet that applying SRP is a good idea. Both scenarios imply that it does more than one focused thing. As mentioned above, nothing is set in stone, there is no one truth fits all scenario, but at least it should raise the question if it might be a good idea to refactor your code until “and” and “or” is out of that classe’s elevator pitch.
 
 ## But it is Hard
 
-I give you that. In the beginning it will be relatively easy to break models into focused classes that do one thing. That will be your foundation to move forward into more complex waters. Take the time to build this base with smarts. Once complexity kicks in, it becomes a lot harder to break objects apart. I mean, there is no way around it. It will happen anyway, but with a good foundation, not only buildings get to be built taller and more stable. It will get harder over time, that is probably for sure. But at the same time, the problems also get more interesting, more challenging. It is a fun process that you might actually enjoy.
+“Nothing good comes easy” as they say. Maybe, I give you that. In the beginning it will be relatively easy to break models into focused classes that do one thing. That will be your foundation to move forward into more complex waters. Take your time to build this base with carefully. Rushing is not your friend.
 
-## Benefits
-
-Breaking classes into focused components have a few benefits that can easily go unnoticed among the upside mentioned above. A few benefits that I can see are the following: 
-
-+ Method names can often stay simpler due to fewer dependencies referenced.
-+ Better organization because you grouped functionality more coherently.
-+ Namespace clashes are easier to avoid.
-+ Classes are easier to read and digest.
-+ Same might apply for variable names.
-+ Simpler, more readable APIs.
-+ Smaller objects.
-+ Faster objects.
+Once complexity kicks in, it becomes a lot harder to break objects apart. I mean, there is no way around it. It will happen anyway, but with a good foundation you can build higher and more stable—as with buildings. It will get harder over time, that is probably for sure. But at the same time, the problems also get more interesting, more challenging. It is a fun process that you might actually enjoy. Basically, embrace it!
 
 ## Payoff
 
-Good design will pay off. As with having a test suite around. It might cost you a little bit of extra effort in the beginning, but you will be glad going forward to have built on solid ground. Once you start to feel the need to fight your app all the time, you will wish back the good times where the application was young and perfect where you had an easy opportunity to apply solid design.
+Good design will pay off, similar to having a test suite around. It might cost you a little bit of extra effort in the beginning, but you will be glad going forward that have built on solid ground. Once you start to feel a need to fight your app all the time, you will wish back the good times where the application was young and perfect. At time where you had an easy opportunity to apply solid design.
 
-Good design takes time in the beginning, as does TDD. But you can count on being better prepared for changing conditions down the line. Actually, it will most likely cost you extra money to not pay attention to design in your application. Cleaning up spaghetti code takes time and costs big bucks.
+Good design takes time in the beginning, as does TDD. No doubt about it! But you can count on being better prepared for changing conditions down the line. Actually, it will most likely cost you extra money if you don’t pay attention to design in your application. Cleaning up spaghetti code takes time and costs big bucks. Ouch!
 
 ## SRP Symtoms
+
+To close this section of semi-random thoughts, let’s summarize the symptoms of code that adheres to SRP.
 
 When your code is
 
@@ -214,20 +197,11 @@ When your code is
 + easily composeable
 + context independent
 
-
-It keeps your classes and methods small. That directly leads to better maintainability
-
-Coupling is dependency
-
-Managing dependencies is a huge chunk of your actual work as a software writer.
-
-## What should I do?
-
-As a consequence of applying SRP, you will very often extract classes. If you have a bigger class with many responsibilities, you will end up needing more classes that have smaller, more focused jobs.
+chances are good that your responsibilites are well spread and managed. This keeps your classes and methods small. These factors directly lead to better maintainability. Coupling for example just another fancy term for dependencies. Managing dependencies is a huge chunk of your actual work as a software writer and this is what SRP and SOLID in general is all about.
 
 # Extract Class
 
-
+Spaghetti in your code? What should can I do? SRP, you will very often require you to extract classes. This is a very common refactoring method. If you have a bigger class with many responsibilities, you will end up needing more classes that have smaller, more focused jobs.
 
 
 You don’t go fast by writing bad code. That’s for sure. Chances are pretty good that the opposite is adequate.
@@ -298,11 +272,11 @@ def clean_date(episode_subtitle)
 end
 
 def build_tags(title, interviewee)
-  extracted_tags = strip_pipes(title)
+  extracted_tags = clean_title(title)
   "#{interviewee}"+ ", #{extracted_tags}"
 end
 
-def strip_pipes(text)
+def clean_title(text)
   tags = text.tr('|', ',')
   tags = tags.gsub(/[@?#&]/, '')
   tags.gsub(/[w\/]{2}/, 'with')
@@ -396,11 +370,11 @@ require 'date'
 module ExtractionUtilities
 
   def build_tags(title, interviewee)
-    extracted_tags = strip_pipes(title)
+    extracted_tags = clean_title(title)
     "#{interviewee}"+ ", #{extracted_tags}"
   end
 
-  def strip_pipes(title)
+  def clean_title(title)
     tags = title.tr('|', ',')
     tags = tags.gsub(/[@?#&]/, '')
     tags.gsub(/[w\/]{2}/, 'with')
@@ -425,7 +399,7 @@ class PageExtractor
   include ExtractionUtilities
 
   def initialize(detail_page_link)
-    @detail_page = detail_page_link.click
+    @detail_page ||= detail_page_link.click
   end
 
   def extract_data
@@ -585,11 +559,11 @@ We could have extracted some more but for now I felt it would be overkill to spl
 module ExtractionUtilities
 
   def build_tags(title, interviewee)
-    extracted_tags = strip_pipes(title)
+    extracted_tags = clean_title(title)
     "#{interviewee}"+ ", #{extracted_tags}"
   end
 
-  def strip_pipes(title)
+  def clean_title(title)
     tags = title.tr('|', ',')
     tags = tags.gsub(/[@?#&]/, '')
     tags.gsub(/[w\/]{2}/, 'with')
@@ -637,7 +611,7 @@ class PageExtractor
   include ExtractionUtilities
 
   def initialize(detail_page_link)
-    @detail_page = detail_page_link.click
+    @detail_page ||= detail_page_link.click
   end
 
   def extract_data
@@ -778,21 +752,21 @@ end
 
 Back to the drawing board. The private method above needs another look.
 
-## PageWriter Refactored
+## PageWriter v.2
 
 ``` ruby
 
 class MarkdownComposer
   include ExtractionUtilities
 
-  attr_reader :detail_page_link
+  attr_reader :extracted_data
 
   def initialize(detail_page_link)
-    @detail_page_link = detail_page_link
+    @extracted_data ||= PageExtractor.new(detail_page_link).extract_data
   end
 
   def prepare_markdown
-    compose_markdown(extract_data)
+    compose_markdown(extracted_data)
   end
 
   def prepare_filename
@@ -821,20 +795,16 @@ HEREDOC
     "#{date}-#{interviewee}-#{episode_number}.html.erb.md" 
   end
 
-  def extract_data
-    extracted_data ||= PageExtractor.new(detail_page_link).extract_data
-  end
-
   def date
-    extract_data[:date]
+    extracted_data[:date]
   end
 
   def interviewee
-    dasherize(extract_data[:interviewee])
+    dasherize(extracted_data[:interviewee])
   end
 
   def episode_number
-    extract_data[:episode_number]
+    extracted_data[:episode_number]
   end
 end
 
@@ -857,6 +827,95 @@ end
 ```
 
 So we shifted things around a bit. Big deal! Sure, that is one way to see it, but now we have a `PageWriter` class that is not dabbling in the responsibilities of composing markdown. Since the bulk of the work that we wanna achieve culminated in the creation of `.markdown` files with the data for each episode, it is more appropriate to let `MarkdownComposer do the heavy lifting. Clear cut responsibilities. And these decisions can frequently be necessary to keep the size of classes in check. Good class design will lead to touch tangential classes less and less when you introduce new code, or delete old one.
+
+But! Doesn’t the `PageWriter` class still feel a bit smelly? After all, it does handle the prepping of filenames and markdown text. Sure, it has a single method, `write_page`, but its responsibilities can be split up even more. As a last step before we move forward, I suggest we create another class that is in charge of `FilenameComposition` and adjust `PageWriter` to make use of it. 
+
+## PageWriter v.3
+
+``` ruby
+
+class MarkdownComposer
+
+  attr_reader :extracted_data
+
+  def initialize(detail_page_link)
+    @extracted_data ||= PageExtractor.new(detail_page_link).extract_data
+  end
+
+  def prepare_markdown
+    compose_markdown(extracted_data)
+  end
+
+  private
+
+  def compose_markdown(options={})
+<<-HEREDOC
+--- 
+title: #{options[:interviewee]}
+interviewee: #{options[:interviewee]}
+topic_list: #{options[:title]}
+tags: #{options[:tags]}
+soundcloud_id: #{options[:sc_id]}
+date: #{options[:date]}
+episode_number: #{options[:episode_number]}
+---
+
+#{options[:text]}
+HEREDOC
+  end
+end
+
+class FilenameComposer
+  include ExtractionUtilities
+
+  attr_reader :extracted_data
+
+  def initialize(detail_page_link)
+    @extracted_data ||= PageExtractor.new(detail_page_link).extract_data
+  end
+
+  def prepare_filename
+    compose_filename
+  end
+
+  private
+
+  def compose_filename
+    "#{date}-#{interviewee}-#{episode_number}.html.erb.md" 
+  end
+
+  def date
+    extracted_data[:date]
+  end
+
+  def interviewee
+    dasherize(extracted_data[:interviewee])
+  end
+
+  def episode_number
+    extracted_data[:episode_number]
+  end
+end
+
+class PageWriter
+
+  attr_reader :text, :file_name
+
+  def initialize(detail_page_link)
+   @text          = MarkdownComposer.new(detail_page_link).prepare_markdown
+   @file_name     = FilenameComposer.new(detail_page_link).prepare_filename
+  end
+
+  def write_page
+    File.open(file_name, 'w') { |file| file.write(text) }
+  end
+end
+
+```
+
+To summarize, we could remove the `ExtractionUtilities` mixin from `PageWriter` and extracted the methods necessary for the filename creation from `MarkdownComposer` into the new class `FilenameComposer`. This new class now has one single job and does not mix filename business with markdown stuff. If you extend this class in the future, it will be able to easily handle the creation of any filename you like—not only markdown files.
+
+I hope this little example was able to illustrate that you will often take this design process step by step. It is more of a discovery process where you are guided by coding principles. Like above, you will often shuffle stuff around until you can’t extract anymore. I suspect that very few people design these things perfectly in their head without sandblasting the code along the way. So far so good. There is still work to do with this class but we can save that for another SOLID article.
 
 ## class Scraper
 
@@ -898,11 +957,11 @@ require 'date'
 module ExtractionUtilities
 
   def build_tags(title, interviewee)
-    extracted_tags = strip_pipes(title)
+    extracted_tags = clean_title(title)
     "#{interviewee}"+ ", #{extracted_tags}"
   end
 
-  def strip_pipes(title)
+  def clean_title(title)
     tags = title.tr('|', ',')
     tags = tags.gsub(/[@?#&]/, '')
     tags.gsub(/[w\/]{2}/, 'with')
@@ -927,11 +986,10 @@ class PageExtractor
   include ExtractionUtilities
 
   def initialize(detail_page_link)
-    @detail_page = detail_page_link.click
+    @detail_page ||= detail_page_link.click
   end
 
   def extract_data
-
     options = {
       interviewee:    interviewee,
       title:          title,
@@ -985,20 +1043,15 @@ class PageExtractor
 end
 
 class MarkdownComposer
-  include ExtractionUtilities
 
-  attr_reader :detail_page_link
+  attr_reader :extracted_data
 
   def initialize(detail_page_link)
-    @detail_page_link = detail_page_link
+    @extracted_data ||= PageExtractor.new(detail_page_link).extract_data
   end
 
   def prepare_markdown
-    compose_markdown(extract_data)
-  end
-
-  def prepare_filename
-    compose_filename
+    compose_markdown(extracted_data)
   end
 
   private
@@ -1018,40 +1071,50 @@ episode_number: #{options[:episode_number]}
 #{options[:text]}
 HEREDOC
   end
+end
+
+class FilenameComposer
+  include ExtractionUtilities
+
+  attr_reader :extracted_data
+
+  def initialize(detail_page_link)
+    @extracted_data ||= PageExtractor.new(detail_page_link).extract_data
+  end
+
+  def prepare_filename
+    compose_filename
+  end
+
+  private
 
   def compose_filename
     "#{date}-#{interviewee}-#{episode_number}.html.erb.md" 
   end
 
-  def extract_data
-    extracted_data ||= PageExtractor.new(detail_page_link).extract_data
-  end
-
   def date
-    extract_data[:date]
+    extracted_data[:date]
   end
 
   def interviewee
-    dasherize(extract_data[:interviewee])
+    dasherize(extracted_data[:interviewee])
   end
 
   def episode_number
-    extract_data[:episode_number]
+    extracted_data[:episode_number]
   end
 end
 
 class PageWriter
 
-  attr_reader :detail_page_link
+  attr_reader :text, :file_name
 
   def initialize(detail_page_link)
-    @detail_page_link = detail_page_link
+   @text          = MarkdownComposer.new(detail_page_link).prepare_markdown
+   @file_name     = FilenameComposer.new(detail_page_link).prepare_filename
   end
 
   def write_page
-    text          = MarkdownComposer.new(detail_page_link).prepare_markdown
-    file_name     = MarkdownComposer.new(detail_page_link).prepare_filename
-
     File.open(file_name, 'w') { |file| file.write(text) }
   end
 end
@@ -1072,7 +1135,6 @@ class Scraper
     end
   end
 end
-
 
 Scraper.new.scrape
 
