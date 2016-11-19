@@ -59,16 +59,21 @@ Idealistic scenario that you probably can’t achieve completely.
 
 The classes stay the same. we can achieve this with abstraction.
 
+
+
+
 # Dependency Injection
-The use of dependency injection is pretty typical to achieve OCP.
 
-This technique allows us to extend already existing classes without modifying them. Since this is a frequent strategy to follow OCP, I thought we should give it a quick look.
+The use of dependency injection is pretty typical strategy to achieve OCP. This technique allows us to extend already existing classes without modifying them. Since this is a frequent strategy to follow OCP, I thought we should give it a quick look. It’s also useful in terms of keeping objects simple and adhering to SRP.  
 
-aids srp
+Injecting dependencies sounds like a mouthful, I know. Maybe its not a bad analogy to a vaccination. We inject behavior into classes without creating tight coupling between them. In fact, the less the injected class knows about other classes, the better off the all are. Ignorance is bliss in Object Oriented Design—maybe. Or “in part”, as politicians like to spin their arguments. Since this seems to be a lofty goal to achieve, I don’t want to propagate it as a rule of sorts.
 
-When you inject dependencies you avoid having that object creating these dependencies themselves. It’s like outsourcing that responsibility??? As a result you have more flexibility and less coupling. But for our purposes here, also fewer reasons to change due to less coupling.
+What is pretty clear though is that if a class uses the behavior of another, the code is more brittle due to tight coupling. If you change the name of the class or its API, things break. The amount of breakage is something we can try to limit though.
 
-Below. it knows the name of another class. It knows a method and its argument on that other class.
+Below is an example from the code in the previous article. As I said, it was not done in terms of refactoring. It was still not addressing the Open/Closed Principle in a few places. For example, `MarkdownComposer` knows too much of another class, `PageExtractor`. Unnecessarily so. It knows the class’ name, a method and its argument. `MarkdownCompoer` can and should be more ignorant of these. Sure, it needs to know a little bit if it uses the behavior of another objects, but we can limit the extend. Knowing the details about the `detail_page_link` is maybe also not the business of dealing with markdown.
+
+#### Tight Coupling
+
 ``` ruby
 
 class MarkdownComposer
@@ -79,14 +84,32 @@ class MarkdownComposer
     @extracted_data ||= PageExtractor.new(detail_page_link).extract_data
   end
 
-  ????
-  def initialize(extracted_data)
-    @extracted_data = extracted_data
-  end
-  ????
+```
 
+#### Injected Dependency
+
+``` ruby
+
+class MarkdownComposer
+
+  attr_reader :extracted_data
+
+  def initialize(page_extractor)
+    @page_extractor = page_extractor
+  end
+
+#  ????
+#  def initialize(extracted_data)
+#    @extracted_data = extracted_data
+#  end
+#  ????
 
 ```
+
+It’s easy to see that `MarkdownComposer` is now kept in the dark about the object in charge of extracting data. Now we could change the `PageExtractor` object, or swap it out completely with something different. 
+
+
+When you inject dependencies you avoid having that object creating these dependencies themselves. It’s like outsourcing that responsibility??? As a result you have more flexibility and less coupling. But for our purposes here, also fewer reasons to change due to less coupling.
 
 The class is not as ignorant as it could be. it knows about pageextractor.
 
