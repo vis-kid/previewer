@@ -227,7 +227,6 @@ I gave a little hint that extracting classes is a good way to start getting this
 ``` ruby
 
 require 'Mechanize'
-require 'Pry'
 require 'date'
 
 # Helper Methods
@@ -364,7 +363,6 @@ Now that is one blob of code. I hear you. I wouldn’t say it’s spaghetti, but
 ``` ruby
 
 require 'Mechanize'
-require 'Pry'
 require 'date'
 
 module ExtractionUtilities
@@ -951,7 +949,6 @@ Below is again the full code with extracted classes that now better manage their
 ``` ruby
 
 require 'Mechanize'
-require 'Pry'
 require 'date'
 
 module ExtractionUtilities
