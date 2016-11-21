@@ -80,7 +80,6 @@ Please take a look and view it through the lens of what you have learned so far 
 ``` ruby
 
 require 'Mechanize'
-require 'Pry'
 require 'date'
 
 module ExtractionUtilities
@@ -418,7 +417,7 @@ class PageWriter
 
 ```
 
-We could scrub the knowledge of the particular link to scrape and only pass interchangeable objects into its initializer. `PageWriter` itself is a simple class with a simple task. It does not really need to have a hard ties. We just keep it around to take care of writing out the final end product after we scraped and composed all the data.
+We could scrub the knowledge of the particular link to scrape and only pass interchangeable objects into its initializer. `PageWriter` itself is a simple class with a simple task. It does not really need to have hard ties. We just keep it around to take care of writing out the final end product after we scraped and composed all the data. Also, if we need additional data from either of these injected objects, we would need to modify the `initialize` method.
 
 #### class PageWriter Refactored
 
@@ -447,7 +446,7 @@ O.K., back to my rant about the `detail_page_link` that was passed around too mu
 
 That might not look like a big win but overall, this little change reduced a pretty sneaky dependency that previously trickled through the whole scraper. It was passed around too much. Adhering to the “Single Responsibility Principle” was not enough. But after injecting `PageExtractor` in a couple of classes, we could not only strengthen the responsibility aspect, we could encapsulate this parameter in one place where it is actually put to work. By injecting responsibilities, we could encapsulate this parameter where it is instantiated. That means less duplication as well. You can see that applying sane coding principles also create nice byproducts along the way. The feed off of each other—the same goes for the opposite as well of course.
 
-Where does this lead to? Where are all these injected objects ending up? Good question. I decided to put them high up in the food chain so to speak. These injected objects kinda bubble up and often enable you to make changes in one or a few places—instead of all over the place. In our case, `Scraper` is now in charge of instantiating these objects injects them as well. If we need to make changes, we can do that in one central place—in contrast to doing it in multiple places at once.
+Where does this lead to? Where are all these injected objects ending up? Good question. I decided to put them high up in the food chain so to speak. These injected objects kinda bubble up and often enable you to make changes in one or a few places—instead of all over the place. In our case, `Scraper` is now in charge of instantiating these objects injects them as well. If we need to make changes, we can do that in one central place—in contrast to doing it in multiple places at once. Here we build up all the objects that are needed to write the markdown page. We sort of feed them into each other, bottom-up.
 
 #### class Scraper Refactored
 
@@ -476,8 +475,7 @@ end
 
 ```
 
-Here we build up all the object that are needed to write the markdown page. We sort of feed them into each other, bottom-up.
-
+Instead of passing each page link to `PageWriter`, we directly pass it to the class who scrapes the data from the page. Nobody else needs to know about it. `PageExtractor` takes the link, clicks it, saves its state, follows it to the shownotes and provides `MarkdownComposer` and `FileComposer` all the abilities to prepare the markdown text and the filename from that particular page. In turn, `PageWriter` get injected with the former two which are needed to write out the new page containing the extracted data.
 
 #### class PageExtractor
 
@@ -495,57 +493,161 @@ class PageExtractor
 
 ```
 
+Overall, refactoring with OCP in mind made the code became simpler and less coupled. The logic is more focused in each class. We instantiate the objects in play at the highest layer instead of all over the place. Classes know a lot less about each other and are more flexible to face changes. 
 
+Along the way, I could delete and simplify a few bits that were harder to do before the refactoring. For exmaple, `PageExtractor` is not returning a hash with the extracted data. Instead, we let the injected `page_extractor` handle the extraction business more fine grained. For example, if I would have decided to extract more data than the hash provided, I would have had one more reason to change the class. Now, this class only handles the extraction logic for every piece of data separately and is easy to extend.
 
-The class is not as ignorant as it could be. it knows about pageextractor.
+It saves the state of each page which can then be passed into the injected classes to do their bidding. The method `extract_data` is completely gone because it was not as future proof if I wanted to scrape additional data. The API used to get that data in other classes was also a bit iffy. Each method is focused on one extraction job only. We left little reason to change but opened every opportunity to extend the code easily.
 
-We have a strong link here.
+#### class PageExtractor refactored
 
-What is obvious above, is that if we change the name of the  PageExtractor class or change the extract_data method, we need to come here as well. 
+``` ruby
 
-in the new methods, MarkdownComposer only knows that the injected object responds to the `extract_data` methods???
+class PageExtractor
+  include ExtractionUtilities
 
-It allows us to only use the interface of an injected dependency but not coupled to the creation of ...
+  attr_reader :detail_page
 
-A dependency can be easily injected within the constructor. We pass an object into the targeted class without letting it know what this object is all about.
+  def initialize(detail_page_link)
+    @detail_page ||= detail_page_link.click
+  end
 
-Mocking code dependencies in our tests becomes easier with DI as well.
+  def interviewee
+    interviewee_selector = '.episode_sub_title span'
+    detail_page.search(interviewee_selector).text.strip
+  end
 
-Through DI, we are feeding a class new behavior without changing it.
+  def title
+    title_selector = ".episode_title"
+    detail_page.search(title_selector).text.gsub(/[?#]/, '')
+  end
 
-When we need to refer to another class through its name, we create a stronger relationship, a stronger dependency between them.
+  def soundcloud_id
+    sc = detail_page.iframes_with(href: /soundcloud.com/).to_s
+    sc.scan(/\d{3,}/).first
+  end
 
-What we also reduce is reuseability with these stronger dependencies
+  def shownotes_text
+    shownote_selector = "#shownote_container > p"
+    detail_page.search(shownote_selector)
+  end
 
+  def tags
+    build_tags(title, interviewee)
+  end
 
+  def date
+    clean_date(subtitle)
+  end
 
+  def episode_number
+    number = /[#]\d*/.match(subtitle)
+    clean_episode_number(number)
+  end
 
+  private
 
+  def subtitle
+    subheader_selector = ".episode_sub_title"
+    detail_page.search(subheader_selector).text
+  end
+end 
 
+```
 
+`MarkdownComposer` is now also significantly simpler. We don’t need to fumble around with the options hash of extracted data. The API I mentioned is also less smelly. Oh, yes and I decided to just request `markdown` without the compose part when I got rid of `compose_markdown`. It only requested a private method and was not as much needed as I thought in the beginning.
 
+#### before
 
+``` ruby
 
+  def compose_markdown(options={})
+<<-HEREDOC
+--- 
+title: #{options[:interviewee]}
+interviewee: #{options[:interviewee]}
+topic_list: #{options[:title]}
+tags: #{options[:tags]}
+soundcloud_id: #{options[:sc_id]}
+date: #{options[:date]}
+episode_number: #{options[:episode_number]}
+---
 
+#{options[:text]}
+HEREDOC
+  end
 
+``` 
 
+#### after
 
+``` ruby
 
+  def markdown
+<<-HEREDOC
+--- 
+title: #{page_extractor.interviewee}
+interviewee: #{page_extractor.interviewee}
+topic_list: #{page_extractor.title}
+tags: #{page_extractor.tags}
+soundcloud_id: #{page_extractor.soundcloud_id}
+date: #{page_extractor.date}
+episode_number: #{page_extractor.episode_number}
+---
 
+#{page_extractor.shownotes_text}
+HEREDOC
+  end
 
+``` 
 
+A good improvement I think. Reads better, feels cleaner and doesn’t need an argument. If I would need to edit the file I wanna compose, say I extract additional data, I would need to open `compose_markdown`. In that case, I don’t see a way around it. Other than that, the overall class is small, ignorant and focused.
 
+#### class MarkdownComposer
 
+``` ruby
 
+class MarkdownComposer
 
+  attr_reader :page_extractor
 
+  def initialize(page_extractor)
+    @page_extractor = page_extractor
+  end
 
-## After Dependency Injection
+  def markdown
+<<-HEREDOC
+--- 
+title: #{page_extractor.interviewee}
+interviewee: #{page_extractor.interviewee}
+topic_list: #{page_extractor.title}
+tags: #{page_extractor.tags}
+soundcloud_id: #{page_extractor.soundcloud_id}
+date: #{page_extractor.date}
+episode_number: #{page_extractor.episode_number}
+---
+
+#{page_extractor.shownotes_text}
+HEREDOC
+  end
+end
+
+```
+
+One last refactoring I should mention. Maybe you asked yourself why `PageWriter` now uses two new method names:
+
++ markdown_filename
++ markdown_text
+
+As I mentioned somewhere above, proper method naming can also play into the whole closed for modification theme. If I wanna use `PageWriter` to not only write out markdown files but say, `txt` or `html` files, I just need to extend the code without touching existing methods. On the one hand it reads a bit more clearly, but it also better encapsulates specific logic that can better stand on its own if specifications change. The same goes for `md_filename` and `markdown` methods. If I need a different kind of filename or a different blueprint for text, I simply extend the classes. Long story short, proper naming is hard but worth the extra effort.
+
+I did a couple of other tweaks while shuffling the code around but I don’t think they are worth mentioning here. Take a look at the complete code after dependency injection. I think we made some good progress in terms of the ”Open/Closed Principle”. The code is better equipped to deal with future changes. OCP helped to tighten the responsibilities we tried to isolate using the “Single Responsibility Principle”. The code below hopefully shows that both principles have a symbiotic thing going on.
+
+## Podcast Scraper After Dependency Injection
 
 ``` ruby
 
 require 'Mechanize'
-require 'Pry'
 require 'date'
 
 module ExtractionUtilities
@@ -726,4 +828,52 @@ end
 Scraper.new.scrape
 
 ```
+
+
+
+
+
+
+The class is not as ignorant as it could be. it knows about pageextractor.
+
+We have a strong link here.
+
+What is obvious above, is that if we change the name of the  PageExtractor class or change the extract_data method, we need to come here as well. 
+
+in the new methods, MarkdownComposer only knows that the injected object responds to the `extract_data` methods???
+
+It allows us to only use the interface of an injected dependency but not coupled to the creation of ...
+
+A dependency can be easily injected within the constructor. We pass an object into the targeted class without letting it know what this object is all about.
+
+Mocking code dependencies in our tests becomes easier with DI as well.
+
+Through DI, we are feeding a class new behavior without changing it.
+
+When we need to refer to another class through its name, we create a stronger relationship, a stronger dependency between them.
+
+What we also reduce is reuseability with these stronger dependencies
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
