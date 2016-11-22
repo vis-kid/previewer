@@ -16,10 +16,6 @@ categories: [Mechanic, Nokogiri, Ruby]
 + Dependency Injection
 + Refactor Code Example
 
-??
-+ Composite?
-+ Decorator?
-
 # OCP
 
 The “Open/Closed Principle” simply states that you should be able to extend a class’s behavior without modifying it. Open for extension, closed for modification. At closer distance, this means that a class or module should be cool with extension but avoid modification. To some extend this can be useful for functions as well.
@@ -28,37 +24,24 @@ Why, what’s the beef with modification? Ideally, when you put a class into pro
 
 What about bugs? Are we allowed to bug fix without adhering to OCP? Of course, that is always ok. In that case you have to change the class. I guess it’s fair to say that this principle at its core wants to manage change—at least the rate of it. Since this is a constant companion in our work, it is important to keep it in check where we can. Single responsibilities are one thing, not needing to modify them is a different story though. In practice, both SRP and OCP seem to have symbiotic existences. OCP often helps with attaining SRP
 
+Changing the behavior is O.K., extending the behavior is O.K. We just want to be able to do that without changing existing code. That is the trick—as well as the tricky part. How can we have classes that stay the same? We achieve this with abstraction. We’re not living in a perfect world where we can always achieve OCP. It would be an idealistic scenario that you probably can’t achieve completely. Code that never changes is not on the table.
+
 # Composition over inheritance
 
-OCP was originally thought of in the context of inheritance. But we learned that composition over inheritance is the way to go.
+OCP was originally thought of in the context of inheritance. But we learned that composition over inheritance is the way to go. Both have their place but if you have the opportunity, prefer composing objects over using inheritance. Both approaches are valuable and can achieve similar goals. Inheritance is a great strategy for designing objects that are specializations of others. In general, you will be able to achieve better results in regards to coupling and cohesion. I hope I could already clarify why coupling is an important issue to address aggressively when you refactor code. Cohesion might be a little more vague for beginners.
 
-Extension can redefine parts of the behaviour of a class.
+Classes have better focus if they don’t mix concerns. If  an object is solely focused on extracting content, its cohesion is stronger than say a class that is also busy with composing markdown files. Strong cohesion reduces the chances of changing existing code because we separated concerns—basically, split up responsibilities. A single responsibility is the strongest cohesion you can get in a class.
 
-subclassing. dont affect anybody else that way. you dont need to overwrite functionality
+When you compose objects, you have a lot more freedom to break up the functionality into discrete, encapsulated objects that are less dependent of each other. Inheritance can introduce a lot more “garbage” down the line. If objects inherit from various ancestors, the responsibilities can pile up quickly. The encapsulation between parent objects and their inheritors is not exactly strong.
 
-prefer subclassing over reopening classes
-
-
-Extend them via child classes and inheritance
+The biggest downside to composition is a matter of context that you need to load in your brain. Composition is easily plagued by indirection. That simply means that the components in play can end up being all over the place and can seem harder to put together. That kind of specialized encapsulation will lead to more objects that we need to keep track of. Sometimes, the cost of indirection might be too big. Using inheritance instead can be a good compromise. I think a good guideline is to reach for composition first and only go for inheritance solutions if necessary. All that being said, increased indirection is always a side effect when you work towards OCP.
 
 
 
 
 
 
-It reduces churn??
 
-similar to immutable datasstructures??
-
-Code that never changes
-
-change the behavior is ok, extend the behavior is ok. We just want to be able to do that without changing existing code.
-
-The downside to ocp is indirection
-
-Idealistic scenario that you probably can’t achieve completely.
-
-The classes stay the same. we can achieve this with abstraction.
 
 
 
