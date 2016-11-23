@@ -41,6 +41,12 @@ The biggest downside to composition is a matter of context that you need to load
 
 
 
+Mocking code dependencies in our tests becomes easier with DI as well.
+
+
+
+What we also reduce is reuseability with these stronger dependencies
+
 
 
 
@@ -48,15 +54,15 @@ The biggest downside to composition is a matter of context that you need to load
 
 # Dependency Injection
 
-The use of dependency injection is pretty typical strategy to achieve OCP. This technique allows us to extend already existing classes without modifying them. Since this is a frequent strategy to follow OCP, I thought we should give it a quick look. It’s also useful in terms of keeping objects simple and adhering to SRP.  
+Through DI, we are feeding a class new behavior without changing it. A dependency can be easily injected within the constructor. We pass an object into the targeted class without letting it know what this object is all about. This technique allows us to extend already existing classes without modifying them. Since this is a frequent strategy to follow OCP, I thought we should give it a quick look. It’s also useful in terms of keeping objects simple and adhering to SRP.  
 
-Injecting dependencies sounds like a mouthful, I know. Maybe its not a bad analogy to a vaccination. We inject behavior into classes without creating tight coupling between them. In fact, the less the injected class knows about other classes, the better off the all are. Ignorance is bliss in Object Oriented Design—maybe. Or “in part”, as politicians like to spin their arguments. Since this seems to be a lofty goal to achieve, I don’t want to propagate it as a rule of sorts.
+Injecting dependencies sounds like a mouthful, I know. We inject behavior into classes without creating tight coupling between them. In fact, the less the injected class knows about other classes, the better off the all are. Ignorance is bliss in Object Oriented Design—maybe. Or “in part”, as politicians like to spin their arguments. Since this seems to be a lofty goal to achieve, I don’t want to propagate it as a rule of sorts.
 
-What is pretty clear though is that if a class uses the behavior of another, the code is more brittle due to tight coupling. If you change the name of the class or its API, things break. The amount of breakage is something we can try to limit though.
+It’s pretty clear that if a class uses the behavior of another class, the code is more brittle due to coupling. We want to make this connection as flexible as possible. When we need to refer to another class through its name directly, we create a stronger relationship, a stronger dependency between them. If you change the name of the class or its API, things break more easily. The amount of breakage is something we can try to limit with OCP in mind.
 
-Below is an example from the code in the previous article. As I addressed at the end of that article, it was not done in terms of refactoring. I hope that was clear that the refactorings targeted the Single Responsibility Principle first and foremost. I left the code in that condition because it was still not addressing the Open/Closed Principle in a few places.
+Below is an example from the code of the previous article. As I mentioned at the end of that article, it wasn’t done in terms of refactoring. I hope it was clear that the previous refactorings targeted the “Single Responsibility Principle” first and foremost. I left the code in that condition because it was still not addressing the Open/Closed Principle in a few places.
 
-Please take a look and view it through the lens of what you have learned so far about being open for extension and closed for modification. There are definitely some issues here that make the code brittle. Think about how we can use dependency injection to decouple the affected classes.
+Please take another look and view it through the lens of what you have learned so far about being open for extension and closed for modification. There are definitely some issues here that make the code unnecessarily brittle. Think about how we can use dependency injection to decouple the affected classes.
 
 ## Old Podcast Scraper Code
 
@@ -249,14 +255,11 @@ end
 
 Scraper.new.scrape
 
-
-
 ```
 
 ## Injected Dependencies
 
-Let’s dig in! For example, `MarkdownComposer` knows too much of another class, `PageExtractor`. Unnecessarily so. It knows the class’ name, a method `extract_data` and its argument `detail_page` for instantiation. `MarkdownCompoer` can and should be more ignorant of these. Sure, it needs to know a little bit if it uses the behavior of another objects, but we can limit the extend. Knowing the details about the `detail_page_link` is maybe also not the business of dealing with markdown.
-
+Let’s dig in! For example, `MarkdownComposer` knows too much of another class, `PageExtractor`. Unnecessarily so. It knows the class’ name, the method `extract_data` and its argument `detail_page` for instantiation. `MarkdownCompoer` can and should be more ignorant of these. Sure, it needs to know a little bit for using the behavior of another objects. We can limit the extend though. Knowing the details about the `detail_page_link` is  also not exactly the business of a class that is dealing with markdown.
 
 #### class MarkdownComposer
 
@@ -270,13 +273,9 @@ class MarkdownComposer
     @extracted_data ||= PageExtractor.new(detail_page_link).extract_data
   end
 
+  ...
+
 ```
-
-It’s easy to see that the refactored `MarkdownComposer` is now kept in the dark about the object in charge of extracting data. Now we could easily change the `PageExtractor` object, or even swap it out completely with something different.
-
-
-Naming can play a big part in that as well. If you name methods that are focused they can fall less victim to change. For example, `write_page` or `write_markdown_page` can make a significant difference if you decide to add the behaviour of writing HTML pages as well. Chances are good that we would need to touch `write_page` now—at the very least rename it to easily differentiate it from the `write_html_page`.
-
 
 #### class MarkdownComposer Refactored
 
@@ -284,7 +283,7 @@ Naming can play a big part in that as well. If you name methods that are focused
 
 class MarkdownComposer
 
-  attr_reader :extracted_data
+  attr_reader :page_extractor
 
   def initialize(page_extractor)
     @page_extractor = page_extractor
@@ -294,8 +293,28 @@ class MarkdownComposer
 
 ```
 
+It’s easy to see that the refactored `MarkdownComposer` is now kept in the dark about the object in charge of extracting data. Now we could easily change the name of  `PageExtractor`, or even swap it out completely with something different.
 
- We have one dependency left in here that we should talk about. With the `page_extractor` object ready to extract inside the `MarkdownComposer class, it needs to do its business. That means it needs to use the API of the `PageExtractor` class at some point. That dependency stays. Therefore, if we change the method calls we might break the class that were injected with it. I hope it is clear why this is on the one hand necessary but how it already improved the level of fragility in play here. Also, I hope it illustrated how change can ripple through an application and why we would rather opt for extensions than changes to existing code. It’s hard to predict how a little change can ripple through your codebase. Better err on the side of sanity and safety. 
+Of course we have one dependency left in here that we should talk about. With the `page_extractor` object ready to extract inside the `MarkdownComposer` class, it needs to do its business. That means it needs to use the API of the `PageExtractor` class at some point. That dependency stays. Therefore, if we change the method calls we might break the class that was injected with it.
+
+I hope it’s clear why this dependency is necessary and how it already improved the level of fragility in here. Also, it hopefully illustrated how change can ripple through an application and why we would rather opt for extensions than changes to existing code. It’s hard to predict how a little change can ripple through your codebase. Better err on the side of sanity and safety and minimize the risk of tight coupling as much as we can. 
+
+Naming methods adequately can play a significant part towards improved OCP as well. If you name and build methods to have a sharp focus, they will less likely fall victim to change as well. For example, `write_page` or `write_markdown_page` can make a critical difference if you decide to add the behaviour of writing HTML pages later on. Chances are good that we would need to touch `write_page` in that scenario—at the very least we would need to rename it in order to easily differentiate it from the `write_html_page`.
+
+#### class PageWriter
+
+``` ruby
+
+class PageWriter
+
+  ...
+
+  def write_page
+    File.open(file_name, 'w') { |file| file.write(text) }
+  end
+end
+
+```
 
 Let’s have a look at the next class to illustrate this through an actual example. `FilenameComposer` has the same issues as the previous class. Also, both classes’ initializers are kinda overly motivated. They instantiate an instance of `PageExtractor`, feed it a link acquired from the `Scraper` class and on top of that, the also `extract_data`. Ok, not super bad for a first attempt, but this code is nowhere near production ready.
 
@@ -826,37 +845,4 @@ What is obvious above, is that if we change the name of the  PageExtractor class
 in the new methods, MarkdownComposer only knows that the injected object responds to the `extract_data` methods???
 
 It allows us to only use the interface of an injected dependency but not coupled to the creation of ...
-
-A dependency can be easily injected within the constructor. We pass an object into the targeted class without letting it know what this object is all about.
-
-Mocking code dependencies in our tests becomes easier with DI as well.
-
-Through DI, we are feeding a class new behavior without changing it.
-
-When we need to refer to another class through its name, we create a stronger relationship, a stronger dependency between them.
-
-What we also reduce is reuseability with these stronger dependencies
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
