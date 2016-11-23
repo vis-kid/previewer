@@ -14,7 +14,7 @@ categories: [Mechanic, Nokogiri, Ruby]
 + Open/Closed?
 + Composition over inheritance
 + Dependency Injection
-+ Refactor Code Example
++ Code Example
 
 # OCP
 
@@ -36,29 +36,18 @@ When you compose objects, you have a lot more freedom to break up the functional
 
 The biggest downside to composition is a matter of context that you need to load in your brain. Composition is easily plagued by indirection. That simply means that the components in play can end up being all over the place and can seem harder to put together. That kind of specialized encapsulation will lead to more objects that we need to keep track of. Sometimes, the cost of indirection might be too big. Using inheritance instead can be a good compromise. I think a good guideline is to reach for composition first and only go for inheritance solutions if necessary. All that being said, increased indirection is always a side effect when you work towards OCP.
 
-
-
-
-
-
-Mocking code dependencies in our tests becomes easier with DI as well.
-
-
-
-What we also reduce is reuseability with these stronger dependencies
-
-
-
-
-
-
 # Dependency Injection
 
 Through DI, we are feeding a class new behavior without changing it. A dependency can be easily injected within the constructor. We pass an object into the targeted class without letting it know what this object is all about. This technique allows us to extend already existing classes without modifying them. Since this is a frequent strategy to follow OCP, I thought we should give it a quick look. It’s also useful in terms of keeping objects simple and adhering to SRP.  
 
 Injecting dependencies sounds like a mouthful, I know. We inject behavior into classes without creating tight coupling between them. In fact, the less the injected class knows about other classes, the better off the all are. Ignorance is bliss in Object Oriented Design—maybe. Or “in part”, as politicians like to spin their arguments. Since this seems to be a lofty goal to achieve, I don’t want to propagate it as a rule of sorts.
 
-It’s pretty clear that if a class uses the behavior of another class, the code is more brittle due to coupling. We want to make this connection as flexible as possible. When we need to refer to another class through its name directly, we create a stronger relationship, a stronger dependency between them. If you change the name of the class or its API, things break more easily. The amount of breakage is something we can try to limit with OCP in mind.
+It’s pretty clear that if a class uses the behavior of another class, the code is more brittle due to coupling. What we also reduce the reuseability with stronger dependencies. We want to make this connection as small and as flexible as possible. Smarter coupling makes mocking code dependencies in our tests a lot easier as well.
+
+When we need to refer to another class through its name directly, we create a strong relationship, a stronger dependency between them. If you change the name of the class or its API, things break more easily. The amount of breakage is something we can try to limit with OCP in mind.
+
+
+# Code Example
 
 Below is an example from the code of the previous article. As I mentioned at the end of that article, it wasn’t done in terms of refactoring. I hope it was clear that the previous refactorings targeted the “Single Responsibility Principle” first and foremost. I left the code in that condition because it was still not addressing the Open/Closed Principle in a few places.
 
@@ -261,6 +250,10 @@ Scraper.new.scrape
 
 Let’s dig in! For example, `MarkdownComposer` knows too much of another class, `PageExtractor`. Unnecessarily so. It knows the class’ name, the method `extract_data` and its argument `detail_page` for instantiation. `MarkdownCompoer` can and should be more ignorant of these. Sure, it needs to know a little bit for using the behavior of another objects. We can limit the extend though. Knowing the details about the `detail_page_link` is  also not exactly the business of a class that is dealing with markdown.
 
+When we inject dependencies we avoid having that affected object creating these dependencies themselves. It’s like outsourcing that responsibility. As a result you have more flexibility and less coupling. But for our purposes here, also fewer reasons to change due to less coupling. Let’s go through the major changes step by step and talk about the improvements we can make.
+
+## MarkdownComposer
+
 #### class MarkdownComposer
 
 ``` ruby
@@ -299,24 +292,9 @@ Of course we have one dependency left in here that we should talk about. With th
 
 I hope it’s clear why this dependency is necessary and how it already improved the level of fragility in here. Also, it hopefully illustrated how change can ripple through an application and why we would rather opt for extensions than changes to existing code. It’s hard to predict how a little change can ripple through your codebase. Better err on the side of sanity and safety and minimize the risk of tight coupling as much as we can. 
 
-Naming methods adequately can play a significant part towards improved OCP as well. If you name and build methods to have a sharp focus, they will less likely fall victim to change as well. For example, `write_page` or `write_markdown_page` can make a critical difference if you decide to add the behaviour of writing HTML pages later on. Chances are good that we would need to touch `write_page` in that scenario—at the very least we would need to rename it in order to easily differentiate it from the `write_html_page`.
+## FilenameComposer
 
-#### class PageWriter
-
-``` ruby
-
-class PageWriter
-
-  ...
-
-  def write_page
-    File.open(file_name, 'w') { |file| file.write(text) }
-  end
-end
-
-```
-
-Let’s have a look at the next class to illustrate this through an actual example. `FilenameComposer` has the same issues as the previous class. Also, both classes’ initializers are kinda overly motivated. They instantiate an instance of `PageExtractor`, feed it a link acquired from the `Scraper` class and on top of that, the also `extract_data`. Ok, not super bad for a first attempt, but this code is nowhere near production ready.
+Let’s have a look at the next class. `FilenameComposer` has the same issues as the previous class. Also, both classes’ initializers are kinda overly motivated. They instantiate an instance of `PageExtractor`, feed it a link acquired from the `Scraper` class. On top of that, the also `extract_data` right away. Ok, not super bad for a first attempt, but this code is nowhere near production ready. This is a good example how refactoring is a never-ending sandblasting process that often involves multiple steps and attempts.
 
 #### class FilenameComposer
 
@@ -335,7 +313,7 @@ class FilenameComposer
 
 ```
 
-We can use the same refactoring as in `MarkdownCompower`. That change alone made the whole code example not only simpler but more flexible along the way. The initializers became ignorant and straightforward. Nothing to trip over really.
+We can use the same refactoring as in `MarkdownCompower`. This little change alone made the code not only simpler but more flexible along the way. The initializers became ignorant and straightforward. Nothing to trip over really.
 
 #### class FilenameComposer Refactored
 
@@ -354,7 +332,13 @@ class FilenameComposer
 
 ```
 
-The dependency issue that is left, is the API issue I mentioned above. Let’s look at an example. `FilenameComposer` needs the `date`, `interviewee` and `episode_number` of the scraped episode at some point. Nothing easier than that, it simply uses the injected object and asks for the data.
+So far so good. The dependency issue that is left, is an API issue. `FilenameComposer` needs the
+
++ `date`
++ `interviewee`
++ and `episode_number`
+
+of the scraped episode from `PageExtractor` at some point. Nothing easier than that, it simply uses the injected object and asks for the data.
 
 #### class FilenameComposer Refactored
 
@@ -378,26 +362,30 @@ The dependency issue that is left, is the API issue I mentioned above. Let’s l
 
 ```
 
-The coupling of these three methods on `page_extractor` is something we need to accept. On the flip side, these composer classes are now a lot more ignorant about `PageExtractor`. They don’t know its class name and what argument it needs for instantiation. Two degrees of coupling are gone with only one left. Good trade off. 
+The coupling of these three methods on `page_extractor` is something we need to accept. On the flip side, both composer classes are now a lot more ignorant about `PageExtractor`. They don’t know its class name and what argument it needs for instantiation. Two degrees of coupling are gone with only one left. Good trade off! 
+
+## PageWriter
+
+Naming methods adequately can play a significant part towards improved OCP as well. If you name and build methods to have a sharp focus, they will less likely fall victim to change as well. For example, `write_page` or `write_markdown_page` can make a critical difference if you decide to add the behaviour of writing HTML pages later on. Chances are good that we would need to touch `write_page` in that scenario—at the very least we would need to rename it in order to easily differentiate it from the `write_html_page`. Even the names for `file_name` and `text` will turn out to be problematic. What file name and what text are we exactly talking about?
+
+#### class PageWriter
+
+``` ruby
+
+class PageWriter
+
+  ...
+
+  def write_page
+    File.open(file_name, 'w') { |file| file.write(text) }
+  end
+end
+
+```
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-When you inject dependencies you avoid having that object creating these dependencies themselves. It’s like outsourcing that responsibility??? As a result you have more flexibility and less coupling. But for our purposes here, also fewer reasons to change due to less coupling.
 
 
 The `initialize` method of `PageWriter` is smelly as well. We instantiate it with two objects and feed it another link the class itself has no business of knowing about. I have more to say about passing this link around for scraping, but first things first.
@@ -447,6 +435,8 @@ O.K., back to my rant about the `detail_page_link` that was passed around too mu
 + `PageWriter`
 
 That might not look like a big win but overall, this little change reduced a pretty sneaky dependency that previously trickled through the whole scraper. It was passed around too much. Adhering to the “Single Responsibility Principle” was not enough. But after injecting `PageExtractor` in a couple of classes, we could not only strengthen the responsibility aspect, we could encapsulate this parameter in one place where it is actually put to work. By injecting responsibilities, we could encapsulate this parameter where it is instantiated. That means less duplication as well. You can see that applying sane coding principles also create nice byproducts along the way. The feed off of each other—the same goes for the opposite as well of course.
+
+## Scraper
 
 Where does this lead to? Where are all these injected objects ending up? Good question. I decided to put them high up in the food chain so to speak. These injected objects kinda bubble up and often enable you to make changes in one or a few places—instead of all over the place. In our case, `Scraper` is now in charge of instantiating these objects injects them as well. If we need to make changes, we can do that in one central place—in contrast to doing it in multiple places at once. Here we build up all the objects that are needed to write the markdown page. We sort of feed them into each other, bottom-up.
 
