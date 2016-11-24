@@ -49,6 +49,8 @@ When we need to refer to another class through its name directly, we create a st
 
 # Code Example
 
+Refactoring with OCP in mind should make the code simpler and less coupled. The logic should be more focused in each class. We will instantiate the objects in play at the highest layer—instead of all over the place. Classes will know a lot less about each other and will end up being more flexible to face changes. 
+
 Below is an example from the code of the previous article. As I mentioned at the end of that article, it wasn’t done in terms of refactoring. I hope it was clear that the previous refactorings targeted the “Single Responsibility Principle” first and foremost. I left the code in that condition because it was still not addressing the Open/Closed Principle in a few places.
 
 Please take another look and view it through the lens of what you have learned so far about being open for extension and closed for modification. There are definitely some issues here that make the code unnecessarily brittle. Think about how we can use dependency injection to decouple the affected classes.
@@ -252,7 +254,7 @@ Let’s dig in! For example, `MarkdownComposer` knows too much of another class,
 
 When we inject dependencies we avoid having that affected object creating these dependencies themselves. It’s like outsourcing that responsibility. As a result you have more flexibility and less coupling. But for our purposes here, also fewer reasons to change due to less coupling. Let’s go through the major changes step by step and talk about the improvements we can make.
 
-## MarkdownComposer
+## MarkdownComposer -> TextComposer
 
 #### class MarkdownComposer
 
@@ -274,7 +276,7 @@ class MarkdownComposer
 
 ``` ruby
 
-class MarkdownComposer
+class TextComposer
 
   attr_reader :page_extractor
 
@@ -286,15 +288,96 @@ class MarkdownComposer
 
 ```
 
-It’s easy to see that the refactored `MarkdownComposer` is now kept in the dark about the object in charge of extracting data. Now we could easily change the name of  `PageExtractor`, or even swap it out completely with something different.
+The most obvious change is that the class name is now different. I figured it would be more flexible if I leave the door open for extension. Other classes might benefit as well. If I need to add the ability to compose `.html` or `.txt` files, I already have a home for them.
 
-Of course we have one dependency left in here that we should talk about. With the `page_extractor` object ready to extract inside the `MarkdownComposer` class, it needs to do its business. That means it needs to use the API of the `PageExtractor` class at some point. That dependency stays. Therefore, if we change the method calls we might break the class that was injected with it.
+It’s easy to see that the refactored `TextComposer` is now kept in the dark about the object in charge of extracting data. Now we could easily change the name of  `PageExtractor`, or even swap it out completely with something different.
+
+Of course we have one dependency left in here that we should talk about. With the `page_extractor` object ready to extract inside the `TextComposer` class, it needs to do its business. That means it needs to use the API of the `PageExtractor` class at some point. That dependency stays. Therefore, if we change the method calls we might break the class that was injected with it.
 
 I hope it’s clear why this dependency is necessary and how it already improved the level of fragility in here. Also, it hopefully illustrated how change can ripple through an application and why we would rather opt for extensions than changes to existing code. It’s hard to predict how a little change can ripple through your codebase. Better err on the side of sanity and safety and minimize the risk of tight coupling as much as we can. 
 
+`TextComposer` is now also significantly simpler. We don’t need to fumble around with the options hash of extracted data. The API is also less smelly. Oh, yes and I decided to just request `markdown` without the compose part when I got rid of `compose_markdown`. It only requested a private method and was not as much needed as I thought in the beginning. Now we have a `markdown` method in charge for that kind of text and it would be easy to add `txt` or `html` methods without changing existing code. OCP!
+
+#### before
+
+``` ruby
+
+  def compose_markdown(options={})
+<<-HEREDOC
+--- 
+title: #{options[:interviewee]}
+interviewee: #{options[:interviewee]}
+topic_list: #{options[:title]}
+tags: #{options[:tags]}
+soundcloud_id: #{options[:sc_id]}
+date: #{options[:date]}
+episode_number: #{options[:episode_number]}
+---
+
+#{options[:text]}
+HEREDOC
+  end
+
+``` 
+
+#### after
+
+``` ruby
+
+  def markdown
+<<-HEREDOC
+--- 
+title: #{page_extractor.interviewee}
+interviewee: #{page_extractor.interviewee}
+topic_list: #{page_extractor.title}
+tags: #{page_extractor.tags}
+soundcloud_id: #{page_extractor.soundcloud_id}
+date: #{page_extractor.date}
+episode_number: #{page_extractor.episode_number}
+---
+
+#{page_extractor.shownotes_text}
+HEREDOC
+  end
+
+``` 
+
+A nice improvement I think. Reads better, feels cleaner and doesn’t need an argument. If I would need to edit the file I wanna compose, say I extract additional data, I would need to open `markdown`. In such a case, I don’t see a way around modifying existing code without introducing irrational complexity. Other than that, the overall class is small, ignorant and focused.
+
+#### class TextComposer
+
+``` ruby
+
+class TextComposer
+
+  attr_reader :page_extractor
+
+  def initialize(page_extractor)
+    @page_extractor = page_extractor
+  end
+
+  def markdown
+<<-HEREDOC
+--- 
+title: #{page_extractor.interviewee}
+interviewee: #{page_extractor.interviewee}
+topic_list: #{page_extractor.title}
+tags: #{page_extractor.tags}
+soundcloud_id: #{page_extractor.soundcloud_id}
+date: #{page_extractor.date}
+episode_number: #{page_extractor.episode_number}
+---
+
+#{page_extractor.shownotes_text}
+HEREDOC
+  end
+end
+
+```
+
 ## FilenameComposer
 
-Let’s have a look at the next class. `FilenameComposer` has the same issues as the previous class. Also, both classes’ initializers are kinda overly motivated. They instantiate an instance of `PageExtractor`, feed it a link acquired from the `Scraper` class. On top of that, the also `extract_data` right away. Ok, not super bad for a first attempt, but this code is nowhere near production ready. This is a good example how refactoring is a never-ending sandblasting process that often involves multiple steps and attempts.
+Let’s have a look at the next class. `FilenameComposer` has the same issues as the previous class. Also, both classes’ initializers are kinda overly motivated. They instantiate an instance of `PageExtractor` and feed it a link acquired from the `Scraper` class. On top of that, they also `extract_data` right away. Ok, not super bad for a first attempt, but this code is nowhere near production ready. This is a good example how refactoring is a never-ending sandblasting process that often involves multiple steps and attempts.
 
 #### class FilenameComposer
 
@@ -313,7 +396,7 @@ class FilenameComposer
 
 ```
 
-We can use the same refactoring as in `MarkdownCompower`. This little change alone made the code not only simpler but more flexible along the way. The initializers became ignorant and straightforward. Nothing to trip over really.
+We can use the same refactoring as in `TextComposer`. This little change alone made the code not only simpler but more flexible along the way. The initializers became ignorant and straightforward. Nothing to trip over really.
 
 #### class FilenameComposer Refactored
 
@@ -338,13 +421,39 @@ So far so good. The dependency issue that is left, is an API issue. `FilenameCom
 + `interviewee`
 + and `episode_number`
 
-of the scraped episode from `PageExtractor` at some point. Nothing easier than that, it simply uses the injected object and asks for the data.
+of the scraped episode from `PageExtractor` at some point. Nothing easier than that. Instead of extracting this data from a hash that is temporarily parked in an instance variable, it simply uses the injected object and asks for the data needed. Reads nicer too.
 
-#### class FilenameComposer Refactored
+#### before
 
 ``` ruby
 
-...
+  ...
+
+  private
+
+  def date
+    extracted_data[:date]
+  end
+
+  def interviewee
+    dasherize(extracted_data[:interviewee])
+  end
+
+  def episode_number
+    extracted_data[:episode_number]
+  end
+
+  ...
+
+```
+
+#### after
+
+``` ruby
+
+  ...
+
+  private
 
   def date
     page_extractor.date
@@ -358,37 +467,53 @@ of the scraped episode from `PageExtractor` at some point. Nothing easier than t
     page_extractor.episode_number
   end
 
-...
+  ...
 
 ```
 
 The coupling of these three methods on `page_extractor` is something we need to accept. On the flip side, both composer classes are now a lot more ignorant about `PageExtractor`. They don’t know its class name and what argument it needs for instantiation. Two degrees of coupling are gone with only one left. Good trade off! 
 
-## PageWriter
+We can also simplify the way we compose the final file name.
 
-Naming methods adequately can play a significant part towards improved OCP as well. If you name and build methods to have a sharp focus, they will less likely fall victim to change as well. For example, `write_page` or `write_markdown_page` can make a critical difference if you decide to add the behaviour of writing HTML pages later on. Chances are good that we would need to touch `write_page` in that scenario—at the very least we would need to rename it in order to easily differentiate it from the `write_html_page`. Even the names for `file_name` and `text` will turn out to be problematic. What file name and what text are we exactly talking about?
-
-#### class PageWriter
+#### before
 
 ``` ruby
 
-class PageWriter
+ ...
+
+ def prepare_filename
+    compose_filename
+  end
+
+  private
+
+  def compose_filename
+    "#{date}-#{interviewee}-#{episode_number}.html.erb.md" 
+  end
 
   ...
 
-  def write_page
-    File.open(file_name, 'w') { |file| file.write(text) }
+```
+
+#### after
+
+``` ruby
+
+ ...
+
+  def md_filename
+    "#{date}-#{interviewee}-#{episode_number}.html.erb.md" 
   end
-end
+
+  ...
 
 ```
 
+```md_filename``` is not private anymore and is much more specific. `compose_filename` can mean just about anything. If we need to add another method for composing HTML file names, it would be as easy as adding something like `html_filename`. Also, I removed `prepare_filename` since it was an intermediary method that lost its purpose.
 
+## PageWriter
 
-
-
-
-The `initialize` method of `PageWriter` is smelly as well. We instantiate it with two objects and feed it another link the class itself has no business of knowing about. I have more to say about passing this link around for scraping, but first things first.
+The `initialize` method of `PageWriter` is smelly as well. We instantiate it with two objects and feed it another link the class itself has no business of knowing about. I have more to say about passing this link around for scraping, but first things first. What I like the least about the scenario here is that if we need additional data from either of these injected objects, we would need to modify the `initialize` method.
 
 #### class PageWriter
 
@@ -407,7 +532,7 @@ class PageWriter
 
 ```
 
-We could scrub the knowledge of the particular link to scrape and only pass interchangeable objects into its initializer. `PageWriter` itself is a simple class with a simple task. It does not really need to have hard ties. We just keep it around to take care of writing out the final end product after we scraped and composed all the data. Also, if we need additional data from either of these injected objects, we would need to modify the `initialize` method.
+We can encapsulate the knowledge of the particular link to scrape within `PageExtractor` alone. Then we only need to pass interchangeable objects into the initializer here. No need to play with fire here. Even before the refactoring, `PageWriter` itself is a simple class with a simple task. It does not really need to have all these hard ties. We keep this class only around to focus on writing out the final files after we scraped and composed all the data somewhere else.
 
 #### class PageWriter Refactored
 
@@ -415,10 +540,10 @@ We could scrub the knowledge of the particular link to scrape and only pass inte
 
 class PageWriter
 
-  attr_reader :markdown_composer, :filename_composer
+  attr_reader :text_composer, :filename_composer
 
-  def initialize(markdown_composer, filename_composer)
-    @markdown_composer = markdown_composer
+  def initialize(text_composer, filename_composer)
+    @text_composer = text_composer
     @filename_composer = filename_composer
   end
 
@@ -426,48 +551,85 @@ class PageWriter
 
 ```
 
-It is completely ignorant about its dependencies. For example, if we want to extend that class by making it write `.txt` or `.html` files, we don’t need to change it. No opportunity to break it for that matter. We can let the injected objects be in charge of dealing with different filenames and what not—encapsulated in new methods of course.
+It is now a lot more ignorant about its dependencies. For example, if we want to extend that class by making it write `.txt` or `.html` files, we don’t need to change it. The injected `TextComposer` and `FileNameComposer` should then provide all the knowledge to write out whatever new file name or text. We leave no opportunity to break it for that matter. We can let the injected objects be in charge of dealing with different filenames and what not—encapsulated in new methods of course.
 
 O.K., back to my rant about the `detail_page_link` that was passed around too much. Our little refactoring made it easier to only provide `PageExtractor` with that information. In fact nothing changed in that class in that regard but we could eliminate its references in three places:
 
-+ `MarkdownComposer`
++ `TextComposer`
 + `FilenameComposer`
 + `PageWriter`
 
-That might not look like a big win but overall, this little change reduced a pretty sneaky dependency that previously trickled through the whole scraper. It was passed around too much. Adhering to the “Single Responsibility Principle” was not enough. But after injecting `PageExtractor` in a couple of classes, we could not only strengthen the responsibility aspect, we could encapsulate this parameter in one place where it is actually put to work. By injecting responsibilities, we could encapsulate this parameter where it is instantiated. That means less duplication as well. You can see that applying sane coding principles also create nice byproducts along the way. The feed off of each other—the same goes for the opposite as well of course.
+That might not look like a big win but overall, this little change reduced a pretty sneaky dependency that previously trickled through the whole scraper. This was possibly the smelliest part we needed to improve. It was passed around too much. Adhering to the “Single Responsibility Principle” was not enough.
 
-## Scraper
+After injecting `PageExtractor` in a couple of classes, we could not only strengthen the responsibility aspect, we could encapsulate this parameter in one place where it is actually put to work. By injecting responsibilities, we could encapsulate this parameter only where it is instantiated. That means less duplication as well. You can see that applying sane coding principles also create nice side effects along the way. The feed off of each other—the same goes for the opposite as well of course.
 
-Where does this lead to? Where are all these injected objects ending up? Good question. I decided to put them high up in the food chain so to speak. These injected objects kinda bubble up and often enable you to make changes in one or a few places—instead of all over the place. In our case, `Scraper` is now in charge of instantiating these objects injects them as well. If we need to make changes, we can do that in one central place—in contrast to doing it in multiple places at once. Here we build up all the objects that are needed to write the markdown page. We sort of feed them into each other, bottom-up.
+Naming methods adequately can play a significant part towards improved OCP as well. If you name and build methods to have a sharp focus, they will less likely fall victim to change as well. For example, `write_page` or `write_markdown_page` can make a critical difference if you decide to add the behaviour of writing HTML pages later on. Chances are good that we would need to touch `write_page` in that scenario—at the very least we would need to rename it in order to easily differentiate it from the `write_html_page`. Even the names for `file_name` and `text` will turn out to be problematic. What file name and what text are we exactly talking about?
 
-#### class Scraper Refactored
+#### before
 
 ``` ruby
 
-class Scraper
+class PageWriter
 
-  def scrape
-    link_range = 1
-    agent ||= Mechanize.new
+  attr_reader :text, :file_name
 
-    until link_range == 21
-      page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
-      link_range += 1
+  def initialize(detail_page_link)
+   @text          = MarkdownComposer.new(detail_page_link).prepare_markdown
+   @file_name     = FilenameComposer.new(detail_page_link).prepare_filename
+  end
 
-      page.links[2..8].map do |link|
-        page_extractor    = PageExtractor.new(link)
-        markdown_composer = MarkdownComposer.new(page_extractor)
-        filename_composer = FilenameComposer.new(page_extractor)
-
-        PageWriter.new(markdown_composer, filename_composer).write_markdown_page
-      end
-    end
+  def write_page
+    File.open(file_name, 'w') { |file| file.write(text) }
   end
 end
 
 ```
 
-Instead of passing each page link to `PageWriter`, we directly pass it to the class who scrapes the data from the page. Nobody else needs to know about it. `PageExtractor` takes the link, clicks it, saves its state, follows it to the shownotes and provides `MarkdownComposer` and `FileComposer` all the abilities to prepare the markdown text and the filename from that particular page. In turn, `PageWriter` get injected with the former two which are needed to write out the new page containing the extracted data.
+#### after
+
+``` ruby
+
+class PageWriter
+
+  attr_reader :text_composer, :filename_composer
+
+  def initialize(text_composer, filename_composer)
+    @text_composer = text_composer
+    @filename_composer = filename_composer
+  end
+
+  def write_markdown_page
+    File.open(markdown_filename, 'w') { |file| file.write(markdown_text) }
+  end
+
+  private
+
+  def markdown_filename
+    filename_composer.md_filename
+  end
+
+  def markdown_text
+    text_composer.markdown
+  end
+end
+
+
+```
+
+Maybe you asked yourself why `PageWriter` now uses two new private methods. Simple, I decided it would scale better if I rename `write_page` into `write_markdown_page`.
+
++ markdown_filename
++ markdown_text
+
+Proper method naming can also play into the whole closed for modification theme. If I wanna use `PageWriter` to not only write out markdown files but say, `txt` or `html` files, I just need to extend the code without touching existing methods. The arguments for `write_markdown_page` are now more specific as well.
+
+`PageWriter` is set up to easily write out new pages and hide the functionality behind specialized private methods for possibly new file names and other forms of text. The same goes for `md_filename` and `markdown` methods. If I need a different kind of filename or a different blueprint for text, I simply extend the injected classes. Long story short, proper naming is hard but worth the extra effort.
+
+
+
+
+
+## PageExtractor
 
 #### class PageExtractor
 
@@ -484,8 +646,6 @@ class PageExtractor
   ...
 
 ```
-
-Overall, refactoring with OCP in mind made the code became simpler and less coupled. The logic is more focused in each class. We instantiate the objects in play at the highest layer instead of all over the place. Classes know a lot less about each other and are more flexible to face changes. 
 
 Along the way, I could delete and simplify a few bits that were harder to do before the refactoring. For exmaple, `PageExtractor` is not returning a hash with the extracted data. Instead, we let the injected `page_extractor` handle the extraction business more fine grained. For example, if I would have decided to extract more data than the hash provided, I would have had one more reason to change the class. Now, this class only handles the extraction logic for every piece of data separately and is easy to extend.
 
@@ -547,99 +707,78 @@ end
 
 ```
 
-`MarkdownComposer` is now also significantly simpler. We don’t need to fumble around with the options hash of extracted data. The API I mentioned is also less smelly. Oh, yes and I decided to just request `markdown` without the compose part when I got rid of `compose_markdown`. It only requested a private method and was not as much needed as I thought in the beginning.
 
-#### before
 
-``` ruby
 
-  def compose_markdown(options={})
-<<-HEREDOC
---- 
-title: #{options[:interviewee]}
-interviewee: #{options[:interviewee]}
-topic_list: #{options[:title]}
-tags: #{options[:tags]}
-soundcloud_id: #{options[:sc_id]}
-date: #{options[:date]}
-episode_number: #{options[:episode_number]}
----
 
-#{options[:text]}
-HEREDOC
-  end
+## Scraper
 
-``` 
+Where does this lead to? Where are all these injected objects ending up? Good question. I decided to put them high up in the food chain so to speak. These injected objects kinda bubble up and often enable you to make changes in one or a few places—instead of all over the place.
 
-#### after
+#### Before
 
 ``` ruby
 
-  def markdown
-<<-HEREDOC
---- 
-title: #{page_extractor.interviewee}
-interviewee: #{page_extractor.interviewee}
-topic_list: #{page_extractor.title}
-tags: #{page_extractor.tags}
-soundcloud_id: #{page_extractor.soundcloud_id}
-date: #{page_extractor.date}
-episode_number: #{page_extractor.episode_number}
----
+class Scraper
 
-#{page_extractor.shownotes_text}
-HEREDOC
-  end
+  def scrape
+    link_range = 1
+    agent ||= Mechanize.new
 
-``` 
+    until link_range == 21
+      page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
+      link_range += 1
 
-A good improvement I think. Reads better, feels cleaner and doesn’t need an argument. If I would need to edit the file I wanna compose, say I extract additional data, I would need to open `compose_markdown`. In that case, I don’t see a way around it. Other than that, the overall class is small, ignorant and focused.
-
-#### class MarkdownComposer
-
-``` ruby
-
-class MarkdownComposer
-
-  attr_reader :page_extractor
-
-  def initialize(page_extractor)
-    @page_extractor = page_extractor
-  end
-
-  def markdown
-<<-HEREDOC
---- 
-title: #{page_extractor.interviewee}
-interviewee: #{page_extractor.interviewee}
-topic_list: #{page_extractor.title}
-tags: #{page_extractor.tags}
-soundcloud_id: #{page_extractor.soundcloud_id}
-date: #{page_extractor.date}
-episode_number: #{page_extractor.episode_number}
----
-
-#{page_extractor.shownotes_text}
-HEREDOC
+      page.links[2..8].map do |link|
+        PageWriter.new(link).write_page
+      end
+    end
   end
 end
 
 ```
 
-One last refactoring I should mention. Maybe you asked yourself why `PageWriter` now uses two new method names:
+`Scraper` is now in charge of instantiating these objects and injects them into their respective targets. Here we build up all the objects that are needed to write the markdown page. We sort of feed them into each other, bottom-up. If we need to make changes, we can do that in one central place—in contrast to doing it in multiple places at once.
 
-+ markdown_filename
-+ markdown_text
 
-As I mentioned somewhere above, proper method naming can also play into the whole closed for modification theme. If I wanna use `PageWriter` to not only write out markdown files but say, `txt` or `html` files, I just need to extend the code without touching existing methods. On the one hand it reads a bit more clearly, but it also better encapsulates specific logic that can better stand on its own if specifications change. The same goes for `md_filename` and `markdown` methods. If I need a different kind of filename or a different blueprint for text, I simply extend the classes. Long story short, proper naming is hard but worth the extra effort.
+#### After
+
+``` ruby
+
+class Scraper
+
+  def scrape
+    link_range = 1
+    agent ||= Mechanize.new
+
+    until link_range == 21
+      page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
+      link_range += 1
+
+      page.links[2..8].map do |link|
+        page_extractor    = PageExtractor.new(link)
+        markdown_composer = MarkdownComposer.new(page_extractor)
+        filename_composer = FilenameComposer.new(page_extractor)
+
+        PageWriter.new(markdown_composer, filename_composer).write_markdown_page
+      end
+    end
+  end
+end
+
+```
+
+Instead of passing each page link to `PageWriter`, we directly pass it to the class who scrapes the data from the page. Nobody else needs to know about it. `PageExtractor` takes the link, clicks it, saves its state, follows it to the shownotes and provides `MarkdownComposer` and `FileComposer` all the abilities to prepare the markdown text and the filename from that particular page. In turn, `PageWriter` get injected with the former two which are needed to write out the new page containing the extracted data.
+
+
+## Complete Scraper After Dependency Injection
 
 I did a couple of other tweaks while shuffling the code around but I don’t think they are worth mentioning here. Take a look at the complete code after dependency injection. I think we made some good progress in terms of the ”Open/Closed Principle”. The code is better equipped to deal with future changes. OCP helped to tighten the responsibilities we tried to isolate using the “Single Responsibility Principle”. The code below hopefully shows that both principles have a symbiotic thing going on.
-
-## Podcast Scraper After Dependency Injection
 
 ``` ruby
 
 require 'Mechanize'
+require 'Pry'
 require 'date'
 
 module ExtractionUtilities
@@ -719,7 +858,7 @@ class PageExtractor
   end
 end
 
-class MarkdownComposer
+class TextComposer
 
   attr_reader :page_extractor
 
@@ -774,10 +913,10 @@ end
 
 class PageWriter
 
-  attr_reader :markdown_composer, :filename_composer
+  attr_reader :text_composer, :filename_composer
 
-  def initialize(markdown_composer, filename_composer)
-    @markdown_composer = markdown_composer
+  def initialize(text_composer, filename_composer)
+    @text_composer = text_composer
     @filename_composer = filename_composer
   end
 
@@ -792,7 +931,7 @@ class PageWriter
   end
 
   def markdown_text
-    markdown_composer.markdown
+    text_composer.markdown
   end
 end
 
@@ -802,16 +941,17 @@ class Scraper
     link_range = 1
     agent ||= Mechanize.new
 
-    until link_range == 21
+    #until link_range == 21
+    until link_range == 2
       page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
       link_range += 1
 
       page.links[2..8].map do |link|
         page_extractor    = PageExtractor.new(link)
-        markdown_composer = MarkdownComposer.new(page_extractor)
+        text_composer = TextComposer.new(page_extractor)
         filename_composer = FilenameComposer.new(page_extractor)
 
-        PageWriter.new(markdown_composer, filename_composer).write_markdown_page
+        PageWriter.new(text_composer, filename_composer).write_markdown_page
       end
     end
   end
@@ -820,6 +960,7 @@ end
 Scraper.new.scrape
 
 ```
+
 
 
 
