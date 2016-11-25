@@ -254,6 +254,140 @@ Let’s dig in! For example, `MarkdownComposer` knows too much of another class,
 
 When we inject dependencies we avoid having that affected object creating these dependencies themselves. It’s like outsourcing that responsibility. As a result you have more flexibility and less coupling. But for our purposes here, also fewer reasons to change due to less coupling. Let’s go through the major changes step by step and talk about the improvements we can make.
 
+## PageExtractor
+
+The object that does most of the dirty work and get injected most is `PageExtractor`. We need to prepare it a bit first before we inject other classes with it. On the surface, this class didn’t change dramatically but I could delete one method that was not ready for change or elegant dependency injection.
+
+`extract_data` was handy for spiking out the original idea but it made the code brittle and the API awkward. If I would have decided to extract more data than the hash provided, I would have had one more reason to change the class because of that method.
+
+#### Before
+
+``` ruby
+
+class PageExtractor
+  attr_reader :detail_page
+  include ExtractionUtilities
+
+  def initialize(detail_page_link)
+    @detail_page ||= detail_page_link.click
+  end
+
+  def extract_data
+    options = {
+      interviewee:    interviewee,
+      title:          title,
+      sc_id:          soundcloud_id,
+      text:           shownotes_text,
+      tags:           tags,
+      date:           date,
+      episode_number: episode_number
+    }
+  end
+
+  private
+
+  def interviewee
+    interviewee_selector = '.episode_sub_title span'
+    detail_page.search(interviewee_selector).text.strip
+  end
+
+  def title
+    title_selector = ".episode_title"
+    detail_page.search(title_selector).text.gsub(/[?#]/, '')
+  end
+
+  def soundcloud_id
+    sc = detail_page.iframes_with(href: /soundcloud.com/).to_s
+    sc.scan(/\d{3,}/).first
+  end
+
+  def shownotes_text
+    shownote_selector = "#shownote_container > p"
+    detail_page.search(shownote_selector)
+  end
+
+  def tags
+    build_tags(title, interviewee)
+  end
+
+  def date
+    clean_date(subtitle)
+  end
+
+  def episode_number
+    number = /[#]\d*/.match(subtitle)
+    clean_episode_number(number)
+  end
+
+  def subtitle
+    subheader_selector = ".episode_sub_title"
+    detail_page.search(subheader_selector).text
+  end
+end
+
+```
+
+#### After
+
+``` ruby
+
+class PageExtractor
+  include ExtractionUtilities
+
+  attr_reader :detail_page
+
+  def initialize(detail_page_link)
+    @detail_page ||= detail_page_link.click
+  end
+
+  def interviewee
+    interviewee_selector = '.episode_sub_title span'
+    detail_page.search(interviewee_selector).text.strip
+  end
+
+  def title
+    title_selector = ".episode_title"
+    detail_page.search(title_selector).text.gsub(/[?#]/, '')
+  end
+
+  def soundcloud_id
+    sc = detail_page.iframes_with(href: /soundcloud.com/).to_s
+    sc.scan(/\d{3,}/).first
+  end
+
+  def shownotes_text
+    shownote_selector = "#shownote_container > p"
+    detail_page.search(shownote_selector)
+  end
+
+  def tags
+    build_tags(title, interviewee)
+  end
+
+  def date
+    clean_date(subtitle)
+  end
+
+  def episode_number
+    number = /[#]\d*/.match(subtitle)
+    clean_episode_number(number)
+  end
+
+  private
+
+  def subtitle
+    subheader_selector = ".episode_sub_title"
+    detail_page.search(subheader_selector).text
+  end
+end 
+
+```
+
+After the refactoring, this class alone will be in charge of the link to each page we scrape for data. It saves the state of each page which can then be passed into the injected classes to do their bidding. Each method that is left is focused on one specific extraction job only. We left little reason to change but opened every opportunity to extend the code easily. Scraping another object from a page without modifying existing code is no problem anymore.
+
+The class is now ready to let the injected `page_extractor` objects do their bidding directly. You will see that shorty in action below. That also lead to a nicer API. No need to pass this hash object around anyway. The class is simpler and ready for extension without a bottleneck. 
+
+
 ## MarkdownComposer -> TextComposer
 
 #### class MarkdownComposer
@@ -344,7 +478,7 @@ HEREDOC
 
 A nice improvement I think. Reads better, feels cleaner and doesn’t need an argument. If I would need to edit the file I wanna compose, say I extract additional data, I would need to open `markdown`. In such a case, I don’t see a way around modifying existing code without introducing irrational complexity. Other than that, the overall class is small, ignorant and focused.
 
-#### class TextComposer
+#### class TextComposer (refactored)
 
 ``` ruby
 
@@ -625,92 +759,6 @@ Proper method naming can also play into the whole closed for modification theme.
 
 `PageWriter` is set up to easily write out new pages and hide the functionality behind specialized private methods for possibly new file names and other forms of text. The same goes for `md_filename` and `markdown` methods. If I need a different kind of filename or a different blueprint for text, I simply extend the injected classes. Long story short, proper naming is hard but worth the extra effort.
 
-
-
-
-
-## PageExtractor
-
-#### class PageExtractor
-
-``` ruby
-
-class PageExtractor
-  attr_reader :detail_page
-  include ExtractionUtilities
-
-  def initialize(detail_page_link)
-    @detail_page ||= detail_page_link.click
-  end
-
-  ...
-
-```
-
-Along the way, I could delete and simplify a few bits that were harder to do before the refactoring. For exmaple, `PageExtractor` is not returning a hash with the extracted data. Instead, we let the injected `page_extractor` handle the extraction business more fine grained. For example, if I would have decided to extract more data than the hash provided, I would have had one more reason to change the class. Now, this class only handles the extraction logic for every piece of data separately and is easy to extend.
-
-It saves the state of each page which can then be passed into the injected classes to do their bidding. The method `extract_data` is completely gone because it was not as future proof if I wanted to scrape additional data. The API used to get that data in other classes was also a bit iffy. Each method is focused on one extraction job only. We left little reason to change but opened every opportunity to extend the code easily.
-
-#### class PageExtractor refactored
-
-``` ruby
-
-class PageExtractor
-  include ExtractionUtilities
-
-  attr_reader :detail_page
-
-  def initialize(detail_page_link)
-    @detail_page ||= detail_page_link.click
-  end
-
-  def interviewee
-    interviewee_selector = '.episode_sub_title span'
-    detail_page.search(interviewee_selector).text.strip
-  end
-
-  def title
-    title_selector = ".episode_title"
-    detail_page.search(title_selector).text.gsub(/[?#]/, '')
-  end
-
-  def soundcloud_id
-    sc = detail_page.iframes_with(href: /soundcloud.com/).to_s
-    sc.scan(/\d{3,}/).first
-  end
-
-  def shownotes_text
-    shownote_selector = "#shownote_container > p"
-    detail_page.search(shownote_selector)
-  end
-
-  def tags
-    build_tags(title, interviewee)
-  end
-
-  def date
-    clean_date(subtitle)
-  end
-
-  def episode_number
-    number = /[#]\d*/.match(subtitle)
-    clean_episode_number(number)
-  end
-
-  private
-
-  def subtitle
-    subheader_selector = ".episode_sub_title"
-    detail_page.search(subheader_selector).text
-  end
-end 
-
-```
-
-
-
-
-
 ## Scraper
 
 Where does this lead to? Where are all these injected objects ending up? Good question. I decided to put them high up in the food chain so to speak. These injected objects kinda bubble up and often enable you to make changes in one or a few places—instead of all over the place.
@@ -738,9 +786,6 @@ end
 
 ```
 
-`Scraper` is now in charge of instantiating these objects and injects them into their respective targets. Here we build up all the objects that are needed to write the markdown page. We sort of feed them into each other, bottom-up. If we need to make changes, we can do that in one central place—in contrast to doing it in multiple places at once.
-
-
 #### After
 
 ``` ruby
@@ -767,6 +812,8 @@ class Scraper
 end
 
 ```
+
+`Scraper` is now in charge of instantiating the objects in play and injects them into their respective targets. Here we build up all the objects that are needed to write the markdown page. We sort of feed them into each other, bottom-up. If we need to make changes, we can do that in one central place—in contrast to doing it in multiple places at once.
 
 Instead of passing each page link to `PageWriter`, we directly pass it to the class who scrapes the data from the page. Nobody else needs to know about it. `PageExtractor` takes the link, clicks it, saves its state, follows it to the shownotes and provides `MarkdownComposer` and `FileComposer` all the abilities to prepare the markdown text and the filename from that particular page. In turn, `PageWriter` get injected with the former two which are needed to write out the new page containing the extracted data.
 
@@ -941,8 +988,7 @@ class Scraper
     link_range = 1
     agent ||= Mechanize.new
 
-    #until link_range == 21
-    until link_range == 2
+    until link_range == 21
       page = agent.get("https://between-screens.herokuapp.com/?page=#{link_range}")
       link_range += 1
 
