@@ -23,7 +23,7 @@ Why should we squash at all? Squashing is cool because you can clean up your wor
 
 So far so good. What we also need to fix frequently are small mistakes that we don’t wanna spread all over our git history. Commits that address small mistakes are just noise really.
 
-For example, commits that address a little typo fix is nothing you wanna put in front of your colleagues. Giving everybody a concise and focused history of commits benefits everybody.
+For example, commits that fix a little typo is nothing you wanna put in front of our colleagues or open source contributors. Giving everybody a concise and focused history of commits benefits everybody.
 
 
 ## Screen 00
@@ -62,13 +62,14 @@ The resulting commit message will consist of the subject line of the specified c
 
 # Fixup
 
-With a fixup you tell git that there is no need to modify the original commit message. You just pass the hash of the commit that has the content plus the commit message you need.
-
-With a squash, you tell git the you want to modify the commit message as well.????
-
-git commit fixup is simply a preparation for that fix to be squashed into another commit-without the need to change the commit message of that squash target.
 
 Typos or white space issues are good candidates for commits we better squash instead of keeping them around on their own.  Keeping track of such commits is unecessary if we mark them as FIXUPS.
+
+With a fixup you tell git that there is no need to modify the original commit message. You just pass the hash of the commit that has the content plus the commit message you need.
+
+With a squash, you tell git the you want to modify the commit message as well. At the end of the interactive session, you will be asked to compose a new commit message.
+
+git commit fixup is simply a preparation for that fix to be squashed into another commit-without the need to change the commit message of that squash target.
 
 ## Screen 02
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -84,9 +85,11 @@ Show history of commits with typo fix
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 git add .
+
 git commit --fixup hash
 
 git log 
+
 show new commit on top
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -127,18 +130,22 @@ In the interactive rebase session, the commits are already organized automatical
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 pick aaa1111 A first commit
+
 pick bbb2222 A second commit
+
 fixup ddd4444 fixup! A second commit
+
 pick ccc3333 A third commit
 
 Show that fixup commit is now reordered right after the commit it is squashed into. It is already in the right place. 
+
 Compapre to git log from before.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Since we start with the oldest commit at the top, the commits to be squashed need to come right after the specified commit they get squashed into.
 
-As you can see, the fixup commit is now already in that new position. It comes right after the second commit in which it will be squashed into.
+As you can see, the fixup commit is now already in that new position. It comes right after the specified commit in which it will be squashed into.
 
 ## Screen 06
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -156,7 +163,9 @@ We could have done this purely by hand in any interactive rebase session. But in
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 show normal rebase interactive
+
 show rebase interactive autosquash 
+
 compare
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -169,17 +178,78 @@ During the interactive rebase session, we can still move things around. What we 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 pick aaa1111 A first commit
+
 pick bbb2222 A second commit
+
 fixup ddd4444 fixup! A second commit
+
 pick ccc3333 A third commit
 
 Move things around
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-# Automating things
+Let’s quickly run through the second option autosquash option. We commit a little fix via git commit --squash hash.
 
 ## Screen 09
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+git commit --squash hash
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+We will be prompted in our editor of choice to possibly change the commit message. Leave it as is.
+
+When both messages of the fix and the squash target are the same, the interactive rebase session will pick the squash option for us automatically. If you change the message here, it won’t.
+
+When we are ready to sqash our work we run again
+
+## Screen 10
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+git rebase --interactive --autosquash master
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+As you can see, the new commit is now in the right place to be squashed and has the squash option already selected for us.
+
+## Screen 11
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+pick aaa1111 A first commit
+
+pick bbb2222 A second commit
+
+squash ddd4444 fixup! A second commit
+
+pick ccc3333 A third commit
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+As a final step, after we save and close this session, we will be asked to compose a new commit message for the two squashed commits. We delete what we don’t need and enlighten our colleagues with our concise git poetry. 
+
+That’s it. A quick look at the log tells us that everything is in order, cleaned up and has a new commit message.
+
+## Screen 12
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+git log
+
+output
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# Automating things
+
+## Screen 13
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -194,7 +264,7 @@ Since git rebase interactive autosquash is only focused on commits that has a me
 
 Why shouldn’t we autosquash all the time by default when we do an interactive rebase? Exactly!
 
-## Screen 10
+## Screen 14
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -207,7 +277,7 @@ without autosquash option
 
 Lucky for us, we can set this as the default via the rebase.autosquash setting
 
-## Screen 11
+## Screen 15
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -226,7 +296,7 @@ Now we can save ourselves from typing the extra --autosquash option all the time
 
 One minor pain is left that we can optimize. Instead of typing or copy pasting the specific SHA for the commit we wanna squash into, wouldn’t it be cool to just type part of the commit message instead? 
 
-## Screen 12
+## Screen 16
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
