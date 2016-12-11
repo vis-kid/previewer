@@ -75,6 +75,15 @@ If you need to, you should go to greater detail in the paragraphs below. Below t
 
 It’s not unlike an email with a short subject line and a longer explanatory body.
 
+## Screen 03
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Highlight gap between subject line and body text
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 Between the first line and the paragraphs below is a blank line. Always! It’s not a hard rule but it seems like a standard most people have adopted by now. The reason behind this is simple. Rebase doesn’t get confused that way.
 
 If you are using vim, you can enhance your .vimrc to help you not going over the 72 characters width. We can set the textwidth to 72 characters.
@@ -107,7 +116,9 @@ git commit -m "Fix login bug"
 
 It is probably a great idea to almost never use the -m flag for messages when we commit. This feels like a bad habit that breeds lazy commit messages.
 
-Writing your commit messages using the -m flag can easily trick us being influenced by the size of the current shell itself. For example, we might have tight space in some crammed terminal next to our editor and end up with typing only a few words that don’t explain anything.
+Writing your commit messages using the -m flag can easily trick us being influenced by the size of the current shell itself.
+
+For example, we might have tight space in some crammed terminal next to our editor and end up with typing only a few words that don’t explain anything.
 
 ## Screen 05
 
@@ -233,9 +244,13 @@ laptop terminal: Pull Requests
 
 All of the above basically apply to Pull Requests as well of course—maybe even more so since it is targeted at other developers who need to make sense of your code suggestion. You want to make their lives as easy as possible with your contribution.
 
-If your team has some sort of process for code reviews before it gets merged into master or whatever, it is even more important to craft commit messages carefully I think. This can influence the team on multiple levels. Being able to approve a piece of code faster is just one aspect.
+If your team has some sort of process for code reviews before it gets merged into master or whatever, it is even more important to craft commit messages carefully I think.
 
-I guess a good overall guideline is to respect other people’s time and intelligence first and foremost. The rest is comes then easy and is icing on the cake. You will make mistakes and people will point them out to you eventually. But this is good, it is an opportunity to sharpen your skills and improve the quality of your commit process.
+This can influence the team on multiple levels. Being able to approve a piece of code faster is just one aspect.
+
+I guess a good overall guideline is to respect other people’s time and intelligence first and foremost. The rest is comes then easy and is icing on the cake.
+
+You will make mistakes and people will point them out to you eventually. But this is good, it is an opportunity to sharpen your skills and improve the quality of your commit process.
 
 In reality, you will learn all these things very quickly if you pay attention to what other developers do or don’t. It’s no rocket science after all.
 
@@ -255,7 +270,9 @@ show result in browser
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-When you stick to the ideas that compose good commit messages, then you will rarely need to do extra work for pull rquests. They will end up being one and the same. Using a tool like github, it will write your pull request message for you. If your commit message is hitting all the points, then you will have no reason to change it for the PR.
+When you stick to the ideas that compose good commit messages, then you will rarely need to do extra work for pull rquests. They will end up being one and the same.
+
+Using a tool like github, it will write your pull request message for you. If your commit message is hitting all the points, then you will have no reason to change it for the PR.
 
 
 ## Screen 15
@@ -266,6 +283,10 @@ laptop terminal: Final Thoughts
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-Overall, we wanna be able to present a story of a project through our commit history. The perceived quality of a project will most likely be influenced by they quality of your commit messages. Even the quality of individual developers or designers might be seen under a different light if you pay attention to your commit messages.
+Overall, we wanna be able to present a story of a project through our commit history. The perceived quality of a project will most likely be influenced by they quality of your commit messages.
 
-We wanna make Git pleasant to work with. Good, thoughtful commit messages play a bigger part in this as I originally thought when I started out. I recommend that you start paying attention to this little detail as soon as possible. The payoff is great. You can thank me later! But most of all, Tim Pope of course!
+Even the quality of individual developers or designers might be seen under a different light if you pay attention to your commit messages.
+
+We wanna make Git pleasant to work with. Good, thoughtful commit messages play a bigger part in this as I originally thought when I started out.
+
+I recommend that you start paying attention to this little detail as soon as possible. The payoff is great. You can thank me later! But most of all, Tim Pope of course!
