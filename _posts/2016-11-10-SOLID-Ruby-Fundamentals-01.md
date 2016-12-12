@@ -18,7 +18,7 @@ categories: [Mechanic, Nokogiri, Ruby]
 
 # SOLID?
 
-SOLID is an acronym for five design principles in object oriented design in programming.
+SOLID is an acronym for five design principles in object oriented programming.
 
 + SRP, or the “Single Responsibility Principle”.
 + Open/Closed Principle.
@@ -26,13 +26,13 @@ SOLID is an acronym for five design principles in object oriented design in prog
 + Interface Segregation Principle.
 + Dependency Inversion Principle.
 
-A lot of principles, I hear ya! Don’t let you discourage by their academic sex appeal. I assume you are new to this and are probably still dealing with a lot of basic programming concepts. The last thing you wanna stuff your into your brain right now are coding principles. Fair point! I would say though that you are maybe missing out on an opportunity to step up your game from the very beginning.
+A lot of principles, I hear ya! Don’t let you discourage by their academic sex appeal. I assume you are new to this and you are probably still dealing with a lot of basic programming concepts. The last thing you wanna stuff your into your brain right now are coding principles. Fair point! I would say though that you are maybe missing out on an opportunity to step up your game from the very beginning.
 
-If I would attempt to sum up the SOLID principles in one sentence, I would probably fail—miserably. What question do these principles address? This might be easier to answer. They were the result of thinking about how we can better manage dependencies. How can we prevent ourselves to create fast-rotting software? How can we write software with minimal entanglements? For that matter, these questions are of equal importance for beginners and pros alike.
+If I would attempt to sum up the SOLID principles in one sentence, I would probably fail—miserably. What question do these principles address? This might be easier to answer. They were the result of thinking about how we can better manage dependencies. How can we write software with minimal entanglements?  How can we prevent ourselves from creating fast-rotting software? For that matter, these questions are of equal importance to beginners and pros alike.
 
-It is not uncommon for newbies to think that they need to wait until they are ready to jump into more advanced waters. And that might be right in some regards. These design principles are different though. I feel like they are beginner-friendly and they will improve the quality of your code from day one. They will help you to design your code the way professionals do—at least you will start looking at your code as the big boys & girls do. What’s not to like?
+It is not uncommon for newbies to think that they need to wait until they are ready to jump into more advanced waters like this. And that might be right in some regards. These design principles are different though. I feel like they are beginner-friendly and they will improve the quality of your code from day one. They will help you to design your code the way professionals do—at least you will start looking at your code as the big boys & girls do. What’s not to like?
 
-Are these principles appropriate for a dynamic language like Ruby? After all, when SOLID was formed, it was in an era of statically typed Java and C++ programming. Good question! Yes, static languages have stronger dependencies but there is no reason to throw these principles out the window when you write Ruby code. They will teach you basic techniques of how you can modularize and stabilize your code.
+Are these principles appropriate for a dynamic language like Ruby? After all, when SOLID was formed, it was in an era more dominated by statically typed Java and C++ programming. Good question! Yes, static languages might have stronger dependencies but there is no reason to throw these principles out the window when you write Ruby code. They will teach you basic techniques of how you can modularize and stabilize your code.
 
 Stabilize? Yes, in the sense that you will be better equipped to write code that is less brittle and better prepared for the inevitable changes down the line. The ease with which you are able to change a code base is in direct correlation to its quality. I recommend that you start thinking about this early in your developer career. You can start by giving these OO design principles a little sneak peak.
 
