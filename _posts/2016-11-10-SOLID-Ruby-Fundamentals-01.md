@@ -533,7 +533,7 @@ Let’s go over each of them and check their responsibilities. If you would like
 
 ## module ExtractionUtilities
 
-We could have extracted some more but for now I felt it would be overkill to split the module up. If I would amass more methods like dasherize, I would start thinking to find a better home for them. Since I need these utilities in more than one place I chose a module for now and include these methods where needed. I felt the `class PageExtractor` shouldn’t be concerned about stuff like striping pipe characters or building tags from the extracted data. That way we also increase the likelihood that we can reuse them.
+We could have extracted some more but for now I felt it would be overkill to split the module up. If I would amass more methods like dasherize, I would start thinking to find a better home for them. Since I need these utilities in more than one place I chose a module for now and include these methods where needed. I felt the `class PageExtractor` shouldn’t be concerned about stuff like striping pipe characters or building tags from the extracted data. That way we also increase the likelihood that we can reuse functionality.
 
 #### module ExtractionUtilities
 
@@ -583,7 +583,7 @@ This class now has one responsibility, extracting the data from the link it was 
 
 They are made private to not mess with the API of this class while providing the convenience of looking up the implementation of scraping various selectors—without needing to go to another class or module. I felt they belong better into this class since they are in charge of actually scraping the data that we export in the options hash.
 
-The class includes a module that takes care of smaller utility functions like `clean_episode_number`, `clean_date` and ` build_tags`. As always, trade offs are part of the game. I had to weigh readability and cohesiveness when I decided to put these methods into a module. It might now be immediately clear where they come from, but on the other hand, their implementation might not be needed to be investigated most of the time. We saved some space in the private section of this class and put them into a module that fits their purpose better.
+The class includes a module that takes care of smaller utility functions like `clean_episode_number`, `clean_date` and `build_tags`. As always, trade offs are part of the game. I had to weigh readability and cohesiveness when I decided to put these methods into a module. It might not be immediately clear where they come from, but on the other hand, their implementation might not be needed to be investigated most of the time. We saved some space in the private section of this class and put them into a module that fits their purpose better.
 
 #### class PageExtractor
 
@@ -739,6 +739,22 @@ Back to the drawing board. The private method above needs another look.
 
 ``` ruby
 
+class PageWriter
+
+  attr_reader :detail_page_link
+
+  def initialize(detail_page_link)
+    @detail_page_link = detail_page_link
+  end
+
+  def write_page
+    text          = MarkdownComposer.new(detail_page_link).prepare_markdown
+    file_name     = MarkdownComposer.new(detail_page_link).prepare_filename
+
+    File.open(file_name, 'w') { |file| file.write(text) }
+  end
+end
+
 class MarkdownComposer
   include ExtractionUtilities
 
@@ -791,31 +807,31 @@ HEREDOC
   end
 end
 
-class PageWriter
-
-  attr_reader :detail_page_link
-
-  def initialize(detail_page_link)
-    @detail_page_link = detail_page_link
-  end
-
-  def write_page
-    text          = MarkdownComposer.new(detail_page_link).prepare_markdown
-    file_name     = MarkdownComposer.new(detail_page_link).prepare_filename
-
-    File.open(file_name, 'w') { |file| file.write(text) }
-  end
-end
-
 ```
 
-So we shifted things around a bit. Big deal! Sure, that is one way to see it, but now we have a `PageWriter` class that is not dabbling in the responsibilities of composing markdown. Since the bulk of the work that we wanna achieve culminated in the creation of `.markdown` files with the data for each episode, it is more appropriate to let `MarkdownComposer do the heavy lifting. Clear cut responsibilities. And these decisions can frequently be necessary to keep the size of classes in check. Good class design will lead to touch tangential classes less and less when you introduce new code, or delete old one.
+So we shifted things around a bit, big deal! Sure, that is one way to see it, but now we have a `PageWriter` class that is not dabbling too much into the responsibilities of composing markdown (we will improve the design even more when we get to injecting dependencies in the next article).
+
+Since the bulk of the work that we wanna achieve culminated in the creation of `.markdown` files with the data for each episode, it is more appropriate to let `MarkdownComposer` do the heavy lifting. Clear cut responsibilities. Moving things around like this can frequently be necessary to keep the size of classes in check. Good class design will lead to touch tangential classes less and less when you introduce new code, or delete old one.
 
 But! Doesn’t the `PageWriter` class still feel a bit smelly? After all, it does handle the prepping of filenames and markdown text. Sure, it has a single method, `write_page`, but its responsibilities can be split up even more. As a last step before we move forward, I suggest we create another class that is in charge of `FilenameComposition` and adjust `PageWriter` to make use of it. 
 
 ## PageWriter v.3
 
 ``` ruby
+
+class PageWriter
+
+  attr_reader :text, :file_name
+
+  def initialize(detail_page_link)
+   @text          = MarkdownComposer.new(detail_page_link).prepare_markdown
+   @file_name     = FilenameComposer.new(detail_page_link).prepare_filename
+  end
+
+  def write_page
+    File.open(file_name, 'w') { |file| file.write(text) }
+  end
+end
 
 class MarkdownComposer
 
@@ -877,20 +893,6 @@ class FilenameComposer
 
   def episode_number
     extracted_data[:episode_number]
-  end
-end
-
-class PageWriter
-
-  attr_reader :text, :file_name
-
-  def initialize(detail_page_link)
-   @text          = MarkdownComposer.new(detail_page_link).prepare_markdown
-   @file_name     = FilenameComposer.new(detail_page_link).prepare_filename
-  end
-
-  def write_page
-    File.open(file_name, 'w') { |file| file.write(text) }
   end
 end
 
@@ -1121,5 +1123,7 @@ end
 Scraper.new.scrape
 
 ```
+
+# Final Thoughts
 
 Let’s stop here and call it a day. I recommend that you play with this code a bit on your own and see if you can come up with other strategies than class extraction to simplify things even more. There are other things to optimize for. Let’s see if we can take this a step further in the next SOLID article about the “Open/Closed Principle”. See you there.
