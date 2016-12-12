@@ -14,7 +14,6 @@ categories: [Mechanic, Nokogiri, Ruby]
 + SRP: Single Responsibility Principle
 + Semi-Random Thoughts
 + Extract Class
-+ Scraper Example
 
 # SOLID?
 
@@ -169,11 +168,11 @@ The SOLID design principles are a great way to start thinking about good design.
 
 ## And / Or
 
-If you need “and” or “or” in the description of the purpose, the functionality in a particular class, you can bet that applying SRP is a good idea. Both scenarios imply that it does more than one focused thing. As mentioned above, nothing is set in stone, there is no approach that fits all scenarios, but at least it should raise the question if it might be a good idea to refactor your code until “and” and “or” is out of that classe’s elevator pitch.
+If you need “and” or “or” in the description of the purpose, the functionality in a particular class, you can bet that applying SRP is a good idea. Both scenarios imply that it does more than one focused thing. As mentioned above, nothing is set in stone, there is no approach that fits all scenarios, but at least it should raise the question if it might be a good idea to refactor your code until “and” and “or” is out of that class’s elevator pitch.
 
 ## Hard
 
-“Nothing good comes easy” as they say. Maybe, I give you that. In the beginning it will be relatively easy to break models into focused classes that do one thing. That will be your foundation to move forward into more complex waters. Take your time to build this base with care. Rushing is not your friend.
+“Nothing good comes easy” as they say. Maybe, I give you that. In the beginning it will be relatively easy to break models into focused classes that do one thing. That will be your foundation to move forward into more complex waters. Take your time to build this base with care. Rushing is not your friend. You don’t go fast by writing bad code. That’s for sure. Chances are pretty good that the opposite is adequate.
 
 Once complexity kicks in, it becomes a lot harder to break objects apart. I mean, there is no way around it. It will happen anyway, but with a good foundation you can build higher and more stable—as with buildings. It will get harder over time, that is probably for sure. But at the same time, the problems also get more interesting, more challenging. It is a fun process that you might actually enjoy. Embrace it!
 
@@ -198,20 +197,9 @@ chances are good that your responsibilites are well spread and managed. This kee
 
 # Extract Class
 
-Spaghetti in your code? What should can I do? SRP, you will very often require you to extract classes. This is a very common refactoring method. If you have a bigger class with many responsibilities, you will end up needing more classes that have smaller, more focused jobs.
+Spaghetti in your code? What should you do? SRP, you will very often require you to extract classes. This is a very common refactoring method. If you have a bigger class with many responsibilities, you will end up needing more classes that have smaller, more focused jobs. Don’t put functions that change for different reasons into the same class. That means you can organize your classes around functions that change for the same reason.
 
-
-You don’t go fast by writing bad code. That’s for sure. Chances are pretty good that the opposite is adequate.
-
-Rigidity in your code means that you need to modify a bunch of seemingly unrelated stuff when you touch one thing. You can only create a new state of consistency once the other dpendencies are taken care of. There are various degrees of course, but the treashold, the line to cross is not that big.
-
-You cannot make an isolated change without changing everything around it. Bad dependencies. 
-
-Fragility. Breaking things in many places that seem unrelated to the one place that actually changed. like butterfly effect.
-
-Don’t put functions that change for different reasons into the same class. That means you can organize you classes around functions that change for the same reason.
-
-# Scraper Example
+## Scraper Example
 
 In my last article about scraping websites, I built a small scraper to get data off my podcast [Between \| Screens](http://betweenscreens.fm/). I left the readers with a small exercise to play with. Since it was another article that was targeted at coding newbies, I wanted the readers to take the code and play with it. The exercise was to find ways to refactor that piece of code once they wrapped their heads around it. 
 
