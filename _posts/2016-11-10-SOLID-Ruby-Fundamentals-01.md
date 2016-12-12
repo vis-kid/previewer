@@ -179,7 +179,7 @@ Once complexity kicks in, it becomes a lot harder to break objects apart. I mean
 
 ## Payoff
 
-Good design will pay off, similar to having a test suite around. It might cost you a little bit of extra effort in the beginning, but you will be glad going forward that have built on solid ground. Once you start to feel a need to fight your app all the time, you will wish back the good times where the application was young and perfect. At time where you had an easy opportunity to apply solid design.
+Good design will pay off, similar to having a test suite around. It might cost you a little bit of extra effort in the beginning, but going forward, you will be glad that you have built on solid ground. Once you feel the need to fight your app all the time, you will wish you could go back to the good times where the application was young and perfect. A time where you had an easy opportunity to build a solid design basis.
 
 Good design takes time in the beginning, as does TDD. No doubt about it! But you can count on being better prepared for changing conditions down the line. Actually, it will most likely cost you extra money if you don’t pay attention to design in your application. Cleaning up spaghetti code takes time and costs big bucks. Ouch!
 
@@ -194,7 +194,7 @@ When your code is
 + easily composeable
 + context independent
 
-chances are good that your responsibilites are well spread and managed. This keeps your classes and methods small. These factors directly lead to better maintainability. Coupling for example just another fancy term for dependencies. Managing dependencies is a huge chunk of your actual work as a software writer and this is what SRP and SOLID in general is all about.
+chances are good that your responsibilites are well spread and managed. This keeps your classes and methods small. These factors directly lead to better maintainability. Coupling for example is just another fancy term for dependencies. Managing dependencies is a huge chunk of your actual work as a software writer and this is what SRP and SOLID in general is all about.
 
 # Extract Class
 
