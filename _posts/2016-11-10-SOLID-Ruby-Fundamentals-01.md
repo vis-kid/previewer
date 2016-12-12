@@ -44,11 +44,11 @@ Your classes have ideally only one responsibility. If a class is focused on only
 
 ## Reasons to Change
 
-Reasons to change roughly equal responsibilities. If you have a class with five different jobs, you have a good chance of ending up with five reasons to change. Say we have a class that sets a session, sends email which also gets validated and does the weather forecast for the next week? If any of these things change, the rest of the class is possibly affected by that. This is exactly what SRP wants us to avoid. This is the brittleness we talk about.
+Reasons to change roughly equals responsibilities. If you have a class with five different jobs, you have a good chance of ending up with five reasons to change. Say we have a class that sets a session, sends email which also gets validated and does the weather forecast for the next week? If any of these things change, the rest of the class is possibly affected by that. This is exactly what SRP wants us to avoid. This is the brittleness we talk about.
 
-So we want to have one class that handles everything in regards to forecasting the weather, one that is in charge of sending email, one that creates a session and one that handles calculating the weather forecast. Maybe even two for that. One that handles the weather forecast for a week and another who is in charge of the next 24 hours.
+So we want to have one class that handles everything in regards to forecasting the weather, one that is in charge of sending email, one that creates a session and one that handles calculating the weather forecast. Maybe even two for that. One that handles the weather forecast for a week and another which is in charge of the next 24 hours.
 
-When you look at this picture below, you can clearly see what you should avoid. This is a tool that tries to be too many things. It sure looks funny, I give you that, but at the same time it doesn’t look that useful either, does it?. Try to carry that around in your pocket, hell, even  holding it in your hands is an artistic challenge. That is the kind of class design we want to avoid. We want to keep things simple and organized. In terms of swiss army knife, we prefer one tool at a time.
+When you look at this picture below, you can clearly see what you should avoid. This is a tool that tries to be too many things. It sure looks funny, I give you that, but at the same time it doesn’t look that useful either, does it?. Try to carry that around in your pocket, hell, even  holding it in your hands is an acrobatic challenge. That is the kind of class design we want to avoid. We want to keep things simple and organized. In terms of swiss army knives, we prefer one tool at a time.
 
 (https://www.flickr.com/photos/redjar/113974357)
 
@@ -56,11 +56,11 @@ When you look at this picture below, you can clearly see what you should avoid. 
 
 ## Cohesive Classes
 
-Classes should be highly cohesive. Every piece of a class should be highly related to other pieces of a class. In our imaginary example from above, the weather forecast is not highly related to email validation, sending email or creating a session. So we end up with weak cohesion which basically let’s your app rot from the inside. You are setting up the dynamite to blow up the house you are living in yourself.
+Classes should be highly cohesive. Every piece of a class should be highly related to other pieces of a class. In our imaginary example from above, the weather forecast is not highly related to email validation, sending email or creating a session. So we end up with weak cohesion which basically let’s your app rot from the inside. You are setting up the dynamite to blow up the house you are living in.
 
 O.K., let’s not overdramatize these things, I was just trying to find a strong metaphor that sticks with you. Nobody is gonna loose his life or anything, but some people might loose their minds if these things pile up for years and suddenly the need for change hits you hard. Entangling large pieces of spaghetti code could literally break a product if people loose the ability to rebuild the application with the components at hand.
 
-Let’s talk Rails for a second. In Rails, people often put stuff in ApplicatioController or ApplicationHelper that often are not very cohesive by nature. It’s a top-level object that can easily collect a bunch of inconvenient stuff. You will often see applications where they act as a dumpsters for stuff that the lazy fix didn’t compose a better home for. This can quickly get out of hand and pile on stuff from all over the place. Just because it’s easy to use these compartments for “global” stuff, doesn’t mean that we should stop there. We need to take the time to compose our objects with their dedicated responsibilities in mind. Also, even as beginners, we already know that global stuff is rarely in our best self-interest.
+Let’s talk Rails for a second. In Rails, people put tons of stuff in ApplicatioController or ApplicationHelper that are often not very cohesive by nature. It’s a top-level object that can easily collect a bunch of inconvenient stuff. You will often see applications where they act as a dumpsters for stuff that the lazy fix didn’t compose a better home for. This can quickly get out of hand and pile on stuff from all over the place. Just because it’s easy to use these compartments for “global” stuff, doesn’t mean that we should stop there. We need to take the time to compose our objects with their dedicated responsibilities in mind. Also, even as beginners, we already know that global stuff is rarely in our best self-interest.
 
 ## Changes
 
@@ -75,8 +75,6 @@ We don’t want to create applications where everything is connected to everythi
 https://www.flickr.com/photos/baccharus/5817342671
 
 ![Alt text](/images/SOLID/cable-mess.jpg)
-
-image. hammer arcade game
 
 ## Benefits
 
@@ -97,34 +95,33 @@ Breaking classes into focused components have a few benefits that can easily go 
 In this section I just wanna quickly discuss a few topics that fit into this whole context. The “Single Responsiblity Principle” has everything to do with the following considerations:
 
 + Clarity
-+ Reuseability
-+ Easy Tests
++ Reusability
++ Easier to Test
 + Easy to Change
 + Code Quality
 + Downloading Context
 + Boundries
++ God Classes
 + Gem Churn
 + Bugs
-+ God Classes
 + Silver Bullet
 + Good Design?
++ And / Or
 + Hard
-+ Benefits
-+ Changes
 + Payoff
 + SRP Symptoms
 
 ## Clarity
 
-You want to avoid classes that have too much going on. If they start to feel blobby and you need to take some time to figure out what’s actually going on, it’s probably a good time to refactor its responsibilities. SRP aids the need for readable classes as well. Long, convoluted classes are not exactly as easy read. In that sense, big classes can often be a smell they they took on too many responsibilities. Applying SRP will have an immediate effect on the clarity of these objects. They will end up being more focused and succinct. Always optimize for readability. Your fellow coders are still human. 
+You want to avoid classes that have too much going on. If they start to feel blobby and you need to take some time to figure out what’s actually going on, it’s probably a good time to refactor its responsibilities. SRP aids the need for readable classes as well. Long, convoluted classes are not exactly as easy to read. In that sense, big classes can often be a smell that they took on too many responsibilities. Applying SRP will have an immediate effect on the clarity of these objects. They will end up being more focused and succinct. Always optimize for readability. Your fellow coders are still human. 
 
-## Reuseability
+## Reusability
 
-Ideally, you want your classes to handle one responsibility well so that you can reuse that functionality in other places as well. Keeping things isolated, in the own little scope, is a good guideline to end up with small components that increase the chance of being useful some place else. Ideally they can be recycled in your code.
+Ideally, you want your classes to handle one responsibility well so that you can reuse that functionality in other places as well. Keeping things isolated, in their own little scope, is a good guideline to end up with small components that increase the chance of being useful some place else. Ideally they can be recycled in your code.
 
-## Easier to Test
+## Easy to Test
 
-When you don’t have classes that are too involved and frankly all over the place, you can write much more focused and readable tests as well. Your tests are probably a good indicator of the quality of your your classes’ design. With single responsibilities, they also run faster because of reduced dependencies. This really is all about exposure.
+When you don’t have classes that are too involved, and frankly all over the place, you can write much more focused and readable tests as well. Your tests are probably a good indicator of the quality of your your classes’ design. With single responsibilities, they also run faster because of reduced dependencies. This really is all about exposure.
 
 Look out for tests that are hard to set up and involve a lot of dependencies. That’s a good indicator that you should spend some time on simplifying the class design. Besides tests being slower, if classes don’t follow SRP, they will also be more brittle along they way. Your classes and your tests will change, this is the one certainty you have. The less responsibilities you encapsulate in classes, the less brittle your code will end up being.
 
@@ -136,7 +133,7 @@ Flexibility and resiliency are two important qualities you want to have from eve
 
 ## Code Quality
 
-For senior software writers, the ease of being able to change code when the requirements necessitate that, is one of their highest metric to assess code quality. They have seen all kinds of trends and cool new stuff. What they often look out for is simplicity and elegance. Code that has adaptability built in is a good indicator of a software writer that aims to produce quality software—not only quick fixes that cater to short-term needs only.
+For senior software writers, the ease of being able to change code when the requirements necessitate it, is one of their highest metrics to assess code quality. They have seen all kinds of trends and cool new stuff but what they often look out for is simplicity and elegance. Code that has adaptability built in is a good indicator of a software writer that aims to produce quality software—not only quick fixes that cater to short-term needs.
 
 ## Downloading Context
 
@@ -146,11 +143,11 @@ Also, what developers need to load into their heads in this context, is often wh
 
 ## Boundries
 
-Often you don’t know from the beginning how the responsibilities are spread. Therefore you should not over-optimize from the start. It’s really hoard to know the journey is headed. It’s best to evolve your code to become SRP friendly step by step. Some classes will end up being magnets for responsibilities while others are likely to be a lot more lazy in piling stuff up.
+Often you don’t know from the beginning how the responsibilities are spread. Therefore you should not over-optimize from the start. It’s really hard to know where the journey is headed. It’s best to evolve your code to become SRP friendly step by step. Some classes will end up being magnets for responsibilities while others are likely to be a lot more lazy in piling stuff up.
 
 ## God Classes
 
-White we’re at it. Always think hard before you add something to models like User. It is such an attractive magnet for all sorts of things in most applications. This and the class that tackles the heart of the business logic logic, like bookmarking in a bookmarking app for example. You should be especially hawk-eyed with these. If you don’t pay attention they can quickly become black holes in your code, devouring tons of responsibilities at once. We call them god classes because they know too much about other classes’ inner businesses.
+White we’re at it. Always think hard before you add something to models like User. It is such an attractive magnet for all sorts of things in most applications. This and the class that tackles the heart of the business logic, like bookmarking in a bookmarking app for example. You should be especially hawk-eyed with these. If you don’t pay attention they can quickly become black holes in your code, devouring tons of responsibilities at once. We call them god classes because they know too much about other classes’ inner businesses.
 
 ## Gem churn
 
@@ -166,19 +163,19 @@ You will often have to weigh different principles against each other. SRP is no 
 
 ## Good design?
 
-Dependencies tell you how change is gonna propagate throughout your code. Many dependencies create a sort of pressure to not change things. Worse if yo don’t know what to what extend a little change will ripple through your code.
+Dependencies tell you how change is gonna propagate throughout your code. Many dependencies create a sort of pressure to not change things. Worse if you don’t know to what extend a little change will ripple through your code.
 
 The SOLID design principles are a great way to start thinking about good design. People with decades of experience extracted some real hard lessons for you to reap. Keeping dependencies in check is on top of their list when it comes to code quality. We should not try to reinvent the wheel too much and build upon their shoulders.
 
 ## And / Or
 
-If you need “and” or “or” in the description of the purpose, the functionality in a particular class, you can bet that applying SRP is a good idea. Both scenarios imply that it does more than one focused thing. As mentioned above, nothing is set in stone, there is no one truth fits all scenario, but at least it should raise the question if it might be a good idea to refactor your code until “and” and “or” is out of that classe’s elevator pitch.
+If you need “and” or “or” in the description of the purpose, the functionality in a particular class, you can bet that applying SRP is a good idea. Both scenarios imply that it does more than one focused thing. As mentioned above, nothing is set in stone, there is no approach that fits all scenarios, but at least it should raise the question if it might be a good idea to refactor your code until “and” and “or” is out of that classe’s elevator pitch.
 
-## But it is Hard
+## Hard
 
-“Nothing good comes easy” as they say. Maybe, I give you that. In the beginning it will be relatively easy to break models into focused classes that do one thing. That will be your foundation to move forward into more complex waters. Take your time to build this base with carefully. Rushing is not your friend.
+“Nothing good comes easy” as they say. Maybe, I give you that. In the beginning it will be relatively easy to break models into focused classes that do one thing. That will be your foundation to move forward into more complex waters. Take your time to build this base with care. Rushing is not your friend.
 
-Once complexity kicks in, it becomes a lot harder to break objects apart. I mean, there is no way around it. It will happen anyway, but with a good foundation you can build higher and more stable—as with buildings. It will get harder over time, that is probably for sure. But at the same time, the problems also get more interesting, more challenging. It is a fun process that you might actually enjoy. Basically, embrace it!
+Once complexity kicks in, it becomes a lot harder to break objects apart. I mean, there is no way around it. It will happen anyway, but with a good foundation you can build higher and more stable—as with buildings. It will get harder over time, that is probably for sure. But at the same time, the problems also get more interesting, more challenging. It is a fun process that you might actually enjoy. Embrace it!
 
 ## Payoff
 
