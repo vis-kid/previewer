@@ -441,19 +441,19 @@ end
 class MarkdownComposer
 
   def compose_markdown(options={})
-  <<-HEREDOC
-  --- 
-  title: #{options[:interviewee]}
-  interviewee: #{options[:interviewee]}
-  topic_list: #{options[:title]}
-  tags: #{options[:tags]}
-  soundcloud_id: #{options[:sc_id]}
-  date: #{options[:date]}
-  episode_number: #{options[:episode_number]}
-  ---
+<<-HEREDOC
+--- 
+title: #{options[:interviewee]}
+interviewee: #{options[:interviewee]}
+topic_list: #{options[:title]}
+tags: #{options[:tags]}
+soundcloud_id: #{options[:sc_id]}
+date: #{options[:date]}
+episode_number: #{options[:episode_number]}
+---
 
-  #{options[:text]}
-  HEREDOC
+#{options[:text]}
+HEREDOC
   end
 end
 
@@ -663,19 +663,19 @@ The next class is even smaller. It takes the extracted info from the options has
 class MarkdownComposer
 
   def compose_markdown(options={})
-  <<-HEREDOC
-  --- 
-  title: #{options[:interviewee]}
-  interviewee: #{options[:interviewee]}
-  topic_list: #{options[:title]}
-  tags: #{options[:tags]}
-  soundcloud_id: #{options[:sc_id]}
-  date: #{options[:date]}
-  episode_number: #{options[:episode_number]}
-  ---
+<<-HEREDOC
+--- 
+title: #{options[:interviewee]}
+interviewee: #{options[:interviewee]}
+topic_list: #{options[:title]}
+tags: #{options[:tags]}
+soundcloud_id: #{options[:sc_id]}
+date: #{options[:date]}
+episode_number: #{options[:episode_number]}
+---
 
-  #{options[:text]}
-  HEREDOC
+#{options[:text]}
+HEREDOC
   end
 end
 
