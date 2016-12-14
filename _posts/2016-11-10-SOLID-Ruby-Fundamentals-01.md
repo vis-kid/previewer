@@ -91,7 +91,7 @@ Breaking classes into focused components have a few benefits that can easily go 
 
 # Semi-Random Thoughts
 
-In this section I just wanna quickly discuss a few topics that fit into this whole context. The “Single Responsiblity Principle” has everything to do with the following considerations:
+In this section I just wanna quickly discuss a few topics that fit into this whole context. The “Single Responsibility Principle” has everything to do with the following considerations:
 
 + Clarity
 + Reusability
@@ -99,7 +99,7 @@ In this section I just wanna quickly discuss a few topics that fit into this who
 + Easy to Change
 + Code Quality
 + Downloading Context
-+ Boundries
++ Boundaries
 + God Classes
 + Gem Churn
 + Bugs
@@ -140,7 +140,7 @@ If the classes are smaller, you will give other team members and your future sel
 
 Also, what developers need to load into their heads in this context, is often what you will end up needing to load as dependencies in your tests. Not exactly ideal in many ways..
 
-## Boundries
+## Boundaries
 
 Often you don’t know from the beginning how the responsibilities are spread. Therefore you should not over-optimize from the start. It’s really hard to know where the journey is headed. It’s best to evolve your code to become SRP friendly step by step. Some classes will end up being magnets for responsibilities while others are likely to be a lot more lazy in piling stuff up.
 
@@ -193,7 +193,7 @@ When your code is
 + easily composeable
 + context independent
 
-chances are good that your responsibilites are well spread and managed. This keeps your classes and methods small. These factors directly lead to better maintainability. Coupling for example is just another fancy term for dependencies. Managing dependencies is a huge chunk of your actual work as a software writer and this is what SRP and SOLID in general is all about.
+chances are good that your responsibilities are well spread and managed. This keeps your classes and methods small. These factors directly lead to better maintainability. Coupling for example is just another fancy term for dependencies. Managing dependencies is a huge chunk of your actual work as a software writer and this is what SRP and SOLID in general is all about.
 
 # Extract Class
 
@@ -205,7 +205,7 @@ In my last article about scraping websites, I built a small scraper to get data 
 
 In the article I focused solely on the functionality, the API and how readers can use [Nokogiri](http://www.nokogiri.org/) / [Mechanize](https://github.com/sparklemotion/mechanize) to extract data from websites. I thought I don’t want to muddy the waters with code smells and refactorings in that context. After all, I expect most of my readers to be freshly hatched coders. Confusing newbies with various different concepts at the same time was something I disliked starting out.
 
-I gave a little hint that extracting classes is a good way to start getting this code in better shape. Let’s use this code and see how we can encapsulate it into objects that focus on simple responsibilities. If the example feels a little dense, I recommend that you go back to at least the third article in the series. You will find detailed explanations for every method this webscraper is executing. 
+I gave a little hint that extracting classes is a good way to start getting this code in better shape. Let’s use this code and see how we can encapsulate it into objects that focus on simple responsibilities. If the example feels a little dense, I recommend that you go back to at least the third article in the series. You will find detailed explanations for every method this web scraper is executing. 
 
 ## Raw Podcast Scraper
 
@@ -533,7 +533,7 @@ Let’s go over each of them and check their responsibilities. If you would like
 
 ## module ExtractionUtilities
 
-We could have extracted some more but for now I felt it would be overkill to split the module up. If I would amass more methods like dasherize, I would start thinking to find a better home for them. Since I need these utilities in more than one place I chose a module for now and include these methods where needed. I felt the `class PageExtractor` shouldn’t be concerned about stuff like striping pipe characters or building tags from the extracted data. That way we also increase the likelihood that we can reuse functionality.
+We could have extracted some more but for now I felt it would be overkill to split the module up. If I would amass more methods like `dasherize`, I would start thinking to find a better home for them. Since I need these utilities in more than one place I chose a module for now and include these methods where needed. I felt the `class PageExtractor` shouldn’t be concerned about stuff like striping pipe characters or building tags from the extracted data. That way we also increase the likelihood that we can reuse functionality.
 
 #### module ExtractionUtilities
 
@@ -570,7 +570,7 @@ end
 
 ## class PageExtractor
 
-This class now has one responsibility, extracting the data from the link it was fed in the loop that visits every podcast episode. It returns an options hash that stores the data we needed from the shownotes site. It has a few private methods that are cohesive enough to not extract into another object on their own.
+This class now has one responsibility, extracting the data from the link it was fed in the loop that visits every podcast episode. It returns an options hash that stores the data we needed from the show notes site. It has a few private methods that are cohesive enough to not extract into another object on their own.
 
 + `interviewee`
 + `title`
