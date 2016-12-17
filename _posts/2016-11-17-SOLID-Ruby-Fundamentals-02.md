@@ -796,7 +796,7 @@ Proper method naming can also play into the whole closed for modification theme.
 
 ## Scraper
 
-Where does this lead to? Where are all these injected objects ending up? Good question. I decided to put them high up in the food chain so to speak. These injected objects kinda bubble up and often enable you to make changes in one or a few places—instead of all over the place.
+Where do all these objects lead to? Where are all these injected objects ending up? Good question. I decided to put them high up in the food chain so to speak. These injected objects kinda bubble up and often enable you to make changes in one or a few places—instead of all over the place.
 
 #### Before
 
@@ -848,14 +848,14 @@ end
 
 ```
 
-`Scraper` is now in charge of instantiating the objects in play and injects them into their respective targets. Here we build up all the objects that are needed to write the markdown page. We sort of feed them into each other, bottom-up. If we need to make changes, we can do that in one central place—in contrast to doing it in multiple places at once.
+`Scraper` is now in charge of instantiating the objects in play and injects them into their respective targets. Here we build up all the objects that are needed to write the markdown page. We sort of feed them into each other, top to bottom. If we need to make changes, we can do that in one central place—in contrast to doing it in multiple places at once.
 
-Instead of passing each page link to `PageWriter`, we directly pass it to the class who scrapes the data from the page. Nobody else needs to know about it. `PageExtractor` takes the link, clicks it, saves its state, follows it to the shownotes and provides `MarkdownComposer` and `FileComposer` all the abilities to prepare the markdown text and the filename from that particular page. In turn, `PageWriter` get injected with the former two which are needed to write out the new page containing the extracted data.
+Instead of passing each page link to `PageWriter`, we directly pass it to the class who scrapes the data from the page. Nobody else needs to know about it. `PageExtractor` takes the link, clicks it, saves its state, follows it to the shownotes and provides `MarkdownComposer` and `FileComposer` all the abilities to prepare the markdown text and the filename from that particular page. In turn, `PageWriter` gets injected with the former two which are needed to write out the new page containing the extracted data.
 
 
 ## Complete Scraper After Dependency Injection
 
-I did a couple of other tweaks while shuffling the code around but I don’t think they are worth mentioning here. Take a look at the complete code after dependency injection. I think we made some good progress in terms of the ”Open/Closed Principle”. The code is better equipped to deal with future changes. OCP helped to tighten the responsibilities we tried to isolate using the “Single Responsibility Principle”. The code below hopefully shows that both principles have a symbiotic thing going on.
+I did a couple of other tweaks while shuffling the code around but I don’t think they are worth mentioning here. Take a look at the complete code after the dependency injection refactorings. I think we made some good progress in terms of the ”Open/Closed Principle”. The code is better equipped to deal with future changes. OCP helped to tighten the responsibilities we tried to isolate using the “Single Responsibility Principle”. The code below hopefully shows that both principles have a symbiotic thing going on.
 
 ``` ruby
 
@@ -1042,19 +1042,6 @@ Scraper.new.scrape
 
 ```
 
+## Final Thoughts
 
-
-
-
-
-
-The class is not as ignorant as it could be. it knows about pageextractor.
-
-We have a strong link here.
-
-What is obvious above, is that if we change the name of the  PageExtractor class or change the extract_data method, we need to come here as well. 
-
-in the new methods, MarkdownComposer only knows that the injected object responds to the `extract_data` methods???
-
-It allows us to only use the interface of an injected dependency but not coupled to the creation of ...
-
+That’s it for now. I encourage you to play with the code some more. I’m sure there are several other ways to make this work with OCP in mind. We have three more principles left in SOLID. Let’s find out if we can apply more of them to improve this piece of code.
