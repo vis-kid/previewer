@@ -682,7 +682,7 @@ end
 
 ## PageWriter
 
-The `initialize` method of `PageWriter` is smelly as well. We instantiate it with two objects and feed it another link the class itself has no business of knowing about. I have more to say about passing this link around for scraping, but first things first. What I like the least about the scenario here is that if we need additional data from either of these injected objects, we would need to modify the `initialize` method.
+The `initialize` method of `PageWriter` is smelly as well. We instantiate it with two objects and feed it another link the class itself has no business of knowing about. I have more to say about passing this link around for scraping, but first things first. What I like the least about this scenario here is that if we need additional data from either of these injected objects, we would need to modify the `initialize` method.
 
 #### class PageWriter
 
@@ -728,11 +728,11 @@ O.K., back to my rant about the `detail_page_link` that was passed around too mu
 + `FilenameComposer`
 + `PageWriter`
 
-That might not look like a big win but overall, this little change reduced a pretty sneaky dependency that previously trickled through the whole scraper. This was possibly the smelliest part we needed to improve. It was passed around too much. Adhering to the “Single Responsibility Principle” was not enough.
+That might not look like a big win but overall but this little change reduced a pretty sneaky dependency that previously trickled down through the whole scraper. This was possibly the smelliest part we needed to improve. It was passed around too much. Adhering to the “Single Responsibility Principle” was not enough.
 
-After injecting `PageExtractor` in a couple of classes, we could not only strengthen the responsibility aspect, we could encapsulate this parameter in one place where it is actually put to work. By injecting responsibilities, we could encapsulate this parameter only where it is instantiated. That means less duplication as well. You can see that applying sane coding principles also create nice side effects along the way. The feed off of each other—the same goes for the opposite as well of course.
+After injecting `PageExtractor` in a couple of classes, we could not only strengthen the responsibility aspect, we could encapsulate this parameter in one place where it is actually put to work. You can see that applying sane coding principles also creates nice side effects along the way. They feed off of each other—the same goes for the opposite as well of course.
 
-Naming methods adequately can play a significant part towards improved OCP as well. If you name and build methods to have a sharp focus, they will less likely fall victim to change as well. For example, `write_page` or `write_markdown_page` can make a critical difference if you decide to add the behaviour of writing HTML pages later on. Chances are good that we would need to touch `write_page` in that scenario—at the very least we would need to rename it in order to easily differentiate it from the `write_html_page`. Even the names for `file_name` and `text` will turn out to be problematic. What file name and what text are we exactly talking about?
+Naming methods adequately can play a significant part towards improved OCP as well. If you name and build methods to have a sharp focus, they will less likely fall victim to change as well. For example, `write_page` or `write_markdown_page` can make a critical difference if you decide to add the behaviour of writing HTML pages later on. Chances are good that we would need to touch `write_page` in that scenario—at the very least we would need to rename it in order to easily differentiate it from the `write_html_page`. Even the names for `file_name` and `text` would turn out to be problematic. What file name and what text are we exactly talking about?
 
 #### before
 
