@@ -18,13 +18,13 @@ categories: [Mechanic, Nokogiri, Ruby]
 
 # OCP
 
-The “Open/Closed Principle” simply states that you should be able to extend a class’s behavior without modifying it. Open for extension, closed for modification. At closer distance, this means that a class or module should be cool with extension but avoid modification. To some extend this can be useful for functions as well.
+The “Open/Closed Principle” simply states that you should be able to extend a class’ behavior without modifying it. Open for extension but closed for modification. A class or module should be cool with extending its functionality but avoids modification of existing code. To some extend this can be useful for functions as well.
 
-Why, what’s the beef with modification? Ideally, when you put a class into production, you don’t want to change it. We want to avoid taking chances of introducing bugs. The same goes for other clients who rely on our work. Changing existing code frequently endangers possibly such relationships. Changing behaviour of a class that clients rely on could impact all of their clients as well. The ripple effects can go far beyond your code. Not good!
+Why, what’s the beef with modification? Ideally, when you put a class into production, you don’t want to change it. We want to avoid taking chances in regards to introducing bugs. The same goes for other clients who rely on our work. Changing existing code frequently possibly endangers such relationships. Changing behaviour of a class that clients rely on could impact all of their clients  because the ripple effects can go far beyond your own code. Not good!
 
-What about bugs? Are we allowed to bug fix without adhering to OCP? Of course, that is always ok. In that case you have to change the class. I guess it’s fair to say that this principle at its core wants to manage change—at least the rate of it. Since this is a constant companion in our work, it is important to keep it in check where we can. Single responsibilities are one thing, not needing to modify them is a different story though. In practice, both SRP and OCP seem to have symbiotic existences. OCP often helps with attaining SRP
+What about bugs? Are we allowed to fix bugs without adhering to OCP? Of course, that is always ok. In that case you have to change the class. I guess it’s fair to say that this principle at its core wants to manage change—at least the rate of it. Since this is a constant companion in our work, it is important to keep it in check where we can. Single responsibilities are one thing, not needing to modify them is a different story though. In practice, both SRP and OCP seem to have symbiotic existences. OCP often helps with attaining SRP
 
-Changing the behavior is O.K., extending the behavior is O.K. We just want to be able to do that without changing existing code. That is the trick—as well as the tricky part. How can we have classes that stay the same? We achieve this with abstraction. We’re not living in a perfect world where we can always achieve OCP. It would be an idealistic scenario that you probably can’t achieve completely. Code that never changes is not on the table.
+Changing behavior is O.K. Extending behavior is O.K. We just want to be able to do that without changing existing code as little as possible. That is the trick—as well as the tricky part. How can we have classes that stay the same? We achieve this with abstraction. We’re not living in a perfect world where we can always achieve OCP. It would be an idealistic scenario that you probably can’t achieve completely. Code that never changes is not on the table.
 
 # Composition over inheritance
 
@@ -32,17 +32,17 @@ OCP was originally thought of in the context of inheritance. But we learned that
 
 Classes have better focus if they don’t mix concerns. If  an object is solely focused on extracting content, its cohesion is stronger than say a class that is also busy with composing markdown files. Strong cohesion reduces the chances of changing existing code because we separated concerns—basically, split up responsibilities. A single responsibility is the strongest cohesion you can get in a class.
 
-When you compose objects, you have a lot more freedom to break up the functionality into discrete, encapsulated objects that are less dependent of each other. Inheritance can introduce a lot more “garbage” down the line. If objects inherit from various ancestors, the responsibilities can pile up quickly. The encapsulation between parent objects and their inheritors is not exactly strong.
+When you compose objects, you have a lot more freedom to break up the functionality into discrete, encapsulated objects that are less dependent on each other. Inheritance can introduce a lot more “garbage” down the line. If objects inherit from various ancestors, the responsibilities can pile up quickly. The encapsulation between parent objects and their inheritors is not exactly strong.
 
 The biggest downside to composition is a matter of context that you need to load in your brain. Composition is easily plagued by indirection. That simply means that the components in play can end up being all over the place and can seem harder to put together. That kind of specialized encapsulation will lead to more objects that we need to keep track of. Sometimes, the cost of indirection might be too big. Using inheritance instead can be a good compromise. I think a good guideline is to reach for composition first and only go for inheritance solutions if necessary. All that being said, increased indirection is always a side effect when you work towards OCP.
 
 # Dependency Injection
 
-Through DI, we are feeding a class new behavior without changing it. A dependency can be easily injected within the constructor. We pass an object into the targeted class without letting it know what this object is all about. This technique allows us to extend already existing classes without modifying them. Since this is a frequent strategy to follow OCP, I thought we should give it a quick look. It’s also useful in terms of keeping objects simple and adhering to SRP.  
+Through Dependency Injection, DI, we are feeding a class new behavior without changing it. A dependency can be easily injected within the constructor. We pass an object into the targeted class without letting it know what this object is all about. This technique allows us to extend already existing classes without modifying them. Since this is a frequent strategy to follow OCP, I thought we should give it a quick look. It’s also useful in terms of keeping objects simple and adhering to SRP.  
 
-Injecting dependencies sounds like a mouthful, I know. We inject behavior into classes without creating tight coupling between them. In fact, the less the injected class knows about other classes, the better off the all are. Ignorance is bliss in Object Oriented Design—maybe. Or “in part”, as politicians like to spin their arguments. Since this seems to be a lofty goal to achieve, I don’t want to propagate it as a rule of sorts.
+Injecting dependencies sounds like a mouthful, I know. We inject behavior into classes without creating tight coupling between them. In fact, the less the injected class knows about other classes, the better off they are. Ignorance is bliss in Object Oriented Design—maybe. Or “in part”, as politicians like to spin their arguments. Since this seems to be a lofty goal to achieve, I don’t want to propagate it as a rule of sorts.
 
-It’s pretty clear that if a class uses the behavior of another class, the code is more brittle due to coupling. What we also reduce the reuseability with stronger dependencies. We want to make this connection as small and as flexible as possible. Smarter coupling makes mocking code dependencies in our tests a lot easier as well.
+It’s pretty clear that if a class uses the behavior of another class, the code is more brittle due to coupling. We also reduce the reusability with stronger dependencies. We want to make this connection as small and as flexible as possible. Smarter coupling makes mocking code dependencies in our tests a lot easier as well.
 
 When we need to refer to another class through its name directly, we create a strong relationship, a stronger dependency between them. If you change the name of the class or its API, things break more easily. The amount of breakage is something we can try to limit with OCP in mind.
 
@@ -51,7 +51,7 @@ When we need to refer to another class through its name directly, we create a st
 
 Refactoring with OCP in mind should make the code simpler and less coupled. The logic should be more focused in each class. We will instantiate the objects in play at the highest layer—instead of all over the place. Classes will know a lot less about each other and will end up being more flexible to face changes. 
 
-Below is an example from the code of the previous article. As I mentioned at the end of that article, it wasn’t done in terms of refactoring. I hope it was clear that the previous refactorings targeted the “Single Responsibility Principle” first and foremost. I left the code in that condition because it was still not addressing the Open/Closed Principle in a few places.
+Below is an example from the code of the previous article. I mentioned that it wasn’t done in terms of refactoring. Hopefully it was clear that the previous refactorings targeted the “Single Responsibility Principle” first and foremost. Now we can improve upon that code with OCP in mind.
 
 Please take another look and view it through the lens of what you have learned so far about being open for extension and closed for modification. There are definitely some issues here that make the code unnecessarily brittle. Think about how we can use dependency injection to decouple the affected classes.
 
@@ -250,15 +250,15 @@ Scraper.new.scrape
 
 ## Injected Dependencies
 
-Let’s dig in! For example, `MarkdownComposer` knows too much of another class, `PageExtractor`. Unnecessarily so. It knows the class’ name, the method `extract_data` and its argument `detail_page` for instantiation. `MarkdownCompoer` can and should be more ignorant of these. Sure, it needs to know a little bit for using the behavior of another objects. We can limit the extend though. Knowing the details about the `detail_page_link` is  also not exactly the business of a class that is dealing with markdown.
+Let’s dig in! For example, `MarkdownComposer` knows too much of another class, namely `PageExtractor`. Unnecessarily so. It knows the class’ name, the method `extract_data` and its argument `detail_page` for instantiation. `MarkdownCompoer` can and should be more ignorant of these. Sure, it needs to know a little bit for using the behavior of another objects. We can limit the extend though. Knowing the details about the `detail_page_link` is  also not exactly the business of a class that is dealing with markdown.
 
-When we inject dependencies we avoid having that affected object creating these dependencies themselves. It’s like outsourcing that responsibility. As a result you have more flexibility and less coupling. But for our purposes here, also fewer reasons to change due to less coupling. Let’s go through the major changes step by step and talk about the improvements we can make.
+When we inject dependencies we can avoid that the affected objects create these dependencies themselves. It’s like outsourcing that responsibility. As a result, you have more flexibility and less coupling. But for our purposes here, also fewer reasons to change due to less coupling. Let’s go through the major changes step by step and talk about the improvements we can make.
 
 ## PageExtractor
 
-The object that does most of the dirty work and get injected most is `PageExtractor`. We need to prepare it a bit first before we inject other classes with it. On the surface, this class didn’t change dramatically but I could delete one method that was not ready for change or elegant dependency injection.
+The object that does most of the dirty work and gets injected most is `PageExtractor`. We need to prepare it a bit first before we inject other classes with it. On the surface, this class didn’t change dramatically but I could delete one method that was not ready for change or elegant dependency injection.
 
-`extract_data` was handy for spiking out the original idea but it made the code brittle and the API awkward. If I would have decided to extract more data than the hash provided, I would have had one more reason to change the class because of that method.
+`extract_data` was handy for spiking out the original idea but it made the code brittle and the API awkward. If I would decide to extract more data than the hash provided, I would have had one more reason to change the class because of that method.
 
 #### Before
 
@@ -385,7 +385,7 @@ end
 
 After the refactoring, this class alone will be in charge of the link to each page we scrape for data. It saves the state of each page which can then be passed into the injected classes to do their bidding. Each method that is left is focused on one specific extraction job only. We left little reason to change but opened every opportunity to extend the code easily. Scraping another object from a page without modifying existing code is no problem anymore.
 
-The class is now ready to let the injected `page_extractor` objects do their bidding directly. You will see that shorty in action below. That also lead to a nicer API. No need to pass this hash object around anyway. The class is simpler and ready for extension without a bottleneck. 
+The class is now ready to be injected and do its bidding directly as `page_extractor` objects. You will see that in action below shortly. That also lead to a nicer API. No need to pass this hash object around anymore. The class is simpler and ready for extension without a bottleneck. 
 
 
 ## MarkdownComposer -> TextComposer
@@ -422,15 +422,9 @@ class TextComposer
 
 ```
 
-The most obvious change is that the class name is now different. I figured it would be more flexible if I leave the door open for extension. Other classes might benefit as well. If I need to add the ability to compose `.html` or `.txt` files, I already have a home for them.
+The most obvious change is that the class name for `MarkdownComposer` is different. I figured it would be more flexible as `TextComposer`. Other classes might benefit from that change as well. If I need to add the ability to compose `.html` or `.txt` files, I already have a home for them. It would only be logical to go from preparing markdown to preparing HTML and beyond. All without changing existing code and with stronger cohesion.
 
-It’s easy to see that the refactored `TextComposer` is now kept in the dark about the object in charge of extracting data. Now we could easily change the name of  `PageExtractor`, or even swap it out completely with something different.
-
-Of course we have one dependency left in here that we should talk about. With the `page_extractor` object ready to extract inside the `TextComposer` class, it needs to do its business. That means it needs to use the API of the `PageExtractor` class at some point. That dependency stays. Therefore, if we change the method calls we might break the class that was injected with it.
-
-I hope it’s clear why this dependency is necessary and how it already improved the level of fragility in here. Also, it hopefully illustrated how change can ripple through an application and why we would rather opt for extensions than changes to existing code. It’s hard to predict how a little change can ripple through your codebase. Better err on the side of sanity and safety and minimize the risk of tight coupling as much as we can. 
-
-`TextComposer` is now also significantly simpler. We don’t need to fumble around with the options hash of extracted data. The API is also less smelly. Oh, yes and I decided to just request `markdown` without the compose part when I got rid of `compose_markdown`. It only requested a private method and was not as much needed as I thought in the beginning. Now we have a `markdown` method in charge for that kind of text and it would be easy to add `txt` or `html` methods without changing existing code. OCP!
+`TextComposer` is now also significantly simpler. We don’t need to fumble around with the options hash of extracted data. The API is also less smelly. Oh, yes and I decided to get rid of `prepare_markdown`. It only requested a private method `compose_markdown` which was not as much needed as I thought in the beginning. My bad! Now we have a `markdown` method in charge for that kind of text and it would be easy to add `txt` or `html` methods. OCP!
 
 #### before
 
@@ -477,6 +471,14 @@ HEREDOC
 ``` 
 
 A nice improvement I think. Reads better, feels cleaner and doesn’t need an argument. If I would need to edit the file I wanna compose, say I extract additional data, I would need to open `markdown`. In such a case, I don’t see a way around modifying existing code without introducing irrational complexity. Other than that, the overall class is small, ignorant and focused.
+
+???
+It’s easy to see that the refactored `TextComposer` is now kept in the dark about the object in charge of extracting data. Now we could easily change the name of  `PageExtractor`, or even swap it out completely with something different.
+
+Of course we have one dependency left in here that we should talk about. The `page_extractor` object is ready to extract inside the `TextComposer` class. That means it needs to use the API of the `PageExtractor` class at some point. That dependency stays. Therefore, if we change its method calls, we might break the class that was injected with it.
+
+I hope it’s clear why this dependency is necessary and how it already improved the level of fragility in here. Also, it hopefully illustrated how change can ripple through an application and why we would rather opt for extensions than changes to existing code. It’s hard to predict how a little change can ripple through your codebase. Better err on the side of sanity and safety and minimize the risk of tight coupling as much as you can. 
+
 
 #### class TextComposer (refactored)
 
