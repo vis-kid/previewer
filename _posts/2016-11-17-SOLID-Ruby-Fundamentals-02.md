@@ -470,14 +470,13 @@ HEREDOC
 
 ``` 
 
-A nice improvement I think. Reads better, feels cleaner and doesn’t need an argument. If I would need to edit the file I wanna compose, say I extract additional data, I would need to open `markdown`. In such a case, I don’t see a way around modifying existing code without introducing irrational complexity. Other than that, the overall class is small, ignorant and focused.
+A nice improvement I think. Reads better, feels cleaner and doesn’t need an extra argument for instantiation. If I would need to edit the file I wanna compose, say I extract additional data, I would need to open `markdown`. In such a case, I don’t see a way around modifying existing code without introducing irrational complexity. Other than that, the overall class is small, ignorant and focused.
 
-???
 It’s easy to see that the refactored `TextComposer` is now kept in the dark about the object in charge of extracting data. Now we could easily change the name of  `PageExtractor`, or even swap it out completely with something different.
 
 Of course we have one dependency left in here that we should talk about. The `page_extractor` object is ready to extract inside the `TextComposer` class. That means it needs to use the API of the `PageExtractor` class at some point. That dependency stays. Therefore, if we change its method calls, we might break the class that was injected with it.
 
-I hope it’s clear why this dependency is necessary and how it already improved the level of fragility in here. Also, it hopefully illustrated how change can ripple through an application and why we would rather opt for extensions than changes to existing code. It’s hard to predict how a little change can ripple through your codebase. Better err on the side of sanity and safety and minimize the risk of tight coupling as much as you can. 
+I hope it’s clear why this dependency is necessary and how it already improved the level of fragility in here. It hopefully illustrates how change can ripple through an application and why we would rather opt for extensions than changes to existing code. It’s hard to predict how a little change can ripple through your codebase. Better err on the side of sanity and safety and minimize the risk of tight coupling as much as you can. 
 
 
 #### class TextComposer (refactored)
@@ -513,9 +512,9 @@ end
 
 ## FilenameComposer
 
-Let’s have a look at the next class. `FilenameComposer` has the same issues as the previous class. Also, both classes’ initializers are kinda overly motivated. They instantiate an instance of `PageExtractor` and feed it a link acquired from the `Scraper` class. On top of that, they also `extract_data` right away. Ok, not super bad for a first attempt, but this code is nowhere near production ready. This is a good example how refactoring is a never-ending sandblasting process that often involves multiple steps and attempts.
+Let’s have a look at the next class. `FilenameComposer` has the same issues as the previous class. Both classes’ initializers were overly motivated. They instantiated an instance of `PageExtractor` and feed it a link acquired from the `Scraper` class. On top of that, they also `extract_data` right away. Ok, not super bad for a first attempt, but this code is nowhere near production ready. This is a good example how refactoring is a never-ending sandblasting process that often involves multiple steps and attempts.
 
-#### class FilenameComposer
+#### before
 
 ``` ruby
 
@@ -534,7 +533,7 @@ class FilenameComposer
 
 We can use the same refactoring as in `TextComposer`. This little change alone made the code not only simpler but more flexible along the way. The initializers became ignorant and straightforward. Nothing to trip over really.
 
-#### class FilenameComposer Refactored
+#### after
 
 ``` ruby
 
@@ -642,6 +641,40 @@ We can also simplify the way we compose the final file name.
   end
 
   ...
+
+```
+
+### class FilenameComposer Refactored
+
+``` ruby
+
+class FilenameComposer
+  include ExtractionUtilities
+
+  attr_reader :page_extractor
+
+  def initialize(page_extractor)
+    @page_extractor = page_extractor
+  end
+
+  def md_filename
+    "#{date}-#{interviewee}-#{episode_number}.html.erb.md" 
+  end
+
+  private
+
+  def date
+    page_extractor.date
+  end
+
+  def interviewee
+    dasherize(page_extractor.interviewee)
+  end
+
+  def episode_number
+    page_extractor.episode_number
+  end
+end
 
 ```
 
